@@ -120,8 +120,6 @@ npm run lint
 
 ## Deployment
 
-See [docs/SETUP.md](docs/SETUP.md) for full deployment guide.
-
 ### Quick Deploy
 
 1. Push to `main` branch
@@ -136,7 +134,3 @@ See [docs/SETUP.md](docs/SETUP.md) for full deployment guide.
 3. Commit changes (`git commit -m "Add feature"`)
 4. Push to branch (`git push origin feature/name`)
 5. Open a Pull Request
-
-## License
-
-MIT
