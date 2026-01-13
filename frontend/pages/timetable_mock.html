@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Timetable Management – Wireframe</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<style>
+    * {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f7f9fc;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.menu a {
+  display: block;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  color: #374151;
+  cursor: pointer;
+}
+
+.menu a.active {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  font-size: 12px;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 24px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.actions .btn {
+  margin-left: 10px;
+}
+
+/* Buttons */
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #0ea5e9;
+  color: #fff;
+}
+
+.btn.outline {
+  background: #fff;
+  border: 1px solid #d1d5db;
+}
+
+/* Filters */
+.filters {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.chips {
+  display: flex;
+  gap: 10px;
+}
+
+.chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  font-size: 13px;
+}
+
+.chip.active {
+  background: #bae6fd;
+}
+
+/* Content */
+.content {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+}
+
+/* Timetable */
+.timetable {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.grid-header {
+  display: grid;
+  grid-template-columns: 80px repeat(5, 1fr);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 80px repeat(5, 1fr);
+  grid-auto-rows: 80px;
+  gap: 10px;
+}
+
+.time {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Cards */
+.card {
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+}
+
+/* Color tokens */
+.blue { background: #e0f2fe; }
+.green { background: #ecfdf5; }
+.red { background: #fee2e2; }
+.yellow { background: #fef3c7; }
+.purple { background: #ede9fe; }
+.pink { background: #fce7f3; }
+.orange { background: #ffedd5; }
+.cyan { background: #cffafe; }
+
+.conflict {
+  background: #fee2e2;
+  border: 1px dashed #ef4444;
+}
+
+/* Break */
+.break {
+  grid-column: 1 / -1;
+  text-align: center;
+  background: repeating-linear-gradient(
+    45deg,
+    #f3f4f6,
+    #f3f4f6 10px,
+    #e5e7eb 10px,
+    #e5e7eb 20px
+  );
+  padding: 10px;
+  font-size: 12px;
+}
+
+/* Empty */
+.empty {
+  border: 2px dashed #e5e7eb;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+/* Unscheduled */
+.unscheduled {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.unscheduled input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+}
+
+.item {
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.hint {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+</style>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">EduManage</div>
+
+    <nav class="menu">
+      <a>Dashboard</a>
+      <a>Students</a>
+      <a>Staff</a>
+      <a class="active">Timetable</a>
+      <a>Exams</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <small>Alex Morgan</small>
+      <span>Admin</span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Header -->
+    <header class="header">
+      <div>
+        <h1>Timetable Management</h1>
+        <p>Class Schedule · Grade 10A · Term 1, 2024</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn outline">Export</button>
+        <button class="btn primary">Save Changes</button>
+      </div>
+    </header>
+
+    <!-- Filters -->
+    <section class="filters">
+      <select>
+        <option>Grade 10A</option>
+      </select>
+
+      <div class="chips">
+        <span class="chip active">All Subjects</span>
+        <span class="chip">Science Dept</span>
+        <span class="chip">Math Dept</span>
+        <span class="chip">Humanities</span>
+      </div>
+    </section>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Timetable Grid -->
+      <section class="timetable">
+
+        <div class="grid-header">
+          <span></span>
+          <span>Monday</span>
+          <span>Tuesday</span>
+          <span>Wednesday</span>
+          <span>Thursday</span>
+          <span>Friday</span>
+        </div>
+
+        <div class="grid">
+
+          <!-- Time -->
+          <div class="time">08:00</div>
+          <div class="card blue">Mathematics</div>
+          <div class="card green">Physics</div>
+          <div class="empty"></div>
+          <div class="card blue">Mathematics</div>
+          <div class="card yellow">History</div>
+
+          <div class="time">09:00</div>
+          <div class="card purple">English Lit</div>
+          <div class="card red">Chemistry</div>
+          <div class="card green">Biology</div>
+          <div class="card green">Physics</div>
+          <div class="empty"></div>
+
+          <div class="break">RECESS BREAK</div>
+
+          <div class="time">10:30</div>
+          <div class="card yellow">History</div>
+          <div class="card conflict">Geography<br><small>Conflict</small></div>
+          <div class="card pink">Art & Design</div>
+          <div class="empty">Free</div>
+          <div class="card red">Chemistry</div>
+
+          <div class="time">11:30</div>
+          <div class="card orange">PE</div>
+          <div class="card yellow">History</div>
+          <div class="card purple">English Lit</div>
+          <div class="card cyan">Geography</div>
+          <div class="card blue">Mathematics</div>
+
+        </div>
+      </section>
+
+      <!-- Unscheduled Panel -->
+      <aside class="unscheduled">
+        <h3>Unscheduled</h3>
+        <input placeholder="Search subjects..." />
+
+        <div class="list">
+          <div class="item">Calculus II</div>
+          <div class="item">Geometry</div>
+          <div class="item">Physics Lab</div>
+          <div class="item">Biology Intro</div>
+        </div>
+
+        <p class="hint">
+          Drag items onto the grid to schedule them.
+        </p>
+      </aside>
+
+    </div>
+
+  </main>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const grade = "Grade 10A";
+
+  loadUnscheduled();
+  loadTimetable();
+
+  /* -----------------------------
+     FETCH & RENDER
+  ------------------------------ */
+
+  function loadTimetable() {
+    fetch(`/api/timetable/fetch.php?grade=${grade}`)
+      .then(r => r.json())
+      .then(renderTimetable);
+  }
+
+  function loadUnscheduled() {
+    fetch("/api/timetable/unscheduled.php")
+      .then(r => r.json())
+      .then(renderUnscheduled);
+  }
+
+  function renderTimetable(data) {
+    document.querySelectorAll(".cell").forEach(c => c.innerHTML = "");
+
+    data.forEach(item => {
+      const cell = document.querySelector(
+        `.cell[data-day="${item.day}"][data-start="${item.start_time}"]`
+      );
+
+      if (!cell) return;
+
+      cell.appendChild(createClassCard(item, true));
+    });
+  }
+
+  function renderUnscheduled(classes) {
+    const container = document.getElementById("unscheduled-list");
+    container.innerHTML = "";
+
+    classes.forEach(c => {
+      container.appendChild(createClassCard(c, false));
+    });
+  }
+
+  /* -----------------------------
+     CARD CREATION
+  ------------------------------ */
+
+  function createClassCard(data, scheduled) {
+    const card = document.createElement("div");
+    card.className = "class-card";
+    card.draggable = true;
+
+    card.dataset.classId = data.id || data.class_id;
+
+    card.innerHTML = `
+      <strong>${data.subject}</strong>
+      <small>${data.teacher || ""}</small>
+      <span>${data.room || ""}</span>
+    `;
+
+    card.addEventListener("dragstart", dragStart);
+
+    if (scheduled) {
+      card.dataset.slotId = data.slot_id;
+      card.addEventListener("dblclick", () => removeFromTimetable(card));
+    }
+
+    return card;
+  }
+
+  /* -----------------------------
+     DRAG & DROP
+  ------------------------------ */
+
+  let draggedCard = null;
+
+  function dragStart(e) {
+    draggedCard = this;
+    setTimeout(() => this.classList.add("dragging"), 0);
+  }
+
+  document.querySelectorAll(".cell").forEach(cell => {
+    cell.addEventListener("dragover", e => e.preventDefault());
+    cell.addEventListener("drop", () => handleDrop(cell));
+  });
+
+  function handleDrop(cell) {
+    if (!draggedCard) return;
+
+    const payload = {
+      class_id: draggedCard.dataset.classId,
+      day: cell.dataset.day,
+      start_time: cell.dataset.start,
+      end_time: cell.dataset.end,
+      grade: cell.dataset.grade
+    };
+
+    fetch("/api/timetable/schedule.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (!res.success) {
+        flashConflict(cell);
+        return;
+      }
+
+      cell.appendChild(draggedCard);
+      draggedCard.classList.remove("dragging");
+      draggedCard = null;
+    });
+  }
+
+  /* -----------------------------
+     REMOVE / RESCHEDULE
+  ------------------------------ */
+
+  function removeFromTimetable(card) {
+    fetch("/api/timetable/delete.php", {
+      method: "POST",
+      body: new URLSearchParams({ slot_id: card.dataset.slotId })
+    }).then(() => {
+      document.getElementById("unscheduled-list").appendChild(card);
+    });
+  }
+
+  /* -----------------------------
+     UI FEEDBACK
+  ------------------------------ */
+
+  function flashConflict(cell) {
+    cell.classList.add("conflict");
+    setTimeout(() => cell.classList.remove("conflict"), 800);
+  }
+});
+
+</script>
+</body>
+</html>

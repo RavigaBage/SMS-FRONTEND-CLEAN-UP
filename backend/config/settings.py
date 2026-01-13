@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts",
     "ratelimit",
+    "timetable"
 ]
 
 MIDDLEWARE = [
