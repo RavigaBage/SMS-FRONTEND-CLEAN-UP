@@ -1,0 +1,129 @@
+
+:root {
+  --primary: #1e3a8a;
+  --emerald: #059669;
+  --amber: #d97706;
+  --red: #b91c1c;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --border: #e5e7eb;
+  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --radius: 14px;
+}
+
+.dashboardWrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  padding: 40px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboard {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Header */
+.header {
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.header p {
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filters select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-weight: 500;
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+/* Table Card */
+.tableCard {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.gradesTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gradesTable thead {
+  background: #f1f5f9;
+}
+
+.gradesTable th, 
+.gradesTable td {
+  padding: 18px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.gradesTable th {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.gradesTable tbody tr {
+  border-top: 1px solid var(--border);
+  transition: background 0.25s ease;
+}
+
+.gradesTable tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Score */
+.score {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* Grade Badges */
+.grade {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.gradeA { background: #ecfdf5; color: var(--emerald); }
+.gradeB { background: #e0f2fe; color: #0284c7; }
+.gradeC { background: #fffbeb; color: var(--amber); }
+.gradeD { background: #fee2e2; color: var(--red); }
+
+/* Remarks */
+.remark {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.footerSpace {
+  height: 40px;
+}

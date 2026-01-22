@@ -1,7 +1,8 @@
 // frontend/src/assets/components/management/StudentTable.tsx
 import Link from "next/dist/client/link";
+import { Student } from "../../types/api";
 
-export function StudentTable({ students }: { students: any[] }) {
+export function StudentTable({ students }: { students: Student[] }) {
   return (
     <div className="bg-white border-x border-b rounded-b-2xl overflow-hidden">
       <table className="w-full text-left">
@@ -21,7 +22,7 @@ export function StudentTable({ students }: { students: any[] }) {
               <td className="px-6 py-4 font-bold text-cyan-600">{student.id}</td>
               <td className="px-6 py-4">
                     <Link 
-                  href={`/students/profile`} //${student.id.replace('#', '')} but for now we use "profile"
+                  href={`/students/${student.id}`}
                   className="flex items-center gap-3 hover:text-cyan-600 transition-colors"
                 >
                   <img src={student.profileImage} className="w-9 h-9 rounded-full bg-slate-100" />

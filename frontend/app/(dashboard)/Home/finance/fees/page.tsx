@@ -8,7 +8,7 @@ import DeletePopup from "@/components/ui/deletepopup";
 import LoaderPopup from "@/components/ui/loader";
 import CellAction from "@/components/ui/cellAction";
 import FeeRow from "@/components/ui/feeConfig";
-import "@/styles/finance.css";
+import "@/styles/fees.css";
 
 
 type FormDataType = {

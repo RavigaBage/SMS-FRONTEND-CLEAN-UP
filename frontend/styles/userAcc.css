@@ -1,0 +1,207 @@
+/* users.css */
+:root {
+  --primary: #1e3a8a;
+  --emerald: #059669;
+  --amber: #d97706;
+  --red: #b91c1c;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --border: #e5e7eb;
+  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --radius: 14px;
+}
+
+.dashboardWrapper {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 40px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.header h1 {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.header p {
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.controls input, .controls select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  outline: none;
+}
+
+/* Table Card */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px;
+  margin-bottom: 40px;
+  overflow-x: auto;
+}
+
+.userTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.userTable th, .userTable td {
+  padding: 16px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.userTable thead {
+  background: #f1f5f9;
+}
+
+.userTable tbody tr {
+  border-top: 1px solid var(--border);
+}
+
+/* Status Badges */
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.activeStatus { background: #ecfdf5; color: var(--emerald); }
+.inactiveStatus { background: #fee2e2; color: var(--red); }
+
+/* Actions */
+.actionGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBtn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.btnEdit { color: #2563eb; border: 1px solid #2563eb; }
+.btnDeactivate { color: var(--red); border: 1px solid var(--red); }
+.btnReset { color: var(--emerald); border: 1px solid var(--emerald); }
+
+.actionBtn:hover { opacity: 0.7; }
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.pageBtn {
+  background: #f1f5f9;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.pageBtn.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modalContent {
+  background: white;
+  padding: 32px;
+  border-radius: var(--radius);
+  width: 450px;
+  max-width: 90%;
+  box-shadow: var(--shadow);
+}
+
+.modalContent h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.modalLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+/* Buttons */
+.primaryBtn {
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondaryBtn {
+  background: #f1f5f9;
+  color: var(--text-dark);
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}

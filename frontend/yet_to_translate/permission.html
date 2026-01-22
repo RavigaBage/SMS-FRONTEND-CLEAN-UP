@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Permissions Management | School Management System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #1e3a8a;
+  --teal: #0d9488;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --border: #e5e7eb;
+  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --radius: 14px;
+  --toggle-bg: #cbd5e1;
+  --toggle-active: #0d9488;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-dark);
+}
+
+/* Layout */
+.dashboard {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.header h1 {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.header p {
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Buttons */
+button {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+button.primary-btn {
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: white;
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+}
+
+button.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(37,99,235,0.35);
+}
+
+button.secondary-btn {
+  background: #f1f5f9;
+  color: var(--text-dark);
+  font-size: 14px;
+}
+
+button.secondary-btn:hover {
+  background: #e2e8f0;
+}
+
+/* Card */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px;
+  margin-bottom: 40px;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+thead {
+  background: #f1f5f9;
+}
+
+th, td {
+  padding: 16px;
+  font-size: 14px;
+  text-align: left;
+}
+
+th {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+tbody tr {
+  border-top: 1px solid var(--border);
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: var(--toggle-bg);
+  border-radius: 34px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.25s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.25s;
+}
+
+input:checked + .slider {
+  background-color: var(--toggle-active);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* Modal / Panel */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15,23,42,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 32px;
+  width: 450px;
+  max-width: 90%;
+  box-shadow: var(--shadow);
+}
+
+.modal-content h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.modal-content input,
+.modal-content select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* Footer spacing */
+.footer-space {
+  height: 40px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>Permissions Management</h1>
+      <p>Configure roles and module access for users</p>
+    </div>
+    <button class="primary-btn" onclick="openModal()">Create Role</button>
+  </div>
+
+  <!-- Permissions Table -->
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Students</th>
+          <th>Staff</th>
+          <th>Classes</th>
+          <th>Attendance</th>
+          <th>Exams</th>
+          <th>Finance</th>
+          <th>Reports</th>
+          <th>Settings</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Administrator</td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+        </tr>
+        <tr>
+          <td>Teacher</td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+        </tr>
+        <tr>
+          <td>Accountant</td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-space"></div>
+</div>
+
+<!-- Modal / Create Role Panel -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2>Create Custom Role</h2>
+    <label for="role-name">Role Name</label>
+    <input type="text" id="role-name" placeholder="Enter role name">
+
+    <label for="role-permissions">Permissions</label>
+    <p style="font-size:13px; color:#64748b; margin-bottom:8px;">Enable module access for this role</p>
+
+    <div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+      <label>Students <label class="switch"><input type="checkbox" checked><span class="slider"></span></label></label>
+      <label>Staff <label class="switch"><input type="checkbox"><span class="slider"></span></label></label>
+      <label>Classes <label class="switch"><input type="checkbox" checked><span class="slider"></span></label></label>
+      <label>Attendance <label class="switch"><input type="checkbox" checked><span class="slider"></span></label></label>
+      <label>Exams <label class="switch"><input type="checkbox"><span class="slider"></span></label></label>
+      <label>Finance <label class="switch"><input type="checkbox"><span class="slider"></span></label></label>
+      <label>Reports <label class="switch"><input type="checkbox" checked><span class="slider"></span></label></label>
+      <label>Settings <label class="switch"><input type="checkbox"><span class="slider"></span></label></label>
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:flex-end;">
+      <button class="secondary-btn" onclick="closeModal()">Cancel</button>
+      <button class="primary-btn">Create Role</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal() {
+  document.getElementById('modal').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+</script>
+
+</body>
+</html>

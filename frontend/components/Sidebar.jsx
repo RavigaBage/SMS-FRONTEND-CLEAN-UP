@@ -23,7 +23,7 @@ export default function Sidebar() {
       <div className={styles.navSection}>
         <div className={styles.navHeader}>Main Menu</div>
 
-        <Link href="/dashboard" className={`${styles.navItem} ${styles.active}`}>
+        <Link href="/Home/" className={`${styles.navItem} ${styles.active}`}>
           <div className={styles.navItemContent}>
             <div className={styles.navIcon}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -49,35 +49,35 @@ export default function Sidebar() {
 
           {openMenu === "academic" && (
             <div className={`submenu ${openMenu === "academic" ? "open" : ""}`}>
-              <Link href="/dashboard/classes" className={styles.submenuItem}>
+              <Link href="/Home/Academics/classes/" className={styles.submenuItem}>
                 <div><svg viewBox="0 0 24 24" height="24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
                 Classes
               </Link>
-              <Link href="/dashboard/enrollments" className={styles.submenuItem}>
+              <Link href="/Home/Academics/enrollment/" className={styles.submenuItem}>
                 <div className="sideIcons">
                   <svg viewBox="0 0 24 24" height="24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
                 </div>
                 Enrollments
               </Link>
-              <Link href="/dashboard/grades" className={styles.submenuItem}>
+              <Link href="/Home/Academics/grades" className={styles.submenuItem}>
                 <div className="sideIcons">
                   <svg viewBox="0 0 24 24" height="24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
                 </div>
                 Grades
               </Link>
-              <Link href="/Academics/subjects" className={styles.submenuItem}>
+              <Link href="/Home/Academics/subjects" className={styles.submenuItem}>
                 <div className="sideIcons">
                   <svg viewBox="0 0 24 24" height="24"  fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                 </div>
                 Subjects
               </Link>
-               <Link href="/dashboard/examSetup" className={styles.submenuItem}>
+               <Link href="/Home/Academics/exam" className={styles.submenuItem}>
                 <div className="sideIcons">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/><path d="M8 14l-4 4"/><path d="M16 4l4 4"/></svg>
                 </div>
                 Exam setup
               </Link>
-               <Link href="/dashboard/transcripts" className={styles.submenuItem}>
+               <Link href="/Home/Academics/transcripts" className={styles.submenuItem}>
                 <div className="sideIcons">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 </div>
@@ -122,6 +122,12 @@ export default function Sidebar() {
                 </div>
                 Teachers
               </Link>
+              <Link href="/Home/profiles/staff/profile" className={styles.submenuItem}>
+                <div className="sideIcons">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                Staff
+              </Link>
               <Link href="/Home/profiles/parents" className={styles.submenuItem}>
               <div>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="11" cy="7" r="4"/><circle cx="16" cy="11" r="2"/></svg>
@@ -154,7 +160,7 @@ export default function Sidebar() {
               </div>
                 Staff Details
               </Link>
-              <Link href="/dashboard/staff-attendance" className={styles.submenuItem}>
+              <Link href="/Home/hr/staffAttendance/" className={styles.submenuItem}>
               <div>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/><path d="M12 7l5 5-5 5"/></svg>
               </div>
@@ -261,7 +267,7 @@ export default function Sidebar() {
                 </div>
                 Timetables
               </Link>
-              <Link href="/dashboard/syllabi" className={styles.submenuItem}>
+              <Link href="/Home/Academics/syllabi" className={styles.submenuItem}>
                 <div className="sideIcons">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 8h7"/><path d="M9 12h7"/></svg>
                 </div>
@@ -273,7 +279,7 @@ export default function Sidebar() {
 
         <div className={styles.navHeader}>System</div>
 
-        <Link href="/dashboard/users" className={styles.navItem}>
+        <Link href="/Home/userAccount/" className={styles.navItem}>
           <div className={styles.navItemContent}>
             <div className={styles.navIcon}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><rect x="18" y="8" width="3" height="3" rx="1"/></svg>
@@ -282,7 +288,7 @@ export default function Sidebar() {
           </div>
         </Link>
 
-        <Link href="/dashboard/permissions" className={styles.navItem}>
+        <Link href="/Home/permission" className={styles.navItem}>
           <div className={styles.navItemContent}>
             <div className={styles.navIcon}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -291,7 +297,7 @@ export default function Sidebar() {
           </div>
         </Link>
 
-        <Link href="/dashboard/token-blacklist" className={styles.navItem}>
+        <Link href="/Home/TokenList" className={styles.navItem}>
           <div className={styles.navItemContent}>
             <div className={styles.navIcon}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
@@ -302,21 +308,21 @@ export default function Sidebar() {
 
         <div className={styles.navHeader}>Actions</div>
 
-        <Link href="/dashboard/settings" className={styles.navItem}>
+        <Link href="/Home/settings" className={styles.navItem}>
           <div className={styles.navItemContent}>
             <div className={styles.navIcon}>⚙️</div>
             <span>Settings</span>
           </div>
         </Link>
 
-        <div className={styles.navItem}>
+        <Link href="/Home/logout"  className={styles.navItem}>
           <div className={styles.navItemContent}>
             <div className={styles.navIcon}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             </div>
             <span>Log Out</span>
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );

@@ -1,0 +1,184 @@
+:root {
+  --primary: #1e3a8a;
+  --emerald: #059669;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --border: #e5e7eb;
+  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --radius: 14px;
+}
+
+.dashboardWrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  padding: 40px 0;
+}
+
+.dashboard {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.header p {
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.filters select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-weight: 500;
+  color: var(--text-dark);
+  cursor: pointer;
+}
+.add_subject,.filter{
+  width: 150px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: #2563eb;
+  color: var(--card);
+  box-shadow: 0px 0px 4px var(--border);
+  cursor: pointer;
+  gap:10px;
+  padding-left: 10px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+.add_subject{
+    width: 200px;
+    margin-left: auto;
+}
+
+/* Table Card */
+.tableCard {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* Table */
+.classTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.classTable thead {
+  background: #f1f5f9;
+}
+
+.classTable th, 
+.classTable td {
+  padding: 18px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.classTable th {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.classTable tbody tr {
+  border-top: 1px solid var(--border);
+  transition: background 0.25s ease;
+}
+
+.classTable tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Status Badges */
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.statusActive {
+  background: #ecfdf5;
+  color: var(--emerald);
+}
+
+.statusInactive {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.action_tr{
+  position: relative;
+}
+.actionContainer{
+  opacity: 0;
+  position: absolute;
+  top: 20px;
+  right: 130px;
+  width:180px;
+  height: fit-content;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+  border:1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+}
+.actionContainer.active {
+  opacity: 1;
+}
+
+.actionBtn {
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  height: 40px;
+  border-width: 0px;
+  outline: none;
+  background-color: transparent;
+  border-bottom: 1px solid var(--border);
+}
+
+.actionBtn:hover,.add_subject:hover {
+  transform: translateY(-1px);
+}
+
+.btnView { color: var(--primary); }
+.btnEdit { color: #2563eb; }
+.btnAssign { color: var(--emerald); }
+.btnManage { color: #9333ea; }
+
+.footerSpace {
+  height: 40px;
+}
