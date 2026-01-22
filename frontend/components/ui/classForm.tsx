@@ -121,9 +121,9 @@ export default function classForm({
     setError(false);
     setMessageMsg("Class Data Found");
 
-    const data = new FormData();
+    var FormObject = new FormData();
     Object.entries(formData).forEach(([key, value]) =>
-      data.append(key, String(value))
+      FormObject.append(key, String(value))
     );
 
     const fetchRequest = await fetch(
@@ -136,10 +136,10 @@ export default function classForm({
           "Content-Type": "application/json",
         },
         // 3. Added the data body
-        body: JSON.stringify(data),
+        body: JSON.stringify(formData),
       }
     );
-    console.log(data);
+    console.log(formData);
 if (fetchRequest.status === 400) {
   const errorDetails = await fetchRequest.json();
   console.log("The server says:", errorDetails); // This will tell you exactly what is missing
@@ -152,7 +152,7 @@ if (fetchRequest.status === 400) {
 
     const data_request = await fetchRequest.json();
     console.log("Success:", data_request);
-      console.log(data_request);
+    console.log(data_request);
   };
 
   const handleChange = (
