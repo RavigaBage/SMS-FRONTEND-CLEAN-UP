@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Subjects Management | School Management System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #1e3a8a;
+  --emerald: #059669;
+  --gray: #64748b;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --border: #e5e7eb;
+  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --radius: 14px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  color: var(--text-dark);
+}
+
+/* Layout */
+.dashboard {
+  max-width: 1300px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+.header h1 {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.header p {
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Primary Button */
+.primary-btn {
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+  transition: all 0.25s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(37,99,235,0.35);
+}
+
+/* Table Card */
+.table-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #f1f5f9;
+}
+
+th, td {
+  padding: 18px;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+tbody tr {
+  border-top: 1px solid var(--border);
+  transition: background 0.25s ease;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Status */
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.active {
+  background: #ecfdf5;
+  color: var(--emerald);
+}
+
+.status.inactive {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.actions button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.actions button.edit {
+  color: #2563eb;
+}
+
+.actions button.assign {
+  color: var(--emerald);
+}
+
+.actions button:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
+}
+
+/* Footer spacing */
+.footer-space {
+  height: 40px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>Subjects Management</h1>
+      <p>Manage academic subjects and teacher assignments</p>
+    </div>
+    <button class="primary-btn">Add Subject</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Subject Name</th>
+          <th>Class Level</th>
+          <th>Assigned Teacher</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>Mathematics</td>
+          <td>Grade 6</td>
+          <td>Mr. Daniel Mensah</td>
+          <td><span class="status active">Active</span></td>
+          <td>
+            <div class="actions">
+              <button class="edit">Edit</button>
+              <button class="assign">Assign Teacher</button>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>English Language</td>
+          <td>JHS</td>
+          <td>Mrs. Linda Asare</td>
+          <td><span class="status active">Active</span></td>
+          <td>
+            <div class="actions">
+              <button class="edit">Edit</button>
+              <button class="assign">Assign Teacher</button>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Integrated Science</td>
+          <td>SHS</td>
+          <td>—</td>
+          <td><span class="status inactive">Inactive</span></td>
+          <td>
+            <div class="actions">
+              <button class="edit">Edit</button>
+              <button class="assign">Assign Teacher</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-space"></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+:root {
+  --primary: #1e3a8a;
+  --emerald: #059669;
+  --gray: #64748b;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --border: #e5e7eb;
+  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --radius: 14px;
+}
+
+.dashboardWrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  padding: 40px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboard {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+.header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.header p {
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Primary Button */
+.primaryBtn {
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+  transition: all 0.25s ease;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(37,99,235,0.35);
+}
+
+/* Table Card */
+.tableCard {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.subjectTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.subjectTable thead {
+  background: #f1f5f9;
+}
+
+.subjectTable th, 
+.subjectTable td {
+  padding: 18px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.subjectTable th {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.subjectTable tbody tr {
+  border-top: 1px solid var(--border);
+  transition: background 0.25s ease;
+}
+
+.subjectTable tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Status Badges */
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.statusActive {
+  background: #ecfdf5;
+  color: var(--emerald);
+}
+
+.statusInactive {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Actions */
+.actionGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBtn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.actionBtn:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
+}
+
+.btnEdit { color: #2563eb; }
+.btnAssign { color: var(--emerald); }
+
+.footerSpace {
+  height: 40px;
+}
