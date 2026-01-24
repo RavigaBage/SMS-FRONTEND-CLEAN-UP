@@ -7,7 +7,7 @@ import { StudentTable } from "@/src/assets/components/management/StudentTable";
 import { AddStudentModal } from "@/src/assets/components/management/AddStudentModal";
 import { Student } from "@/src/assets/types/api";
 import { FilterBar } from "@/src/assets/components/management/FilterBar";
-
+import '@/styles/student_page.css';
 export default function StudentsManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
@@ -43,40 +43,61 @@ export default function StudentsManagementPage() {
   );
 
   return (
-    <div className="p-8 bg-slate-50 min-h-screen">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <FilterBar />
+ <div className="students-page">
+
+      {/* Page Header */}
+      <div className="page-header">
+        <div className="page-title-group">
+          <h1 className="page-title">Students</h1>
+          <p className="page-subtitle">Manage and track student records</p>
+        </div>
+
+        <div className="page-actions">
+          <button 
+            className="primary-button"
+            onClick={() => setIsModalOpen(true)}
+          >
+            + Add Student
+          </button>
+        </div>
       </div>
 
       {/* Control Bar */}
-      <div className="bg-white border-x border-t rounded-t-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <input 
-            type="text" 
+      <div className="control-bar">
+
+        <div className="search-wrapper">
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
             placeholder="Search by name or ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-cyan-100 transition-all text-sm"
+            className="search-input"
           />
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-lg border">
-          <Filter size={16} /> Filters
-        </button>
+
+        <div className="control-actions">
+          <button className="secondary-button">Filters</button>
+          <button className="ghost-button">Export</button>
+        </div>
+
       </div>
 
-      {/* Your Component */}
-      <StudentTable students={filteredStudents} />
+      {/* Table Card */}
+      <div className="table-card">
+        <StudentTable students={filteredStudents} />
+      </div>
 
-      {/* Your Modal Component */}
-      <AddStudentModal 
-        isOpen={isModalOpen} 
+      {/* Modal */}
+      <AddStudentModal
+        isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          fetchStudents(); // Refresh data after adding
-        }} 
+          fetchStudents();
+        }}
       />
+
     </div>
+
   );
 }

@@ -1,0 +1,221 @@
+/* =========================
+   Design Tokens
+========================= */
+
+:root {
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --border-light: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --primary: #06b6d4;
+  --primary-hover: #0891b2;
+  --radius-lg: 1rem;
+  --radius-md: 0.5rem;
+  --shadow-soft: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* =========================
+   Page Layout
+========================= */
+
+.students-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* =========================
+   Header
+========================= */
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.page-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.page-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* =========================
+   Buttons
+========================= */
+
+.primary-button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.primary-button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.secondary-button {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid var(--border-light);
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  background: #e2e8f0;
+}
+
+.ghost-button {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-light);
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.ghost-button:hover {
+  background: #f1f5f9;
+}
+
+/* =========================
+   Control Bar
+========================= */
+
+.control-bar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+
+  box-shadow: var(--shadow-soft);
+}
+
+/* =========================
+   Search
+========================= */
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 22rem;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.6rem 1rem 0.6rem 2.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: #f8fafc;
+  font-size: 0.85rem;
+  outline: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+}
+
+/* =========================
+   Control Actions
+========================= */
+
+.control-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* =========================
+   Table Card
+========================= */
+
+.table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+thead {
+  background: #f1f5f9;
+}
+
+th {
+  text-align: left;
+  padding: 0.75rem;
+  font-weight: 700;
+  color: #334155;
+  border-bottom: 1px solid var(--border-light);
+}
+
+td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #475569;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}

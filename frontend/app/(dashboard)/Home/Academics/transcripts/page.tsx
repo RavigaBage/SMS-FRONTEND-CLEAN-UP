@@ -1,99 +1,105 @@
-import React from 'react';
-import '@/styles/transcripts.css'
+import '@/styles/transcript_home.css'
+import Link from "next/link";
+export default function transcriptHome(){
+    return(
+        <div className="dashboard-container">
 
-export default function StudentTranscript() {
-  const academicRecords = [
-    { subject: "Mathematics", term: "Term 1", score: 88, grade: "A", remark: "Excellent" },
-    { subject: "English Language", term: "Term 1", score: 74, grade: "B", remark: "Very Good" },
-    { subject: "Integrated Science", term: "Term 1", score: 61, grade: "C", remark: "Good Effort" },
-    { subject: "Social Studies", term: "Term 1", score: 92, grade: "A", remark: "Outstanding" },
-  ];
+            <main className="content">
+                <header className="main-header">
+                    <div className="nav-filters">
+                        <div className="filter-group">
+                            <label>Select Class</label>
+                            <select className="nav-select">
+                                <option>Grade 10-B</option>
+                                <option>Grade 10-A</option>
+                                <option>Grade 9-C</option>
+                            </select>
+                        </div>
+                        <div className="filter-group">
+                            <label>Year</label>
+                            <select className="nav-select short">
+                                <option>2025/26</option>
+                                <option>2024/25</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div className="header-right">
+                        <div className="search-box">
+                            <input type="text" placeholder="Search name or ID..." />
+                        </div>
+                        <div className="header-icons">🔔</div>
+                        <div className="avatar-small"></div>
+                    </div>
+                </header>
 
-  const student = {
-    name: "Kwame Boateng",
-    class: "Grade 6A",
-    year: "2024 / 2025",
-    admissionNo: "2024/06A/015",
-    gpa: "3.8",
-    rank: "5 / 60",
-    status: "Promoted to next grade"
-  };
+                <section className="summary-grid">
+                    <div className="stat-card">
+                        <label>TOTAL STUDENTS</label>
+                        <div className="val">32</div>
+                    </div>
+                    <div className="stat-card">
+                        <label>ACTIVE STUDENTS</label>
+                        <div className="val">31</div>
+                        <span className="sub-text">1 On Leave</span>
+                    </div>
+                    <div className="stat-card">
+                        <label>ACADEMIC YEAR</label>
+                        <div className="val">2025/26</div>
+                    </div>
+                </section>
 
-  return (
-    <div className="dashboardWrapper">
-      <div className="dashboard">
-        
-        {/* Header */}
-        <header className="header">
-          <div>
-            <h1>Student Transcripts</h1>
-            <p>View, generate, and export student academic transcripts</p>
-          </div>
-          <div className="actions">
-            <button className="secondaryBtn">Generate New</button>
-            <button className="primaryBtn">Download PDF</button>
-            <button className="secondaryBtn" >Print</button>
-          </div>
-        </header>
+                <section className="table-card">
+                    <table className="student-list-table">
+                        <thead>
+                            <tr>
+                                <th>Avatar</th>
+                                <th>Student Name</th>
+                                <th>Student ID</th>
+                                <th>Class</th>
+                                <th>Status</th>
+                                <th className="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div className="student-avatar"></div></td>
+                                <td><strong>Alex Johnson</strong></td>
+                                <td>2023-8492</td>
+                                <td>Grade 10-B</td>
+                                <td><span className="status-pill active">Active</span></td>
+                                <td className="text-right"><Link href="/Home/Academics/transcripts/student"><button className="btn-table" >View Transcript</button></Link></td>
+                            </tr>
+                            <tr>
+                                <td><div className="student-avatar"></div></td>
+                                <td><strong>Sarah Miller</strong></td>
+                                <td>2023-9104</td>
+                                <td>Grade 10-B</td>
+                                <td><span className="status-pill active">Active</span></td>
+                                <td className="text-right"><Link href="/Home/Academics/transcripts/student"><button className="btn-table" >View Transcript</button></Link></td>
+                            </tr>
+                            <tr>
+                                <td><div className="student-avatar"></div></td>
+                                <td><strong>Michael Chen</strong></td>
+                                <td>2023-7721</td>
+                                <td>Grade 10-B</td>
+                                <td><span className="status-pill leave">On Leave</span></td>
+                                <td className="text-right"><Link href="/Home/Academics/transcripts/student"><button className="btn-table" >View Transcript</button></Link></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-        {/* Transcript Card */}
-        <main className="card">
-          
-          {/* Student Info Section */}
-          <section className="studentInfo">
-            <div className="studentPhoto">
-              {student.name.split(' ').map(n => n[0]).join('')}
-            </div>
-            <div className="studentDetails">
-              <h2>{student.name}</h2>
-              <p>{student.class} | Academic Year: {student.year}</p>
-              <p>Admission No: {student.admissionNo}</p>
-            </div>
-          </section>
-
-          {/* Table */}
-          <table className="transcriptTable">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Term</th>
-                <th>Score</th>
-                <th>Grade</th>
-                <th>Remarks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {academicRecords.map((record, index) => (
-                <tr key={index}>
-                  <td>{record.subject}</td>
-                  <td>{record.term}</td>
-                  <td className="gradeCell">{record.score}</td>
-                  <td className="gradeCell">{record.grade}</td>
-                  <td className="remarkCell">{record.remark}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* GPA and Summary Footer */}
-          <footer className="summarySection">
-            <div className="summaryItem">
-              <h3>GPA</h3>
-              <p>{student.gpa}</p>
-            </div>
-            <div className="summaryItem">
-              <h3>Class Rank</h3>
-              <p>{student.rank}</p>
-            </div>
-            <div className="summaryItem">
-              <h3>Final Status</h3>
-              <p style={{ color: 'var(--emerald)' }}>{student.status}</p>
-            </div>
-          </footer>
-        </main>
-
-        <div className="footerSpace"></div>
-      </div>
-    </div>
-  );
+                    <div className="pagination">
+                        <span className="page-info">Showing 1-10 of 32 Students</span>
+                        <div className="page-btns">
+                            <button className="page-btn active">1</button>
+                            <button className="page-btn">2</button>
+                            <button className="page-btn">3</button>
+                            <button className="page-btn">Next</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    )
 }

@@ -1,0 +1,99 @@
+/* Layout & Variables */
+:root {
+  --primary: #00bcd4;
+  --bg: #f5f7fa;
+  --text: #1a1a1a;
+  --border: #e0e0e0;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  gap: 24px;
+  align-items: start;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styling */
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.fee-item-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 40px;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* Invoice Document Styling */
+.invoice-document {
+  padding: 20px;
+  border: 1px solid var(--border);
+  min-height: 600px;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.invoice-table th {
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  padding: 10px;
+}
+
+.summary {
+  margin-left: auto;
+  width: 200px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.summary-row.total {
+  font-weight: bold;
+  border-top: 1px solid var(--text);
+  margin-top: 10px;
+}
+
+/* Print Logic */
+@media print {
+  .header, .form-section, .add-item-btn, .remove-btn {
+    display: none !important;
+  }
+  .main-grid {
+    display: block;
+  }
+  .invoice-preview {
+    box-shadow: none;
+    padding: 0;
+  }
+}

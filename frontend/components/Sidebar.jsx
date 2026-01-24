@@ -49,15 +49,22 @@ export default function Sidebar() {
 
           {openMenu === "academic" && (
             <div className={`submenu ${openMenu === "academic" ? "open" : ""}`}>
-              <Link href="/Home/Academics/classes/" className={styles.submenuItem}>
-                <div><svg viewBox="0 0 24 24" height="24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
-                Classes
-              </Link>
+
               <Link href="/Home/Academics/enrollment/" className={styles.submenuItem}>
                 <div className="sideIcons">
                   <svg viewBox="0 0 24 24" height="24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
                 </div>
                 Enrollments
+              </Link>
+              <Link href="/Home/Academics/subject" className={styles.submenuItem}>
+                <div className="sideIcons">
+                  <svg viewBox="0 0 24 24" height="24"  fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                Subjects
+              </Link>
+              <Link href="/Home/Academics/classes/" className={styles.submenuItem}>
+                <div><svg viewBox="0 0 24 24" height="24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+                Classes
               </Link>
               <Link href="/Home/Academics/grades" className={styles.submenuItem}>
                 <div className="sideIcons">
@@ -65,12 +72,7 @@ export default function Sidebar() {
                 </div>
                 Grades
               </Link>
-              <Link href="/Home/Academics/subjects" className={styles.submenuItem}>
-                <div className="sideIcons">
-                  <svg viewBox="0 0 24 24" height="24"  fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                </div>
-                Subjects
-              </Link>
+
                <Link href="/Home/Academics/exam" className={styles.submenuItem}>
                 <div className="sideIcons">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/><path d="M8 14l-4 4"/><path d="M16 4l4 4"/></svg>
@@ -154,7 +156,7 @@ export default function Sidebar() {
 
           {openMenu === "hr" && (
             <div className={`submenu ${openMenu === "hr" ? "open" : ""}`}>
-              <Link href="/dashboard/staff" className={styles.submenuItem}>
+              <Link href="/Home/hr/staff" className={styles.submenuItem}>
               <div>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
               </div>
@@ -166,7 +168,7 @@ export default function Sidebar() {
               </div>
                 Staff Attendance
               </Link>
-              <Link href="/dashboard/salaries" className={styles.submenuItem}>
+              <Link href="/Home/hr/salaries" className={styles.submenuItem}>
               <div>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/><path d="M12 7l5 5-5 5"/></svg>
               </div>
@@ -191,7 +193,7 @@ export default function Sidebar() {
           {openMenu === "attendance" && (
             <div className={`submenu ${openMenu === "attendance" ? "open" : ""}`}>
               <Link
-                href="/dashboard/student-attendance"
+                href="/Home/Attendance"
                 className={styles.submenuItem}
               >
                 Student Attendance
@@ -216,19 +218,13 @@ export default function Sidebar() {
 
           {openMenu === "finance" && (
             <div className={`submenu ${openMenu === "finance" ? "open" : ""}`}>
-              <Link href="/dashboard/invoices" className={styles.submenuItem}>
+              <Link href="/Home/finance/invoice" className={styles.submenuItem}>
               <div>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><path d="M9 9h1"/></svg>
               </div>
                 Invoices
               </Link>
-              <Link href="/dashboard/payments" className={styles.submenuItem}>
-              <div>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><path d="M16 15h2"/><path d="M7 15h5"/></svg>
-              </div>
-                Payments
-              </Link>
-              <Link href="/dashboard/expenditure" className={styles.submenuItem}>
+              <Link href="/Home/finance/expenditure" className={styles.submenuItem}>
               <div>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><polyline points="18 19 22 19 22 15"/></svg>
               </div>

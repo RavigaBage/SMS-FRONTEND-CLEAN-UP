@@ -29,6 +29,7 @@ export default function SubjectsManagement() {
     <div className="dashboardWrapper">
       <div className="dashboard">
         
+        {/* Header */}
         <header className="header">
           <div>
             <h1>Subjects Management</h1>
@@ -37,6 +38,7 @@ export default function SubjectsManagement() {
           <button className="primaryBtn">Add Subject</button>
         </header>
 
+        {/* Table Card */}
         <main className="tableCard">
           <table className="subjectTable">
             <thead>
