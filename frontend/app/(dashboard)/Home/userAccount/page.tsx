@@ -1,123 +1,588 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '@/styles/userAcc.css';
+import { apiRequest } from '@/src/lib/apiClient';
+import Pagination from '@/src/assets/components/dashboard/Pagnation';
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: 'admin' | 'headmaster' | 'bursar' | 'teacher';
+  role_display: string;
+  is_active: boolean;
+  last_login: string | null;
+  date_joined: string;
+  created_by_username: string | null;
+}
+
+interface PaginatedResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: User[];
+}
+
+interface CreateUserForm {
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+  is_active: boolean;
+}
 
 export default function UserAccounts() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  
+  // Pagination
+  const [pagination, setPagination] = useState<PaginatedResponse | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  
+  // Form state
+  const [formData, setFormData] = useState<CreateUserForm>({
+    username: '',
+    email: '',
+    password: '',
+    role: '',
+    is_active: true,
+  });
+  
+  // Password reset state
+  const [resetPasswordData, setResetPasswordData] = useState({
+    userId: 0,
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
+  
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const userData = [
-    { id: 1, name: "Kwame Boateng", role: "Teacher", email: "kwame.boateng@example.com", status: "Active", lastLogin: "2026-01-20 08:45" },
-    { id: 2, name: "Akosua Mensah", role: "Administrator", email: "akosua.mensah@example.com", status: "Inactive", lastLogin: "2026-01-18 14:32" },
-  ];
+  useEffect(() => {
+    fetchUsers();
+  }, [currentPage, roleFilter, statusFilter]);
+
+  useEffect(() => {
+    // Debounce search
+    const timer = setTimeout(() => {
+      if (searchQuery || searchQuery === '') {
+        fetchUsers();
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      let endpoint = `/users/?page=${currentPage}`;
+      
+      if (roleFilter) {
+        endpoint += `&role=${roleFilter}`;
+      }
+      
+      if (statusFilter) {
+        endpoint += `&is_active=${statusFilter}`;
+      }
+      
+      if (searchQuery) {
+        endpoint += `&search=${encodeURIComponent(searchQuery)}`;
+      }
+      
+      const response = await apiRequest<User>(endpoint);
+      
+      if (response.results) {
+        setUsers(response.results);
+        setPagination({
+          count: response.count || 0,
+          next: response.next || null,
+          previous: response.previous || null,
+          results: response.results,
+        });
+      } else {
+        setUsers(Array.isArray(response.data) ? response.data : [response.data]);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      showMessage('error', 'Failed to fetch users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.username || !formData.email || !formData.password || !formData.role) {
+      showMessage('error', 'Please fill in all required fields');
+      return;
+    }
+    
+    try {
+      await apiRequest('/users/', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+      });
+      
+      showMessage('success', 'User created successfully');
+      setModalOpen(false);
+      resetForm();
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      showMessage('error', error.message || 'Failed to create user');
+    }
+  };
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedUser) return;
+    
+    try {
+      await apiRequest(`/users/${selectedUser.id}/`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          role: formData.role,
+          is_active: formData.is_active,
+        }),
+      });
+      
+      showMessage('success', 'User updated successfully');
+      setModalOpen(false);
+      setIsEditMode(false);
+      resetForm();
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Error updating user:', error);
+      showMessage('error', error.message || 'Failed to update user');
+    }
+  };
+
+  const handleDeactivateUser = async (userId: number, currentStatus: boolean) => {
+    const action = currentStatus ? 'deactivate' : 'activate';
+    
+    if (!confirm(`Are you sure you want to ${action} this user?`)) {
+      return;
+    }
+    
+    try {
+      await apiRequest(`/users/${userId}/${action}/`, {
+        method: 'POST',
+      });
+      
+      showMessage('success', `User ${action}d successfully`);
+      fetchUsers();
+    } catch (error: any) {
+      console.error(`Error ${action}ing user:`, error);
+      showMessage('error', error.message || `Failed to ${action} user`);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (resetPasswordData.newPassword !== resetPasswordData.confirmPassword) {
+      showMessage('error', 'Passwords do not match');
+      return;
+    }
+    
+    if (resetPasswordData.newPassword.length < 10) {
+      showMessage('error', 'Password must be at least 10 characters long');
+      return;
+    }
+    
+    try {
+      await apiRequest(`/users/${resetPasswordData.userId}/change_password/`, {
+        method: 'POST',
+        body: JSON.stringify({
+          new_password: resetPasswordData.newPassword,
+          confirm_password: resetPasswordData.confirmPassword,
+        }),
+      });
+      
+      showMessage('success', 'Password reset successfully');
+      setIsResetPasswordModalOpen(false);
+      setResetPasswordData({ userId: 0, newPassword: '', confirmPassword: '' });
+    } catch (error: any) {
+      console.error('Error resetting password:', error);
+      showMessage('error', error.message || 'Failed to reset password');
+    }
+  };
+
+  const openEditModal = (user: User) => {
+    setSelectedUser(user);
+    setFormData({
+      username: user.username,
+      email: user.email,
+      password: '',
+      role: user.role,
+      is_active: user.is_active,
+    });
+    setIsEditMode(true);
+    setModalOpen(true);
+  };
+
+  const openResetPasswordModal = (userId: number) => {
+    setResetPasswordData({ userId, newPassword: '', confirmPassword: '' });
+    setIsResetPasswordModalOpen(true);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      username: '',
+      email: '',
+      password: '',
+      role: '',
+      is_active: true,
+    });
+    setSelectedUser(null);
+    setIsEditMode(false);
+  };
+
+  const showMessage = (type: 'success' | 'error', text: string) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage(null), 5000);
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    return date.toLocaleString('en-GB', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   return (
     <div className="dashboardWrapper">
       <div className="dashboard">
         
+        {/* Message Alert */}
+        {message && (
+          <div
+            style={{
+              position: 'fixed',
+              top: '20px',
+              right: '20px',
+              padding: '12px 20px',
+              borderRadius: '8px',
+              backgroundColor: message.type === 'success' ? '#d1fae5' : '#fee2e2',
+              color: message.type === 'success' ? '#065f46' : '#991b1b',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              zIndex: 1000,
+              fontWeight: 500,
+            }}
+          >
+            {message.text}
+          </div>
+        )}
+
         {/* Header */}
         <header className="header">
           <div>
             <h1>User Accounts</h1>
             <p>Manage system users, roles, and access</p>
           </div>
-          <button className="primaryBtn" >
+          <button
+            className="primaryBtn"
+            onClick={() => {
+              resetForm();
+              setModalOpen(true);
+            }}
+          >
             Create User
           </button>
         </header>
 
         {/* Search and Filters */}
         <div className="controls">
-          <input type="text" placeholder="Search by name or email" />
-          <select>
-            <option>All Roles</option>
-            <option>Administrator</option>
-            <option>Teacher</option>
-            <option>Student</option>
+          <input
+            type="text"
+            placeholder="Search by name or email"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+          <select
+            value={roleFilter}
+            onChange={(e) => {
+              setRoleFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="">All Roles</option>
+            <option value="admin">Administrator</option>
+            <option value="headmaster">Headmaster</option>
+            <option value="bursar">Bursar</option>
+            <option value="teacher">Teacher</option>
           </select>
-          <select>
-            <option>All Status</option>
-            <option>Active</option>
-            <option>Inactive</option>
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="">All Status</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
           </select>
         </div>
 
         {/* Users Table */}
         <main className="card">
-          <table className="userTable">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Last Login</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {userData.map((user) => (
-                <tr key={user.id}>
-                  <td style={{ fontWeight: 600 }}>{user.name}</td>
-                  <td>{user.role}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <span className={`statusBadge ${user.status === 'Active' ? 'activeStatus' : 'inactiveStatus'}`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td>{user.lastLogin}</td>
-                  <td>
-                    <div className="actionGroup">
-                      <button className="actionBtn btnEdit">Edit</button>
-                      <button className="actionBtn btnDeactivate">Deactivate</button>
-                      <button className="actionBtn btnReset">Reset Password</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {loading ? (
+            <div style={{ padding: '40px', textAlign: 'center' }}>Loading users...</div>
+          ) : users.length > 0 ? (
+            <>
+              <table className="userTable">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Created By</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id}>
+                      <td style={{ fontWeight: 600 }}>{user.username}</td>
+                      <td>{user.email}</td>
+                      <td>{user.role_display}</td>
+                      <td>
+                        <span
+                          className={`statusBadge ${
+                            user.is_active ? 'activeStatus' : 'inactiveStatus'
+                          }`}
+                        >
+                          {user.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td>{formatDate(user.last_login)}</td>
+                      <td>{user.created_by_username || 'System'}</td>
+                      <td>
+                        <div className="actionGroup">
+                          <button
+                            className="actionBtn btnEdit"
+                            onClick={() => openEditModal(user)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="actionBtn btnDeactivate"
+                            onClick={() => handleDeactivateUser(user.id, user.is_active)}
+                          >
+                            {user.is_active ? 'Deactivate' : 'Activate'}
+                          </button>
+                          <button
+                            className="actionBtn btnReset"
+                            onClick={() => openResetPasswordModal(user.id)}
+                          >
+                            Reset Password
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
-          {/* Pagination */}
-          <div className="pagination">
-            <button className="pageBtn active">1</button>
-            <button className="pageBtn">2</button>
-            <button className="pageBtn">3</button>
-            <button className="pageBtn">Next</button>
-          </div>
+              {/* Pagination */}
+              {pagination && pagination.count > 0 && (
+                <div style={{ marginTop: '20px' }}>
+                  <Pagination
+                    count={pagination.count}
+                    next={pagination.next}
+                    previous={pagination.previous}
+                    currentPage={currentPage}
+                    onPageChange={(newPage) => setCurrentPage(newPage)}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+              No users found
+            </div>
+          )}
         </main>
 
-        {/* Modal Component */}
+        {/* Create/Edit User Modal */}
         {isModalOpen && (
-          <div className="modalOverlay" onClick={() => setModalOpen(false)}>
+          <div className="modalOverlay" onClick={() => {
+            setModalOpen(false);
+            resetForm();
+          }}>
             <div className="modalContent" onClick={(e) => e.stopPropagation()}>
-              <h2>Create New User</h2>
+              <h2>{isEditMode ? 'Edit User' : 'Create New User'}</h2>
               
-              <label className="modalLabel">Full Name</label>
-              <input className="modalInput" type="text" placeholder="Enter full name" />
+              <form onSubmit={isEditMode ? handleUpdateUser : handleCreateUser}>
+                <label className="modalLabel">Username *</label>
+                <input
+                  className="modalInput"
+                  type="text"
+                  placeholder="Enter username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  required
+                />
 
-              <label className="modalLabel">Email</label>
-              <input className="modalInput" type="email" placeholder="Enter email" />
+                <label className="modalLabel">Email *</label>
+                <input
+                  className="modalInput"
+                  type="email"
+                  placeholder="Enter email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                />
 
-              <label className="modalLabel">Role</label>
-              <select className="modalInput">
-                <option>Select Role</option>
-                <option>Administrator</option>
-                <option>Teacher</option>
-                <option>Student</option>
-              </select>
+                {!isEditMode && (
+                  <>
+                    <label className="modalLabel">Password *</label>
+                    <input
+                      className="modalInput"
+                      type="password"
+                      placeholder="Enter password (min 10 characters)"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      minLength={10}
+                      required
+                    />
+                  </>
+                )}
 
-              <label className="modalLabel">Status</label>
-              <select className="modalInput">
-                <option>Active</option>
-                <option>Inactive</option>
-              </select>
+                <label className="modalLabel">Role *</label>
+                <select
+                  className="modalInput"
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  required
+                >
+                  <option value="">Select Role</option>
+                  <option value="admin">Administrator</option>
+                  <option value="headmaster">Headmaster</option>
+                  <option value="bursar">Bursar</option>
+                  <option value="teacher">Teacher</option>
+                </select>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '10px' }}>
-                <button className="secondaryBtn" onClick={() => setModalOpen(false)}>Cancel</button>
-                <button className="primaryBtn">Create User</button>
-              </div>
+                <label className="modalLabel">Status *</label>
+                <select
+                  className="modalInput"
+                  value={formData.is_active ? 'true' : 'false'}
+                  onChange={(e) =>
+                    setFormData({ ...formData, is_active: e.target.value === 'true' })
+                  }
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '12px',
+                    justifyContent: 'flex-end',
+                    marginTop: '20px',
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="secondaryBtn"
+                    onClick={() => {
+                      setModalOpen(false);
+                      resetForm();
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="primaryBtn">
+                    {isEditMode ? 'Update User' : 'Create User'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Reset Password Modal */}
+        {isResetPasswordModalOpen && (
+          <div className="modalOverlay" onClick={() => setIsResetPasswordModalOpen(false)}>
+            <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+              <h2>Reset User Password</h2>
+              
+              <form onSubmit={handleResetPassword}>
+                <label className="modalLabel">New Password *</label>
+                <input
+                  className="modalInput"
+                  type="password"
+                  placeholder="Enter new password (min 10 characters)"
+                  value={resetPasswordData.newPassword}
+                  onChange={(e) =>
+                    setResetPasswordData({ ...resetPasswordData, newPassword: e.target.value })
+                  }
+                  minLength={10}
+                  required
+                />
+
+                <label className="modalLabel">Confirm Password *</label>
+                <input
+                  className="modalInput"
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={resetPasswordData.confirmPassword}
+                  onChange={(e) =>
+                    setResetPasswordData({
+                      ...resetPasswordData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  minLength={10}
+                  required
+                />
+
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '12px',
+                    justifyContent: 'flex-end',
+                    marginTop: '20px',
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="secondaryBtn"
+                    onClick={() => setIsResetPasswordModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="primaryBtn">
+                    Reset Password
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

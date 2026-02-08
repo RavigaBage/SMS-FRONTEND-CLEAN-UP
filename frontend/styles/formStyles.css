@@ -46,7 +46,7 @@ label {
   font-weight: 500;
   color: #555;
 }
-
+input[type="number"]
 input[type="text"],
 input[type="time"],
 select {
@@ -57,7 +57,7 @@ select {
   font-size: 14px;
   transition: border 0.3s, box-shadow 0.3s;
 }
-
+input[type="number"]:focus
 input[type="text"]:focus,
 input[type="time"]:focus,
 select:focus {
@@ -69,9 +69,11 @@ select:focus {
 button {
   padding: 12px;
   border: none;
+  min-height: 40px;
+  max-width: 300px;
   border-radius: 8px;
-  background: #7b61ff;
-  color: white;
+  background-color: #7b61ff;
+  color: white !important;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;

@@ -264,3 +264,22 @@
 .submenuItem:nth-child(3n+3)  svg {
   stroke: #64748b;
 }
+
+.logout {
+  color: #e74c3c;
+}
+
+.logout:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+}
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none; 
+  filter: grayscale(1); 
+}
+
+.submenuItem.disabled {
+  padding-left: 2rem;
+  color: #888;
+}

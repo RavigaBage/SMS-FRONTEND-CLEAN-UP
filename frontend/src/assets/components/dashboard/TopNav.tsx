@@ -1,10 +1,15 @@
 // frontend/src/assets/components/dashboard/TopNav.tsx
 "use client";
-
+import React,{useEffect,useState} from 'react'
 import { usePathname } from "next/navigation";
 import { Bell, Search } from "lucide-react";
 
 export function TopNav() {
+  const [username_user, setUsername] = useState("");
+  useEffect(() => {
+    const userName = localStorage.getItem("userName");
+    setUsername(userName as any);
+  }, []);
     const pathname = usePathname();
     const isManagementPage = pathname === "/students";
     const isProfilePage = pathname.includes("/students/") && pathname !== "/students";

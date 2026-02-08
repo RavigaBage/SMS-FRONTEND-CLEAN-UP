@@ -13,12 +13,12 @@ export function Sidebar() {
 
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
-    { icon: <GraduationCap size={20} />, label: "Students", href: "/dashboard/students" },
-    { icon: <Users size={20} />, label: "Teachers", href: "/dashboard/teachers" },
-    { icon: <School size={20} />, label: "Classes", href: "/dashboard/classes" },
-    { icon: <Landmark size={20} />, label: "Finance", href: "/dashboard/finance" },
-    { icon: <Calendar size={20} />, label: "Attendance", href: "/dashboard/attendance" },
-    { icon: <Settings size={20} />, label: "Settings", href: "/dashboard/settings" },
+    { icon: <GraduationCap size={20} />, label: "Students", href: "/students" },
+    { icon: <Users size={20} />, label: "Staff", href: "/teachers&staff" },
+    { icon: <School size={20} />, label: "Classes", href: "/classes" },
+    { icon: <Landmark size={20} />, label: "Finance", href: "/finance" },
+    { icon: <Calendar size={20} />, label: "Attendance", href: "/attendance" },
+    { icon: <Settings size={20} />, label: "Settings", href: "/settings" },
   ];
 
   return (

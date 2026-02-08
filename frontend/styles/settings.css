@@ -65,8 +65,9 @@ body {
 
 /* Layout */
 .settings-layout {
-  display: block;
-  margin-bottom:10px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
 }
 
 /* Sidebar */
@@ -76,8 +77,6 @@ body {
   border: 1px solid var(--border-color);
   padding: 1rem;
   box-shadow: var(--shadow);
-  display: flex;
-  gap:20px;
 }
 
 .nav-item {

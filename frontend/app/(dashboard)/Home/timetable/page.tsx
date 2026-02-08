@@ -1,21 +1,53 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect,useMemo } from "react";
 import Dropdown from "@/components/ui/dropdown";
 import DropdownYear from "@/components/ui/dropdown_yr";
 import Popup from "@/components/ui/Popup";
 import DeletePopup from "@/components/ui/deletepopup";
-import LoaderPopup from "@/components/ui/loader";
 import "@/styles/timetable.css";
+import { fetchWithAuth } from "@/src/lib/apiClient";
+type TermOption = {
+  class_id:number;
+  class_name:string;
+};
 
-// Typing for class and term lists
+type Teacher = {
+  id: number;
+  first_name: string;
+  last_name: string;
+};
+
+type Subject = {
+  id: number;
+  subject_name: string;
+  subject_code: string;
+};
+
+type Class = {
+  id: number;
+  class_name: string;
+};
+
+type TimetableEntry = {
+  id: number;
+  class_obj: Class;
+  subject: Subject;
+  teacher: Teacher;
+  day_of_week: string;
+  start_time: string;
+  end_time: string;
+  room_number: string;
+};
 type Option = {
   class_id: number;
-  name: string;
+  class_name: string;
 };
-type TermOption = {
-  class_id: number;
-  name: string;
+type TimetableSlot = {
+  start_time: string;
+  end_time: string;
+  day_of_week: string;
+  room_number: string;
 };
 export default function Home() {
   const [classList, setClassList] = useState<Option[]>([]);
@@ -26,7 +58,8 @@ export default function Home() {
   const [showLoader, setShowLoader] = useState(false);
   const [showMessage, setMessage] = useState(false);
   const [fetchTrigger, setTrigger] = useState(false);
-
+  const [Updating, setUpdate] = useState(false);
+  const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
   const boxRef = useRef<HTMLDivElement | null>(null);
 
   const [formData, setFormData] = useState<Record<string, any>>({
@@ -40,36 +73,44 @@ export default function Home() {
     teachers: "",
     subjects: "",
     year: "",
+    academic_year: "",
+    class_id:"",
+    
   });
 
-  // Custom updater for TeachingForm / Popup
   const updateFormField = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+      const fieldMap: Record<string, string> = {
+        schoolClass: "class_id",
+        class_id:"class_obj",
+        year: "academic_year",
+      };
+
+      setFormData((prev) => ({
+        ...prev,
+        [fieldMap[field] ?? field]: value,
+      }));
   };
 
-  // Fetch class list and term list on load
   useEffect(() => {
     const handleOnPageLoad = async () => {
       try {
-        const classRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/timetable/class_list/`, {
+        const classRes = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/classes/`, {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN_VAL}`,
             "Content-Type": "application/json",
           },
         });
         const classData = await classRes.json();
-        if (classRes.ok && Array.isArray(classData)) setClassList(classData);
+        if (classRes.ok) {
+          const classList = classData.results || classData;
+          if (Array.isArray(classList)) setClassList(classList);
+        }
 
-        const termRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/timetable/term_list/`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN_VAL}`,
-            "Content-Type": "application/json",
-          },
-        });
-        const termData = await termRes.json();
-        if (termRes.ok && Array.isArray(termData)) setTermList(termData);
+        setTermList([
+          { class_id: 1, class_name: "Term 1",},
+          { class_id: 2, class_name: "Term 2",},
+          { class_id: 3, class_name: "Term 3",},
+        ]);
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -91,18 +132,43 @@ export default function Home() {
     };
   }, []);
 
-  // Delete / Loader handlers
-  const handleDelete = () => {
-    setShowDelete(false);
-    setShowLoader(true);
-  };
+// Delete handler function
+const handleDelete = async (id: number) => {
+  try {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/timetable/${id}/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
+    if (res.ok) {
+      alert("Timetable entry deleted successfully.");
+
+      setTimetableData(prev => prev.filter(item => item.id !== id));
+
+      setShowDelete(false);
+    } else {
+      const data = await res.json();
+      alert(`Failed to delete: ${data.detail || "Unknown error"}`);
+    }
+  } catch (err) {
+    console.error("Delete failed", err);
+    alert("Error deleting the entry.");
+  }
+};
+
+ const  MiddlewareDel = (id:any)=>{
+  setShowDelete(true);
+  setTimeout(()=>{
+     handleDelete(id)
+  },20)
+ }
   const handleLoader = () => {
     setShowLoader(false);
     document.querySelector(".loader")?.classList.remove("active");
   };
 
-  // Mini-popup toggle
   const handlePopupOption = (e: React.MouseEvent<HTMLDivElement>) => {
     setMiniActive(!active_mini);
     const container = e.currentTarget.parentElement;
@@ -112,9 +178,114 @@ export default function Home() {
     e.currentTarget.classList.add("active");
   };
 
-  const handlePopup = () => {
+  const handlePopup = (item:any,val:any) => {
     setActive(!active);
+    setUpdate(val)
+    
+    const fieldMap: Record<string, string> = {
+      schoolClass: "class_obj",
+      year: "academic_year",
+    };
+
+    const idOnlyFields = new Set(["teacher", "subject", "class_obj"]);
+
+    setFormData(prev => {
+      const updated = { ...prev };
+
+      Object.entries(item).forEach(([key, value]) => {
+        const mappedKey = fieldMap[key] ?? key;
+        if (
+          idOnlyFields.has(mappedKey) &&
+          value &&
+          typeof value === "object" &&
+          "id" in value
+        ) {
+          updated[mappedKey] = value.id;
+        } else {
+          updated[mappedKey] = value;
+        }
+      });
+
+      return updated;
+    });
+
+
   };
+  const fetchTimetable = async () => {
+    try {
+      let url = `${process.env.NEXT_PUBLIC_API_URL}/timetable/?class_id=${formData.class_obj}&term=${formData.term}&academic_year=${formData.academic_year}`;
+      const params = new URLSearchParams();
+      
+      if (formData.schoolClass) params.append("class_obj", formData.schoolClass);
+      
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+
+      const response = await fetchWithAuth(url);
+      const data = await response.json();
+      
+      if (response.ok && (data.results || Array.isArray(data))) {
+        setTimetableData(data.results || data);
+      }
+    } catch (err) {
+      console.error("Error fetching timetable:", err);
+    }
+  };
+
+  const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+  function getSlotsForDay(
+    data: TimetableEntry[],
+    day: string,
+    time?: string,
+  ): TimetableEntry[] {
+    let filtered = data.filter(entry => entry.day_of_week === day);
+    if (time) {
+      const targetHour = Number(time);
+      filtered = filtered.filter(entry => {
+        const [hour] = entry.start_time.split(':').map(Number);
+        return hour === targetHour;
+      });
+    }
+
+    return filtered;
+  }
+
+  function TimetableDiv(match:any,index?:number){
+
+    const colorIndex = useMemo(() => (index! * 7) % 10, [index]);
+      const Fetch_data = match[0];
+      if (!match || match.length === 0) 
+         return(
+        <div className="grid_feild">
+          <div className="card empty" onClick={() => handlePopup("",false)}>
+            <svg xmlns="http://www.w3.org/2000/svg" height="60px" viewBox="0 -960 960 960" width="60px" fill="#e3e3e3"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
+          </div>
+        </div>
+      );
+      return(
+        <div className="grid_feild" onClick={(e) => handlePopupOption(e)}>
+          <div className="card " data-color={colorIndex}>
+            <div className="slot_title">
+              <h1>{Fetch_data.subject.subject_name}</h1>
+            </div>
+            <div className="slot_assigned">
+              <p>{Fetch_data.teacher.last_name} {Fetch_data.teacher.first_name}</p>
+            </div>
+            <div className="slot_location">{Fetch_data.room_number}</div>
+
+              <div className={`slot_options ${active_mini ? '':"clt"}`} >
+                      <div className="item_" onClick={() => MiddlewareDel(Fetch_data.id)}><svg xmlns="http://www.w3.org/2000/svg" className="delete" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>
+                      <div className="item_" onClick={() => handlePopup(Fetch_data,Fetch_data.id)}>
+                          <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" className="update"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                      </div>
+                  </div>
+          </div>
+        </div>
+      );
+   
+  }
 
   return (
     <div className="app">
@@ -151,10 +322,7 @@ export default function Home() {
           />
 
           <div className="chips">
-            <span className="chip active">All Subjects</span>
-            <span className="chip">Science Dept</span>
-            <span className="chip">Math Dept</span>
-            <span className="chip">Humanities</span>
+            <span className="chip active" onClick={fetchTimetable}>Load table</span>
           </div>
         </section>
 
@@ -169,11 +337,11 @@ export default function Home() {
               <span>Friday</span>
             </div>
 
-            <div className="grid">
-              {/* Popups */}
+            <div className="grid" ref={boxRef}>
               <Popup
                 active={active}
-                togglePopup={handlePopup}
+                togglePopup={()=>handlePopup("",true)}
+                setUpdating={Updating}
                 formData={formData}
                 fieldNames={["weekdays", "timeSlots", "teachers", "subjects"]}
                 setFormData={updateFormField}
@@ -181,75 +349,42 @@ export default function Home() {
               <DeletePopup
                 isOpen={showDelete}
                 onClose={() => setShowDelete(false)}
-                onConfirm={handleDelete}
+                onConfirm={() => setShowDelete(false)}
               />
-              <LoaderPopup
-                isOpen={showLoader}
-                message={showMessage}
-                onClose={() => setShowLoader(false)}
-                onConfirm={handleLoader}
-               />
+              
 
-              {/* Grid example */}
               <div className="time">08:00</div>
-              <div className="grid_feild" onClick={(e) => handlePopupOption(e)}>
-                <div className="card blue">
-                  <div className="slot_title">
-                    <h1>Mathematics</h1>
-                  </div>
-                  <div className="slot_assigned">
-                    <p>Mrs.Cruis Mensah</p>
-                  </div>
-                  <div className="slot_location">Room 101</div>
 
-                   <div className={`slot_options ${active_mini ? '':"clt"}`} ref={boxRef}>
-                            <div className="item_" onClick={() => setShowDelete(true)}><svg xmlns="http://www.w3.org/2000/svg" className="delete" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>
-                            <div className="item_" onClick={() => handlePopup()}>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" className="update"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                            </div>
-                        </div>
+              {weekdays.map((day,index) => (
+                <div key={index}>
+                  {TimetableDiv(getSlotsForDay(timetableData, day, "08"),index)}
                 </div>
-              </div>
-                <div className="grid_feild" onClick={(e) => handlePopupOption(e)}>
-                    <div className="card green">
-                        <div className="slot_title"><h1>Physics</h1></div>
-                        <div className="slot_assigned"><p>Mrs.Cruis Mensah</p></div>
-                        <div className="slot_location">rom 101</div>
-                    <div className={`slot_options ${active_mini ? '':"clt"}`} ref={boxRef}>
-                            <div className="item_" onClick={() => setShowDelete(true)}><svg xmlns="http://www.w3.org/2000/svg" className="delete" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>
-                            <div className="item_" onClick={() => handlePopup()}>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" className="update"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="grid_feild"><div className="card empty"><svg xmlns="http://www.w3.org/2000/svg" height="60px" viewBox="0 -960 960 960" width="60px" fill="#e3e3e3"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg></div></div>
-                <div className="grid_feild"><div className="card blue">Mathematics</div></div>
-                <div className="grid_feild"><div className="card yellow">History</div></div>
+              ))}
 
+
+         
                 <div className="time">09:00</div>
-                <div className="grid_feild"><div className="card purple">English Lit</div></div>
-                <div className="grid_feild"><div className="card red">Chemistry</div></div>
-                <div className="grid_feild"><div className="card green">Biology</div></div>
-                <div className="grid_feild"><div className="card green">Physics</div></div>
-                <div className="grid_feild"><div className="card empty"><svg xmlns="http://www.w3.org/2000/svg" height="60px" viewBox="0 -960 960 960" width="60px" fill="#e3e3e3"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg></div></div>
+                  {weekdays.map((day,index) => (
+                  <div key={index}>
+                    {TimetableDiv(getSlotsForDay(timetableData, day, "09"),index)}
+                  </div>
+                ))}
 
                 <div className="break">RECESS BREAK</div>
 
                 <div className="time">10:30</div>
-                <div className="grid_feild"><div className="card yellow">History</div></div>
-                <div className="grid_feild"><div className="card conflict">Geography<br/><small>Conflict</small></div></div>
-                <div className="grid_feild"><div className="card pink">Art & Design</div></div>
-                <div className="grid_feild"><div className="card empty"><h1>Free</h1></div></div>
-                <div className="grid_feild"><div className="card red">Chemistry</div></div>
+                {weekdays.map((day,index) => (
+                <div key={index}>
+                  {TimetableDiv(getSlotsForDay(timetableData, day, "10"),index)}
+                </div>
+              ))}
 
                 <div className="time">11:30</div>
-                <div className="grid_feild"><div className="card orange">PE</div></div>
-                <div className="grid_feild"><div className="card yellow">History</div></div>
-                <div className="grid_feild"><div className="card purple">English Lit</div></div>
-                <div className="grid_feild"><div className="card cyan">Geography</div></div>
-                <div className="grid_feild"><div className="card blue">Mathematics</div></div>
-              {/* Add more grid items as needed */}
+                  {weekdays.map((day, index) => (
+                    <div key={day}>     
+                      {TimetableDiv(getSlotsForDay(timetableData, day, "11"),index)}
+                    </div>
+                  ))}
             </div>
           </section>
         </div>

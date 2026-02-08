@@ -8,7 +8,8 @@ type PopupProps = {
   formData: Record<string, any>;
   fieldNames: string | string[];
   setFormData:  (field: string, value: any) => void;
-
+  isDeleting:Boolean;
+  isUpdating:Boolean
 };
 
 export default function Popup({
@@ -17,6 +18,8 @@ export default function Popup({
   formData,
   fieldNames,
   setFormData,
+  isDeleting,
+  isUpdating
 }: PopupProps) {
   return (
     <div
@@ -33,6 +36,8 @@ export default function Popup({
           formData={formData}
           fieldName={fieldNames}
           setFormData={setFormData}
+          isDeleting={isDeleting} 
+          isUpdating={isUpdating} 
         />
 
         <button

@@ -1,0 +1,560 @@
+
+:root {
+  --primary: #e4a909;
+  --primary-dark: #0ea5e9;
+  --primary-light: #22D3EE;
+  --primary-teal: ;
+  
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #06b6d4;
+  
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-hover: #f1f5f9;
+  
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  
+  --border: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  --grade-a: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --grade-b: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --grade-c: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --grade-d: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --grade-f: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.STUDENT_GRADE .dashboard-container {
+  min-height: 100vh;
+  background: var(--bg-card);
+  padding: 20px;
+}
+
+.STUDENT_GRADE .content {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ==================== HEADER ==================== */
+.STUDENT_GRADE .main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-lg);
+}
+
+.STUDENT_GRADE .breadcrumb {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.STUDENT_GRADE .breadcrumb strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.STUDENT_GRADE .header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.STUDENT_GRADE .search-box input {
+  padding: 10px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  width: 250px;
+  transition: all 0.3s ease;
+}
+
+.STUDENT_GRADE .search-box input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.STUDENT_GRADE .avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+
+/* ==================== INFO CARD ==================== */
+.STUDENT_GRADE .info-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 30px;
+  background: var(--bg-card);
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-lg);
+  border-left: 5px solid var(--primary);
+}
+
+.STUDENT_GRADE .info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.STUDENT_GRADE .info-group label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.info-group p {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ==================== MAIN GRID ==================== */
+.STUDENT_GRADE .main-grid {
+  display: grid;
+  grid-template-columns: 1fr 450px;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) {
+  .STUDENT_GRADE .main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==================== CARDS ==================== */
+.STUDENT_GRADE .card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.STUDENT_GRADE .card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.STUDENT_GRADE .card-header {
+  padding: 20px 24px;
+  background: var(--primary-dark);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.STUDENT_GRADE .card-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ==================== INPUTS ==================== */
+.STUDENT_GRADE .exam-inputs {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.STUDENT_GRADE .input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.STUDENT_GRADE .input-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.STUDENT_GRADE .input-field input,
+.STUDENT_GRADE .score-input {
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: var(--bg-main);
+}
+
+.STUDENT_GRADE .input-field input:focus,
+.STUDENT_GRADE .score-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* ==================== SETTINGS CARD ==================== */
+.STUDENT_GRADE .settings-card .setting-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.STUDENT_GRADE .settings-card .setting-item:last-child {
+  border-bottom: none;
+}
+
+.STUDENT_GRADE .setting-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.STUDENT_GRADE .setting-label span:first-child {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.STUDENT_GRADE .setting-label span:last-child {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* ==================== GRADE PILLS ==================== */
+.STUDENT_GRADE .grade-pill {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+  text-align: center;
+}
+
+.STUDENT_GRADE .grade-pill.a,
+.STUDENT_GRADE .grade-pill.ap {
+  background: var(--grade-a);
+}
+
+.STUDENT_GRADE .grade-pill.b,
+.STUDENT_GRADE .grade-pill.bp {
+  background: var(--grade-b);
+}
+
+.STUDENT_GRADE .grade-pill.c,
+.STUDENT_GRADE .grade-pill.cp {
+  background: var(--grade-c);
+}
+
+.STUDENT_GRADE .grade-pill.d,
+.STUDENT_GRADE .grade-pill.dp {
+  background: var(--grade-d);
+}
+
+.STUDENT_GRADE .grade-pill.f {
+  background: var(--grade-f);
+}
+
+/* ==================== SUMMARY GRID ==================== */
+.STUDENT_GRADE .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 20px;
+  background: var(--bg-main);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.STUDENT_GRADE .sum-box {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.STUDENT_GRADE .sum-box:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-light);
+}
+
+.STUDENT_GRADE .sum-box label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  /* color: var(--text-muted); */
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.STUDENT_GRADE .sum-box .val {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.STUDENT_GRADE .sum-box.final {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color:var(--primary)
+}
+
+
+.STUDENT_GRADE .sum-box.final .val {
+  /* color: white; */
+  font-size: 32px;
+}
+
+/* ==================== BUTTONS ==================== */
+.STUDENT_GRADE .action-area {
+  padding: 20px;
+}
+
+.STUDENT_GRADE .btn-primary,
+.STUDENT_GRADE .btn-secondary {
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.STUDENT_GRADE .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.STUDENT_GRADE .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.STUDENT_GRADE .btn-secondary {
+  background: white;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.STUDENT_GRADE.btn-secondary:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.STUDENT_GRADE .status-message {
+  margin-top: 10px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== LOADING STATE ==================== */
+.STUDENT_GRADE .loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== RANK BADGES ==================== */
+.STUDENT_GRADE .rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 16px;
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.STUDENT_GRADE .rank-badge.rank-1 {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #b8860b;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+}
+
+.STUDENT_GRADE .rank-badge.rank-2 {
+  background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+  color: #696969;
+  box-shadow: 0 4px 15px rgba(192, 192, 192, 0.5);
+}
+
+.STUDENT_GRADE .rank-badge.rank-3 {
+  background: linear-gradient(135deg, #cd7f32 0%, #daa520 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(205, 127, 50, 0.5);
+}
+
+.STUDENT_GRADE .rank-badge.rank-other {
+  background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%);
+  color: white;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .STUDENT_GRADE .dashboard-container {
+    padding: 10px;
+  }
+
+  .main-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .info-card {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .exam-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .STUDENT_GRADE .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+}
+
+/* ==================== TOOLTIPS ==================== */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-primary);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 5px;
+}
+
+/* ==================== PERCENTAGE DISPLAY ==================== */
+.percentage-display {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--bg-main);
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary);
+}
+
+/* ==================== SCORE CARDS ==================== */
+.score-card {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-left: 4px solid var(--primary);
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.score-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.score-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.score-card-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+}

@@ -67,7 +67,6 @@
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  overflow: hidden;
 }
 
 .subjectTable {

@@ -1,166 +1,345 @@
-"use strict"
-import "@/styles/home.css"
-export default function HomePage(){
-    return(
-           <div className="main-view">
-  <header className="top-bar">
-    <div className="top-bar-left">
-      <button className="btn-primary">Main Dashboard</button>
-      <button className="btn-secondary">Analytics</button>
-    </div>
+"use client";
+import React, { useEffect, useState } from "react";
+import { apiRequest } from "@/src/lib/apiClient";
+import { Users, GraduationCap, Calendar, DollarSign, Plus, FileText, ClipboardList, MessageSquare, Activity, Search,
+   AlertCircle, RefreshCcw 
+} from "lucide-react";
+import Link from "next/link";
+import { Bar, Line } from 'react-chartjs-2';
+import "@/styles/home.css";
 
-    <div className="search-container">
-      <input type="text" placeholder="Search students, records, or files..." />
-    </div>
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Tooltip,
+  Legend,
+   Filler,
+} from 'chart.js';
 
-    <div className="user-profile">
-      <div className="user-info">
-        <p className="user-name">Alex Sterling</p>
-        <p className="user-role">SUPER ADMIN</p>
-      </div>
-      <img
-        src="https://i.pravatar.cc/150?u=admin"
-        alt="User"
-        className="user-avatar"
-      />
-    </div>
-  </header>
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Tooltip,
+  Legend,
+   Filler,
+);
 
-  <div className="dashboard-grid">
-    <section className="left-column">
-      <div className="kpi-row">
-        <div className="kpi-card">
-          <div className="kpi-header">
-            <div className="kpi-icon icon-blue">👤</div>
-            <span className="trend-tag up">+12.5%</span>
+export default function HomePage() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [activities, setActivities] = useState<any[]>([]);
+  
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res: any = await apiRequest("/api/dashboard-summary/");
+        console.log(res);
+        setStats(res.data);
+        setTransactions(res.data.recent_transactions || []);
+        setActivities(res.data.recent_activities || []);
+      } catch (e: any) {
+        console.error(e);
+         setError(e.message || "An unexpected error occurred while loading the dashboard.");
+      } finally {
+        setLoading(false);
+      }
+    };
+  useEffect(() => {
+
+    fetchDashboardData();
+  }, []);
+
+  const MONTHS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+
+const mapChartDataToMonths = (
+  labels: string[] = [],
+  values: number[] = []
+) => {
+  const monthIndex = MONTHS.reduce((acc: any, m, i) => {
+    acc[m] = i;
+    return acc;
+  }, {});
+
+  const data = Array(12).fill(0);
+
+  labels.forEach((label, i) => {
+    const idx = monthIndex[label];
+    if (idx !== undefined) {
+      data[idx] = values[i];
+    }
+  });
+
+  return data;
+};
+
+
+const feeChartData = {
+  labels: MONTHS,
+  datasets: [
+    {
+      label: "Fees Collected",
+      data: mapChartDataToMonths(
+        stats?.chart_data?.labels,
+        stats?.chart_data?.values
+      ),
+      backgroundColor: "#3b82f6",
+      borderRadius: 8,
+    },
+  ],
+};
+
+
+const attendanceChartData = {
+  labels: MONTHS,
+  datasets: [
+    {
+      label: "Attendance %",
+      data: mapChartDataToMonths(
+        stats?.attendance_chart?.labels,
+        stats?.attendance_chart?.values
+      ),
+      borderColor: "#10b981",
+      backgroundColor: "rgba(16,185,129,0.25)",
+      tension: 0.4,
+      fill: true,
+    },
+  ],
+};
+
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+    },
+  },
+};
+
+  const SkeletonBox = ({ className }: { className?: string }) => (
+    <div className={`bg-slate-100 animate-pulse rounded ${className}`}></div>
+  );
+
+if (error && !loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 text-center">
+        
+        <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-200 max-w-md w-full">
+          <div className="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <AlertCircle size={40} />
           </div>
-          <p className="kpi-label">Total Students</p>
-          <h2 className="kpi-value">1,240</h2>
-        </div>
-
-        <div className="kpi-card">
-          <div className="kpi-header">
-            <div className="kpi-icon icon-green">🎓</div>
-            <span className="trend-tag up">+2%</span>
-          </div>
-          <p className="kpi-label">Total Staff</p>
-          <h2 className="kpi-value">86</h2>
-        </div>
-
-        <div className="kpi-card">
-          <div className="kpi-header">
-            <div className="kpi-icon icon-yellow">📅</div>
-            <span className="trend-tag down">-1.2%</span>
-          </div>
-          <p className="kpi-label">Today's Attendance</p>
-          <h2 className="kpi-value">94.2%</h2>
-        </div>
-
-        <div className="kpi-card">
-          <div className="kpi-header">
-            <div className="kpi-icon icon-teal">💰</div>
-            <span className="trend-tag up">+8.4%</span>
-          </div>
-          <p className="kpi-label">Fees Collected</p>
-          <h2 className="kpi-value">$45,200</h2>
+          <h2 className="text-2xl font-black text-slate-900 mb-2">Connection Failed</h2>
+          <p className="text-slate-500 mb-8 text-sm leading-relaxed">{error}</p>
+          <button 
+            onClick={fetchDashboardData}
+            className="flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95"
+          >
+            <RefreshCcw size={18} />
+            Try Reconnecting
+          </button>
         </div>
       </div>
+    );
+  }
 
-      <div className="chart-row">
-        <div className="chart-card">
-          <h3 className="card-title">Attendance Trends</h3>
-          <p className="card-subtitle">Academic performance correlation</p>
-          <svg viewBox="0 0 400 150" className="line-chart">
-            <path
-              d="M0,100 Q50,50 100,100 T200,80 T300,120 T400,60"
-              fill="none"
-              stroke="var(--primary)"
-            />
-          </svg>
-        </div>
-
-        <div className="chart-card">
-          <h3 className="card-title">Fee Collection</h3>
-          <p className="card-subtitle">Revenue analytics monthly view</p>
-          <div className="bar-chart">
-            <div className="bar gray"></div>
-            <div className="bar teal"></div>
-            <div className="bar primary"></div>
-            <div className="bar teal"></div>
-            <div className="bar gray"></div>
+  return (
+    <div className="main-view bg-slate-50 min-h-screen">
+      {/* Header */}
+      <header className="top-bar bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+        {loading ? (
+          <div className="flex items-center gap-4 w-full">
+            <SkeletonBox className="h-8 w-32" />
+            <SkeletonBox className="h-8 w-24" />
+            <div className="flex-1 flex justify-end gap-4">
+              <SkeletonBox className="h-10 w-32" />
+              <SkeletonBox className="h-10 w-10 rounded-full" />
+            </div>
           </div>
-        </div>
-      </div>
+        ) : (
+          <div className="flex justify-between items-center w-full">
+            <div className="flex gap-3">
+              <button className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg">Main Dashboard</button>
+              <button className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50">Analytics</button>
+            </div>
+            <div className="search-container relative w-1/3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input type="text" placeholder="Search..." className="w-full bg-slate-100 border-none rounded-xl pl-10 pr-4 py-2 text-sm outline-none" />
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-right hidden sm:block">
+                <p className="font-bold text-slate-900 text-sm">Alex Sterling</p>
+                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1">Super Admin</p>
+              </div>
+              <img src="https://i.pravatar.cc/150?u=admin" alt="User" className="w-10 h-10 rounded-full" />
+            </div>
+          </div>
+        )}
+      </header>
 
-      <div className="table-card">
-        <div className="table-header">
-          <h3>Recent Fee Transactions</h3>
-          <a href="#" className="table-link">View All</a>
-        </div>
+      <div className="dashboard-grid p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Left Column */}
+        <section className="left-column lg:col-span-3 space-y-8">
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {loading ? (
+              [1,2,3,4].map(i => <SkeletonBox key={i} className="h-28 w-full" />)
+            ) : (
+              <>
+                <KPICard label="Total Students" value={stats.student_count} icon={<Users />} />
+                <KPICard label="Total Staff" value={stats.staff_count} icon={<GraduationCap />} />
+                <KPICard label="Attendance" value={`${stats.active_attendance}%`} icon={<Calendar />} />
+                <KPICard label="Fees Collected" value={`$${stats.fees_collected.toLocaleString()}`} icon={<DollarSign />} />
+              </>
+            )}
+          </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Student Name</th>
-              <th>ID Number</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="bold">Julianne Devis</td>
-              <td>#SMS-2024-0492</td>
-              <td className="bold">$1,200.00</td>
-              <td><span className="status paid">PAID</span></td>
-              <td>Oct 12, 2024</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+          {/* Charts */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            {loading ? (
+              [1,2].map(i => <SkeletonBox key={i} className="h-80 w-full" />)
+            ) : (
+              <>
+                <ChartCard title="Fee Collection" subtitle="January to December">
+                  <Bar data={feeChartData} options={chartOptions} />
+                </ChartCard>
 
-    <aside className="right-panel">
-      <h4 className="section-title">Quick Actions</h4>
+                <ChartCard title="Attendance Trends" subtitle="January to December">
+                  <Line data={attendanceChartData} options={chartOptions} />
+                </ChartCard>
+              </>
+            )}
+          </div>
 
-      <div className="quick-actions">
-        <div className="action-btn">➕ Add Student</div>
-        <div className="action-btn">📄 Invoice</div>
-        <div className="action-btn">📝 Exam Result</div>
-        <div className="action-btn">💬 Message</div>
-      </div>
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+              <h3 className="font-bold text-slate-900">Recent Fee Transactions</h3>
+              {!loading && <button className="text-blue-600 text-xs font-bold hover:underline">View All</button>}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50">
+                  <tr>
+                    {['Student', 'Trans Ref', 'Amount', 'Method', 'Date'].map(h => <th key={h} className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {loading ? (
+                    [1,2,3].map(i => (
+                      <tr key={i} className="animate-pulse">
+                        <td colSpan={5} className="px-6 py-4"><SkeletonBox className="h-4 w-full" /></td>
+                      </tr>
+                    ))
+                  ) : transactions.length > 0 ? (
+                    transactions.map(t => (
+                      <tr key={t.id} className="hover:bg-slate-50">
+                        <td className="px-6 py-4 font-bold">{t.student_name}</td>
+                        <td className="px-6 py-4 text-slate-500 text-sm font-mono uppercase">{t.transaction_reference}</td>
+                        <td className="px-6 py-4 font-bold">${Number(t.amount_paid).toLocaleString()}</td>
+                        <td className="px-6 py-4">{t.payment_method}</td>
+                        <td className="px-6 py-4 text-right text-slate-400">{new Date(t.payment_date).toLocaleDateString()}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-400">No transactions</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
 
-      <div className="activity-card">
-        <h4 className="section-title">Recent Activity</h4>
-
-        <div className="activity-item">
-          <span className="dot primary"></span>
+        {/* Right Panel */}
+        <aside className="space-y-8">
           <div>
-            <p><strong>Admin</strong> updated exam schedule</p>
-            <span className="time">2 minutes ago</span>
+            <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Quick Actions</h4>
+            <div className="grid grid-cols-2 gap-3">
+              {loading ? [1,2,3,4].map(i => <SkeletonBox key={i} className="h-20 w-full" />) : (
+                <>
+                  <Link href="/Home/profiles/students/"><QuickBtn icon={<Plus />} label="Add Student" color="bg-blue-600" /></Link>
+                  <Link href="/Home/finance/invoices/"><QuickBtn icon={<FileText />} label="Invoice" color="bg-slate-900" /></Link>
+                  <Link href="/Home/academics/grades/"><QuickBtn icon={<ClipboardList />} label="Exam Result" color="bg-emerald-600" /></Link>
+                  <Link href="/Home/profiles/staff"><QuickBtn icon={<MessageSquare />} label="Teachers & Staffs" color="bg-indigo-600" /></Link>
+                </>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="activity-item">
-          <span className="dot teal"></span>
-          <div>
-            <p>Payment received from <strong>John Doe</strong></p>
-            <span className="time">45 minutes ago</span>
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Recent Activity</h4>
+            <div className="space-y-6">
+              {loading ? (
+                [1,2,3].map(i => <SkeletonBox key={i} className="h-10 w-full" />)
+              ) : activities.length > 0 ? (
+                activities.map(act => (
+                  <div key={act.id} className="flex gap-4 items-center">
+                    <div className="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <p className="text-sm text-slate-700">{act.text}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-slate-400">No recent activity.</p>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="system-status">
-        <h4>System Status</h4>
-        <p className="status-online">● All Modules Online</p>
-        <p className="status-note">
-          Last scan 20 minutes ago. Latency: 14ms.
-        </p>
+          <div className="bg-slate-900 p-6 rounded-3xl text-white shadow-xl shadow-blue-900/20 group cursor-default">
+            {loading ? <SkeletonBox className="h-16 w-full" /> : (
+              <>
+                <div className="flex items-center gap-2 mb-2 text-emerald-400">
+                  <Activity className="w-4 h-4 animate-pulse" />
+                  <span className="text-xs font-bold uppercase tracking-widest">System Online</span>
+                </div>
+                <p className="text-xs text-slate-400 group-hover:text-slate-200">Latency: 14ms. All modules running normally.</p>
+              </>
+            )}
+          </div>
+        </aside>
       </div>
-    </aside>
-  </div>
-</div>
-
-    )
+    </div>
+  );
 }
+const KPICard = ({ label, value, icon }: any) => (
+  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+    <div className="flex justify-between items-center mb-4">
+      {React.cloneElement(icon, { size: 20 })}
+    </div>
+    <p className="text-xs font-bold text-slate-400 uppercase tracking-tight mb-1">{label}</p>
+    <h2 className="text-2xl font-black text-slate-900 tracking-tight">{value ?? "0"}</h2>
+  </div>
+);
+
+const QuickBtn = ({ icon, label, color }: any) => (
+  <button className={`${color} text-white p-4 rounded-2xl flex flex-col items-center gap-2`}>
+    {React.cloneElement(icon, { size: 18 })}
+    <span className="text-[10px] font-black uppercase tracking-tighter">{label}</span>
+  </button>
+);
+
+const ChartCard = ({ title, subtitle, children }: any) => (
+  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm h-80">
+    <div className="mb-4">
+      <h3 className="font-bold text-slate-800 text-lg">{title}</h3>
+      <p className="text-xs text-slate-400">{subtitle}</p>
+    </div>
+    <div className="h-56">{children}</div>
+  </div>
+);

@@ -288,23 +288,18 @@ select{
 }
 
 /* Color tokens */
-.blue { background: #e0f2fe;border-left:5px solid #0195f7; }
-.green { background: #ecfdf5;border-left:5px solid #41f09e; }
-.red { background: #fee2e2;border-left:5px solid #fd4e4e; }
-.yellow { background: #fef3c7;border-left:5px solid #ffdc51; }
-.purple { background: #ede9fe;border-left:5px solid #7b5dff; }
-.pink { background: #fce7f3;border-left:5px solid #fd4bb0; }
-.orange { background: #ffedd5;border-left:5px solid #fdae46; }
-.cyan { background: #cffafe;border-left:5px solid #30e4f5; }
+div[data-color="1"] { background: #e0f2fe;border-left:5px solid #0195f7; }
+div[data-color="2"] { background: #ecfdf5;border-left:5px solid #41f09e; }
+div[data-color="3"] { background: #fee2e2;border-left:5px solid #fd4e4e; }
+div[data-color="4"] { background: #fef3c7;border-left:5px solid #ffdc51; }
+div[data-color="6"] { background: #ede9fe;border-left:5px solid #7b5dff; }
+div[data-color="7"] { background: #fce7f3;border-left:5px solid #fd4bb0; }
+div[data-color="8"] { background: #ffedd5;border-left:5px solid #fdae46; }
+div[data-color="9"] { background: #cffafe;border-left:5px solid #30e4f5; }
+div[data-color="0"] { background: #06e6fa;border-left:5px solid #046068; }
 
-.blue  h1{
-  color: #0867a7;
-}
-.blue  p{
-  color: #0c84d3;
-}
-.blue .slot_location{
-  background-color: #55a5da9f;
+div{
+  cursor: pointer;
 }
 .conflict {
   background: #fee2e2;

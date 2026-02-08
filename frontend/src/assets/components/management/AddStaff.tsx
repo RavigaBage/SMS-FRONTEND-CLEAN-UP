@@ -119,26 +119,29 @@ export function AddStaffModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">System Role</label>
               <select 
-                value={formData.gender}
+                value={formData.gender?.toLowerCase() || ""}
                 onChange={(e) => setFormData({...formData, gender: e.target.value})}
                 className="w-full p-2.5 border border-slate-200 rounded-lg outline-none bg-white text-sm"
               >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="" >Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
               </select>
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">System Role</label>
               <select 
-                value={formData.staff_type}
-                onChange={(e) => setFormData({...formData, staff_type: e.target.value})}
-                className="w-full p-2.5 border border-slate-200 rounded-lg outline-none bg-white text-sm"
-              >
-                <option value="teacher">Teacher</option>
-                <option value="admin">Administrator</option>
-                <option value="registrar">Registrar</option>
-                <option value="librarian">Librarian</option>
-              </select>
+                  value={formData.staff_type}
+                  onChange={(e) => setFormData({...formData, staff_type: e.target.value})}
+                  className="w-full p-2.5 border border-slate-200 rounded-lg outline-none bg-white text-sm"
+                >
+                  <option value="teacher">Teacher</option>
+                  <option value="headmaster">Headmaster</option>
+                  <option value="bursar">Bursar</option>
+                  <option value="admin_staff">Admin Staff</option>
+                  <option value="support_staff">Support Staff</option>
+                </select>
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Status</label>

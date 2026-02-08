@@ -10,19 +10,31 @@ export interface User {
 export interface Student {
   id: number;
   user: User;
-  fullName: string;
   first_name: string;
   last_name: string;
+  fullName: string;
   date_of_birth: string | null;
   profileImage: string;
   email: string;
+  classInfo: any,
+  gender_display:String;
   grade: string;
   enrollmentDate: string;
   status: 'active' | 'graduated' | 'inactive';
-  // Note: Parent data is nested per the serializer
   parent?: {
     id: number;
     phone_number: string;
     address: string;
   };
+}
+
+
+export interface StudentListItem {
+  id: number;
+  fullName: string;
+  email: string;
+  grade: string;
+  enrollmentDate: string;
+  status: 'active' | 'graduated' | 'inactive';
+  profileImage: string;
 }

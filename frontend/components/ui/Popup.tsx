@@ -5,6 +5,7 @@ import TeachingForm from "./PopupForm";
 type PopupProps = {
   active: boolean;
   togglePopup: () => void;
+  setUpdating?:boolean;
   formData: Record<string, any>;
   fieldNames: string | string[];
   setFormData:  (field: string, value: any) => void;
@@ -14,6 +15,7 @@ type PopupProps = {
 export default function Popup({
   active,
   togglePopup,
+  setUpdating,
   formData,
   fieldNames,
   setFormData,
@@ -32,16 +34,10 @@ export default function Popup({
         <TeachingForm
           formData={formData}
           fieldName={fieldNames}
+          Update={setUpdating}
           setFormData={setFormData}
         />
 
-        <button
-          type="button"
-          onClick={togglePopup}
-          className="close-btn"
-        >
-          Close
-        </button>
       </div>
     </div>
   );

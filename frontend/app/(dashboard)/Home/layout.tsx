@@ -9,7 +9,6 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="app-shell">
-      {/* Side Navigation Bar on the left as seen in screen.png */}
       <Sidebar />
 
       <div className="content-shell">

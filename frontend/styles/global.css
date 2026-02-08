@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100..900;1,100..900&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -75,4 +76,68 @@ body {
 }
 .close-btn:hover {
   background: #c0392b;
+}
+
+.statusError{
+    background: #fee2e2;
+    color: #b91c1c;
+    padding:20px;
+    border-radius: 10px;
+    font-size:20px;
+}
+.statusSuccess{
+    background: #eafee2;
+    color: #34a308;
+    padding:20px;
+    border-radius: 10px;
+    font-size:20px;
+}
+
+.skeleton-box {
+  display: inline-block;
+  height: 1rem;
+  position: relative;
+  overflow: hidden;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+}
+.skeleton-box::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+  content: '';
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.skeleton-table td, 
+.skeleton-table th {
+  padding: 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.skeleton-pill {
+  border-radius: 999px;
+  height: 1.5rem;
+  width: 60px;
 }

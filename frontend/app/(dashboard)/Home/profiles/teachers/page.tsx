@@ -38,7 +38,6 @@ export default function StaffDirectoryPage() {
         method: "GET",
       });
 
-      // Map backend data to our StaffMember interface
       const formattedStaff = data.results.map((s: any) => ({
         id: s.user_id || s.id, // Support for the manual user_id
         fullName: `${s.first_name} ${s.last_name}`,

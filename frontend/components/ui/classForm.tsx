@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import "@/styles/formStyles.css";
-import { apiRequest } from '@/src/lib/apiClient';
+import { fetchWithAuth } from '@/src/lib/apiClient';
 /* ===== Types ===== */
 
 type OptionBase = {
@@ -29,37 +30,74 @@ type ClassFormProps = {
   formData: Record<string, any>;
   fieldName: string | string[];
   setFormData:  (field: string, value: any) => void;
+  isDeleting:Boolean
+  isUpdating:Boolean
 };
 
-
+export interface YearsModel {
+  end_date: string
+  id: number
+  is_current: boolean
+  start_date: string
+  year_name: string
+}
 export default function classForm({
   formData,
   setFormData,
+  isDeleting,
+  isUpdating
 }: ClassFormProps) {
   const [weekdays, setWeekdays] = useState<OptionBase[]>([]);
   const [teachers, setTeachers] = useState<TeacherBase[]>([]);
   const [subjects, setSubjects] = useState<OptionBase[]>([]);
-
   const [responseMsg, setResponseMsg] = useState<boolean>(false);
   const [messageMsg, setMessageMsg] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
-  const [AcademicYearList, setAcademicYearList] = useState<any>(null);
+  const [AcademicYearList, setAcademicYearList] = useState<YearsModel[]>([]);
+
+  useEffect(() => {
+    const syncTeacherData = async () => {
+      if (!formData.teachers) {
+        setSubjects([]); 
+        return;
+      }
+
+      try {
+        const res = await fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}/teachers/${formData.teachers}/subjects/`
+        );
+        
+        if (res.ok) {
+          const fetchedSubjects = await res.json();
+          
+          setSubjects(fetchedSubjects); 
+
+          const ids = fetchedSubjects.map((s: any) => s.id);
+          
+          setFormData("subject_id", ids); 
+        }
+      } catch (err) {
+        console.error("Auto-fetch failed:", err);
+      }
+    };
+
+    syncTeacherData();
+    setFormData("class_teacher", parseInt(formData.class_teacher_id));
+  }, [formData.teachers]);
 
   useEffect(() => {
     fetchTeachers();
     handleYearSync();
   }, []);
 
-  /* ===== Fetch helpers ===== */
 
   const fetchTeachers = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/teachers`,
+      const res = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/teachers`,
         {
           headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN_VAL}`,
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
         }
       );
@@ -67,44 +105,27 @@ export default function classForm({
       if(data){
         const result_set = data.results;
         setTeachers(result_set);
-
       }
       
     } catch (err) {
       console.error("Failed to load teachers", err);
     }
   };
+
   const handleYearSync = async () => {
     try {
-      const res = await fetch('/api/academic_years');
-      const result = await res.json();
-      
-      if (result.responseCode !== 0) throw new Error(result.responseMessage);
-      
-      const data = result.data;
-        if (data && typeof data == 'object') {
-        setAcademicYearList(data.year_list); 
+      const res = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/academic-years`,
+        {
+          headers: {
+            "Content-Type": "application/json"
+          },
         }
-      
-
-      const now = new Date();
-      const startYear = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
-      const currentKey = `${startYear}-${startYear + 1}`;
-
-      if (data.year_list[currentKey] !== "true") {
-        const updatedList = { ...data.year_list };
-        Object.keys(updatedList).forEach(yr => updatedList[yr] = "false");
-        updatedList[currentKey] = "true";
-
-        await fetch('/api/academic_years', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ year_list: updatedList })
-        });
-        
-        setAcademicYearList(updatedList);
-      } else {
-        setAcademicYearList(data.year_list);
+      );
+      const data = await res.json();
+      if(data){
+        const result_set = data.results;
+        setAcademicYearList(result_set);
       }
     } catch (error) {
       console.error("Internal Sync Error:", error);
@@ -112,60 +133,86 @@ export default function classForm({
   };
 
 
-  /* ===== Handlers ===== */
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setResponseMsg(true);
     setError(false);
-    setMessageMsg("Class Data Found");
+    
+    const url = isUpdating 
+      ? `${process.env.NEXT_PUBLIC_API_URL}/classes/${formData.id}/`
+      : `${process.env.NEXT_PUBLIC_API_URL}/classes/`;
+    
+    const method = isUpdating ? "PUT" : "POST";
+    
+    setMessageMsg(isUpdating ? "Updating Class..." : "Creating Class...");
 
-    var FormObject = new FormData();
-    Object.entries(formData).forEach(([key, value]) =>
-      FormObject.append(key, String(value))
-    );
-
-    const fetchRequest = await fetch(
-      // 1. Added trailing slash to prevent 301 Redirect
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/classes/`, 
-      {
-        method: "POST", // 2. Changed to POST
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN_VAL}`,
-          "Content-Type": "application/json",
+    try {
+      const fetchRequest = await fetchWithAuth(url, {
+        method: method, 
+        headers:{ 
+          "Content-Type": "application/json"
         },
-        // 3. Added the data body
         body: JSON.stringify(formData),
-      }
-    );
-    console.log(formData);
-if (fetchRequest.status === 400) {
-  const errorDetails = await fetchRequest.json();
-  console.log("The server says:", errorDetails); // This will tell you exactly what is missing
-}
-    if (!fetchRequest.ok) {
-      const errorData = await fetchRequest.json();
-      console.error("API Error Details:", errorData);
-      return;
-    }
+      });
 
-    const data_request = await fetchRequest.json();
-    console.log("Success:", data_request);
-    console.log(data_request);
+      if (fetchRequest.status === 400) {
+        const errorDetails = await fetchRequest.json();
+        console.error("Validation Error:", errorDetails);
+        setError(true);
+        setMessageMsg("Validation error. Please check your inputs.");
+        return;
+      }
+      
+      if (!fetchRequest.ok) {
+        const errorData = await fetchRequest.json();
+        console.error("API Error Details:", errorData);
+        setError(true);
+        setMessageMsg("An error occurred. Please try again.");
+        return;
+      }
+
+      const data_request = await fetchRequest.json();
+      console.log("Success:", data_request);
+      
+      setError(false);
+      setMessageMsg(isUpdating ? "Class updated successfully!" : "Class created successfully!");
+      
+      if (isUpdating) {
+        alert("Class updated successfully!");
+      }
+      
+      setTimeout(() => {
+        setResponseMsg(false);
+        setMessageMsg("");
+      }, 3000);
+
+    } catch (err) {
+      console.error("Request failed:", err);
+      setError(true);
+      setMessageMsg("Network error. Please try again.");
+    }
   };
+
+
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData(name, value);
+
+    if (name === "class_teacher" || name === "academic_year" || name === "grade_level" || name === "capacity") {
+      setFormData(name, value ? parseInt(value) : "");
+    } 
+    else {
+      setFormData(name, value);
+    }
   };
 
   return (
     <div className="form-page">
       <div className="form-wrapper">
-        <h2>Class creation Form</h2>
+        <h2>{formData.id ? "Edit Class" : "Class Creation Form"}</h2>
 
         <form onSubmit={handleSubmit} className="teaching-form">
           <div className={`loader_wrapper ${responseMsg ? "play" : ""}`}>
@@ -186,6 +233,7 @@ if (fetchRequest.status === 400) {
                 <input
                   type="text"
                   name="class_name"
+                  value={formData.class_name || ""}
                   onChange={handleChange}
                   placeholder="Enter the name of the class eg class 1, JHS 2,extra, shs 3 etc"
                   required
@@ -196,39 +244,74 @@ if (fetchRequest.status === 400) {
             <div className="feild">
               <label>
                 Teacher:
-                <select name="teachers" onChange={handleChange} required>
+                <select 
+                  name="class_teacher" 
+                  onChange={handleChange} 
+                  value={formData.class_teacher || ""} 
+                  required
+                >
                   <option value="">Select teacher</option>
-                  {teachers?.length === 0 && (
-                    <option>No list available</option>
-                  )}
                   {teachers?.map((t) => (
-                      <option key={t.id} value={t.id}>
-                          {`${t.first_name} ${t.last_name}`}
-                      </option>
+                    <option key={t.id} value={t.id}>
+                      {`${t.first_name} ${t.last_name}`}
+                    </option>
                   ))}
                 </select>
               </label>
             </div>
           </div>
-
+          <div className="feild_x_x">
+            <div className="feild"> 
+              <label>
+                "Grade level"
+                <input type="text" name="grade_level" value={formData.grade_level || ""} onChange={handleChange} placeholder="Enter the grade level eg Grade 1, Grade 2, Form 1, Form 2 etc" required />
+              </label>
+            </div>
+            <div className="feild"> 
+              <label>
+                "Section"
+                <input type="text" name="section" value={formData.section || ""} onChange={handleChange} placeholder="Enter the section of the class" required />
+              </label>
+            </div>
+            <div className="feild"> 
+              <label>
+                "capacity"
+                <input type="text" name="capacity" value={formData.capacity || ""} onChange={handleChange} placeholder="Enter the capacity of the class" required />
+              </label>
+            </div>
+          </div>
+          <div className="feild_x">
             <div className="feild">
               <label>
                 Academic year:
-                <select name="academic_year" onChange={handleChange} required>
+                <select name="academic_year" onChange={handleChange} value={formData.academic_year || ""} required>
                   <option value="">Select academic year</option>
                   
                   {AcademicYearList && AcademicYearList.length === 0 && (
                     <option>No list available</option>
                   )}
-                  {AcademicYearList && Object.entries(AcademicYearList).map(([year, isActive]) => (
-                    <option key={year} value={year}>
-                        {year} {isActive === "true" ? " (Current)" : ""}
+                  {AcademicYearList.map((year) => (
+                    <option key={year.id} value={year.id}>
+                        {year.year_name}
                     </option>
                     ))}
                 </select>
               </label>
             </div>
-          <button type="submit">Submit</button>
+
+            <div className="feild">
+              <label>
+                Room number:
+                <input type="text" name="room_number" value={formData.room_number || ""} onChange={handleChange} placeholder="Enter the room number" required />
+              </label>
+            </div>
+          </div>
+
+          <div className="button-group">
+            <button type="submit">
+              {formData.id ? "Update Class" : "Submit"}
+            </button>
+          </div>
         </form>
       </div>
     </div>

@@ -18,13 +18,14 @@
     background-color: rgba(5, 218, 5, 0.24);
     color:rgb(1, 146, 1);
 }
-body {
+.login {
     background-color: #f4f4f4;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     color:var( --accent-foreground);
+    width: 100%;
 }
 
 .login-container {

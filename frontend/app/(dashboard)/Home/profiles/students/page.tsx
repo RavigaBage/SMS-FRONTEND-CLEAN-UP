@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Plus, Search, Filter, Download } from "lucide-react";
-import { apiRequest } from "@/src/lib/apiClient";
+import { apiRequest, fetchWithAuth } from "@/src/lib/apiClient";
 import { StudentTable } from "@/src/assets/components/management/StudentTable";
 import { AddStudentModal } from "@/src/assets/components/management/AddStudentModal";
 import { Student } from "@/src/assets/types/api";
@@ -16,8 +16,9 @@ export default function StudentsManagementPage() {
   const fetchStudents = async () => {
     try {
       const data = await apiRequest("/students/", { method: "GET" });
+      const result:any = data.data;
       
-      const formattedData = data.map((s: any) => ({
+      const formattedData = result.map((s: any) => ({
         id: s.user_id || s.id, 
         fullName: `${s.first_name} ${s.last_name}`,
         email: s.email || "N/A",
@@ -32,6 +33,22 @@ export default function StudentsManagementPage() {
       console.error("Failed to load students:", err);
     }
   };
+const handleDelete = async (studentId: number) => {
+  if (!confirm('Are you sure you want to delete this student?')) {
+    return;
+  }
+  
+  try {
+    await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/students/${studentId}/`, {
+      method: 'DELETE',
+    });
+    
+    fetchStudents();
+  } catch (error) {
+    console.error('Failed to delete student:', error);
+  }
+};
+
 
   useEffect(() => {
     fetchStudents();
@@ -83,19 +100,25 @@ export default function StudentsManagementPage() {
 
       </div>
 
-      {/* Table Card */}
-      <div className="table-card">
-        <StudentTable students={filteredStudents} />
-      </div>
-
-      {/* Modal */}
-      <AddStudentModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          fetchStudents();
-        }}
+    <div className="table-card">
+      <StudentTable 
+        students={filteredStudents}
+        onDelete={handleDelete}
       />
+    </div>
+
+    {/* Modal */}
+    <AddStudentModal
+      isOpen={isModalOpen}
+      onClose={() => {
+        setIsModalOpen(false);
+        fetchStudents();
+      }}
+      onSuccess={() => {         
+        fetchStudents();  
+        setIsModalOpen(false); 
+      }}
+    />
 
     </div>
 

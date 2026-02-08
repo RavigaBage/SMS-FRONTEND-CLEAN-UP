@@ -1,28 +1,31 @@
-// frontend/src/components/dashboard/StatsCard.tsx
+
 interface StatsCardProps {
   label: string;
   value: string | number;
   subValue?: string;
-  color: "cyan" | "blue" | "orange";
+  color: "cyan" | "blue" | "orange" | "emerald" | "slate"; 
 }
 
 export function StatsCard({ label, value, subValue, color }: StatsCardProps) {
-  const colors = {
-    cyan: "text-cyan-600 bg-cyan-50",
-    blue: "text-blue-600 bg-blue-50",
-    orange: "text-orange-600 bg-orange-50",
+  // 2. Add the Tailwind classes for the new colors
+  const colorClasses = {
+    cyan: "bg-cyan-50 text-cyan-600",
+    blue: "bg-blue-50 text-blue-600",
+    orange: "bg-orange-50 text-orange-600",
+    emerald: "bg-emerald-50 text-emerald-600", // For 'Active'
+    slate: "bg-slate-50 text-slate-600",       // For 'Inactive'
   };
 
-  return (
-    <div className="p-4 rounded-xl border bg-white shadow-sm">
-      <p className="text-sm font-medium text-slate-500 uppercase">{label}</p>
-      <div className="flex items-center justify-between mt-2">
-        <h2 className="text-2xl font-bold">{value}</h2>
-        <div className={`p-2 rounded-lg ${colors[color]}`}>
-          {/* Icon would go here */}
-        </div>
+
+return (
+    <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+      <div className="flex items-end gap-2 mt-1">
+        <h4 className="text-2xl font-bold text-slate-800">{value}</h4>
+        {subValue && <span className="text-[10px] font-bold text-slate-400 mb-1">{subValue}</span>}
       </div>
-      {subValue && <p className="text-xs mt-2 text-green-600 font-medium">{subValue}</p>}
+      {/* Visual indicator bar or icon using the color */}
+      <div className={`h-1 w-8 mt-3 rounded-full ${colorClasses[color]}`} />
     </div>
   );
 }

@@ -1,123 +1,213 @@
-// frontend/src/assets/components/management/AddStudentModal.tsx
 "use client";
 
-import { useState } from "react";
-import { X, Save, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, User, Hash, Calendar, Loader2, MapPin, Activity } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
-import { useRouter } from "next/navigation";
 
-export function AddStudentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const router = useRouter();
+interface Student {
+  id: number;
+  admission_number: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  current_class: {
+    id: number;
+    name: string;
+    grade_level: number;
+    section: string;
+    academic_year: string;
+  } | null;
+}
+
+
+export function AddStudentModal({ isOpen, onClose, onSuccess }: { 
+  isOpen: boolean; 
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, any>>({});
+  const [classes, setClasses] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  // Match these exactly to your Django Student model/serializer fields
-  const [formData, setFormData] = useState({
+  const initialData = {
     first_name: "",
     last_name: "",
+    middle_name: "",
+    admission_number: "",
     date_of_birth: "",
+    admission_date: new Date().toISOString().split('T')[0], // Default to today
+    gender: "male",
     status: "active",
-  });
+    class_id: "", 
+    address: "",
+  };
 
-  if (!isOpen) return null;
+  const [formData, setFormData] = useState(initialData);
+
+  // Fetch classes so user can pick from a list instead of typing an ID
+  useEffect(() => {
+    if (isOpen) {
+      const fetchClasses = async () => {
+        try {
+          const res = await apiRequest<any>("/classes/");
+          setClasses(res.data || []);
+        } catch (err) {
+          console.error("Failed to load classes");
+        }
+      };
+      fetchClasses();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setErrors({});
+    setError(null);
 
     try {
-      // Sending as a single dictionary/object {} to match Django's default expectation
-      await apiRequest("/students/", {
+      const payload = {
+        ...formData,
+        class_obj: formData.class_id || null, 
+        parents: [] // Keep as empty list per your requirement
+      };
+
+     const result = await apiRequest<Student>("/students/", {
         method: "POST",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
+     console.log("Student created:", result);
+      const student = result?.data ?? result;
+
+     setFormData(initialData);
+      onSuccess(); // optional
       onClose();
-      router.refresh(); // Refresh the table data
-      setFormData({ first_name: "", last_name: "", date_of_birth: "", status: "active" });
+      console.log('creation was a success');
+
     } catch (err: any) {
-      // err.message contains the JSON string of errors from Django
-      try {
-        const backendErrors = JSON.parse(err.message);
-        setErrors(backendErrors);
-      } catch {
-        setErrors({ general: "Something went wrong. Please check your connection." });
-      }
+      // Simple error handling: extract message from DRF response
+      const errorMsg = err.response?.data 
+        ? Object.entries(err.response.data).map(([k, v]) => `${k}: ${v}`).join(", ")
+        : "Failed to register student. Please check the fields.";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="p-6 border-b flex justify-between items-center bg-slate-50">
-          <h2 className="text-xl font-bold text-slate-800">Add New Student</h2>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-            <X size={20} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white w-full max-w-xl rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden transform animate-in zoom-in-95 duration-200">
+        
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+          <div>
+            <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">Student Registration</h2>
+            {error && <p className="text-[10px] text-red-500 font-bold mt-1">{error}</p>}
+          </div>
+          <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-full transition-colors">
+            <X size={18} className="text-slate-400" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+          
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-500 uppercase">First Name</label>
-              <input 
-                type="text" 
-                required
-                value={formData.first_name}
-                onChange={(e) => setFormData({...formData, first_name: e.target.value})}
-                className={`w-full p-2.5 border rounded-lg outline-none transition-all ${errors.first_name ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:ring-2 focus:ring-cyan-100'}`} 
-              />
-              {errors.first_name && <p className="text-[10px] text-red-500 font-bold">{errors.first_name[0]}</p>}
+            <div className="space-y-1.5 col-span-2 md:col-span-1">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Admission # *</label>
+              <div className="relative">
+                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                <input
+                  required
+                  className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-cyan-500/20 text-sm"
+                  value={formData.admission_number}
+                  onChange={(e) => setFormData({...formData, admission_number: e.target.value})}
+                />
+              </div>
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-500 uppercase">Last Name</label>
-              <input 
-                type="text" 
-                required
-                value={formData.last_name}
-                onChange={(e) => setFormData({...formData, last_name: e.target.value})}
-                className={`w-full p-2.5 border rounded-lg outline-none transition-all ${errors.last_name ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:ring-2 focus:ring-cyan-100'}`} 
-              />
-              {errors.last_name && <p className="text-[10px] text-red-500 font-bold">{errors.last_name[0]}</p>}
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-500 uppercase">Date of Birth</label>
-              <input 
-                type="date" 
-                value={formData.date_of_birth}
-                onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
-                className="w-full p-2.5 border border-slate-200 rounded-lg outline-none text-sm" 
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-500 uppercase">Status</label>
+            <div className="space-y-1.5 col-span-2 md:col-span-1">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Class Assignment</label>
               <select 
-                value={formData.status}
-                onChange={(e) => setFormData({...formData, status: e.target.value})}
-                className="w-full p-2.5 border border-slate-200 rounded-lg outline-none bg-white text-sm"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none text-sm"
+                value={formData.class_id}
+                onChange={(e) => setFormData({...formData, class_id: e.target.value})}
               >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="graduated">Graduated</option>
+                <option value="">Not Assigned</option>
+                {classes.map((cls) => (
+                  <option key={cls.id} value={cls.id}>{cls.class_name}</option>
+                ))}
               </select>
             </div>
           </div>
 
-          {errors.general && <p className="text-center text-red-500 text-xs font-bold">{errors.general}</p>}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">First Name</label>
+              <input
+                required
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 text-sm"
+                value={formData.first_name}
+                onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Last Name</label>
+              <input
+                required
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 text-sm"
+                value={formData.last_name}
+                onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+              />
+            </div>
+          </div>
 
-          <div className="pt-4 flex gap-3">
-            <button type="button" onClick={onClose} disabled={loading} className="flex-1 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">DOB *</label>
+              <input 
+                required
+                type="date"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 text-sm"
+                value={formData.date_of_birth}
+                onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gender *</label>
+              <select 
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 text-sm"
+                value={formData.gender}
+                onChange={(e) => setFormData({...formData, gender: e.target.value})}
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Home Address</label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-3 text-slate-400" size={14} />
+              <textarea 
+                className="w-full pl-8 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 text-sm min-h-[60px]"
+                value={formData.address}
+                onChange={(e) => setFormData({...formData, address: e.target.value})}
+              />
+            </div>
+          </div>
+
+          {/* Footer Actions */}
+          <div className="flex gap-2 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 py-3 bg-slate-50 text-slate-400 font-black rounded-xl hover:bg-slate-100 transition-all text-[10px] uppercase tracking-widest">
               Cancel
             </button>
-            <button type="submit" disabled={loading} className="flex-1 py-2.5 bg-cyan-500 text-white text-sm font-bold rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center gap-2">
-              {loading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />} 
-              {loading ? "Saving..." : "Save Student"}
+            <button type="submit" disabled={loading} className="flex-[2] py-3 bg-cyan-600 text-white font-black rounded-xl hover:bg-cyan-700 transition-all text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
+              {loading ? <Loader2 className="animate-spin" size={14} /> : "Finalize Registration"}
             </button>
           </div>
         </form>

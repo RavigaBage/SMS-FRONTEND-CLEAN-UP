@@ -16,9 +16,9 @@ export default function DropdownYear({
   setFormData,
 }: DropdownYearProps) {
   // generate years dynamically
-  const options: number[] = [];
+  const options = [];
   for (let i = currentYear; i >= currentYear - 5; i--) {
-    options.push(i);
+    options.push(`${i}/${i+1}`);
   }
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -28,7 +28,7 @@ export default function DropdownYear({
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
 
-  const handleSelect = (option: number) => {
+  const handleSelect = (option: any) => {
     setSelected(option);
     setIsOpen(false);
     setFormData(fieldName, option);

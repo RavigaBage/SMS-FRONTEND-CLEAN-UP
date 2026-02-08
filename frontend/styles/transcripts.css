@@ -210,3 +210,59 @@
     padding: 0;
   }
 }
+.termHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #edf2f7;
+}
+
+.rankBadge {
+  text-align: center;
+  background: #f8fafc;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.rankLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #64748b;
+  display: block;
+  font-weight: bold;
+}
+
+.rankValue {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.rankValue.gold {
+  color: #d4af37; /* Gold color */
+  text-shadow: 0 0 1px rgba(0,0,0,0.1);
+}
+
+.statusTag.above { color: #059669; background: #ecfdf5; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.statusTag.below { color: #dc2626; background: #fef2f2; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+
+.rankPill {
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #475569;
+}
+.rankPill.gold {
+  background: #fefce8;
+  color: #a16207;
+  border: 1px solid #fef08a;
+}
+.termRankBox {
+  text-align: right;
+  line-height: 1;
+}

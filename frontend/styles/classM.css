@@ -115,7 +115,6 @@
   background: #f8fafc;
 }
 
-/* Status Badges */
 .status {
   padding: 6px 12px;
   border-radius: 20px;
@@ -150,11 +149,16 @@
   border:1px solid var(--border);
   border-radius: 8px;
   background: #ffffff;
+  z-index: -1;
 }
 .actionContainer.active {
   opacity: 1;
+  z-index: 1;
 }
 
+.menu-trigger{
+  z-index: 2;
+}
 .actionBtn {
   font-size: 16px;
   font-weight: 600;
@@ -178,6 +182,7 @@
 .btnEdit { color: #2563eb; }
 .btnAssign { color: var(--emerald); }
 .btnManage { color: #9333ea; }
+.btnDelete { color: #ea3f33; }
 
 .footerSpace {
   height: 40px;
