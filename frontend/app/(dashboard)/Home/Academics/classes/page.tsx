@@ -334,6 +334,7 @@ export default function ClassesManagement() {
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
             >
+              <option>Select academic year</option>
                 {AcademicYears.map((year) => (
                 <option key={year.id} value={year.id}>
                     {year.year_name}

@@ -7,7 +7,7 @@ import { Users, GraduationCap, Calendar, DollarSign, Plus, FileText, ClipboardLi
 import Link from "next/link";
 import { Bar, Line } from 'react-chartjs-2';
 import "@/styles/home.css";
-
+import Image from "next/image";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -37,6 +37,8 @@ export default function HomePage() {
   const [stats, setStats] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
+  const [UserName, setUsername] = useState("");
+  const [UserRole, setRole] = useState("");
   
     const fetchDashboardData = async () => {
       setLoading(true);
@@ -55,7 +57,10 @@ export default function HomePage() {
       }
     };
   useEffect(() => {
-
+    const username = localStorage.getItem('userName');
+    const userRole = localStorage.getItem('userRole');
+    setUsername(username as any);
+    setRole(userRole as any);
     fetchDashboardData();
   }, []);
 
@@ -178,18 +183,28 @@ if (error && !loading) {
           <div className="flex justify-between items-center w-full">
             <div className="flex gap-3">
               <button className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg">Main Dashboard</button>
-              <button className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50">Analytics</button>
-            </div>
-            <div className="search-container relative w-1/3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input type="text" placeholder="Search..." className="w-full bg-slate-100 border-none rounded-xl pl-10 pr-4 py-2 text-sm outline-none" />
+
+            <span className="px-3 py-1.5 bg-slate-100 text-slate-800 rounded-lg text-xs font-extrabold tracking-wide shadow-sm">
+              {new Date().toLocaleDateString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+              })}
+            </span>
+
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
-                <p className="font-bold text-slate-900 text-sm">Alex Sterling</p>
-                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1">Super Admin</p>
+                <p className="font-bold text-slate-900 text-sm">{UserName}</p>
+                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1">{UserRole}</p>
               </div>
-              <img src="https://i.pravatar.cc/150?u=admin" alt="User" className="w-10 h-10 rounded-full" />
+              <Image
+                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(UserName)}&background=random`}
+                alt="User avatar"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
             </div>
           </div>
         )}
@@ -197,7 +212,7 @@ if (error && !loading) {
 
       <div className="dashboard-grid p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Left Column */}
-        <section className="left-column lg:col-span-3 space-y-8">
+        <section className="left-column lg:col-span-1 space-y-8">
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             {loading ? (
@@ -268,7 +283,7 @@ if (error && !loading) {
         </section>
 
         {/* Right Panel */}
-        <aside className="space-y-8">
+        <aside className="lg:col-span-1 space-y-8">
           <div>
             <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Quick Actions</h4>
             <div className="grid grid-cols-2 gap-3">
@@ -328,7 +343,7 @@ const KPICard = ({ label, value, icon }: any) => (
 );
 
 const QuickBtn = ({ icon, label, color }: any) => (
-  <button className={`${color} text-white p-4 rounded-2xl flex flex-col items-center gap-2`}>
+  <button className={`${color} w-full text-white p-4 rounded-2xl flex flex-col items-center gap-2`}>
     {React.cloneElement(icon, { size: 18 })}
     <span className="text-[10px] font-black uppercase tracking-tighter">{label}</span>
   </button>

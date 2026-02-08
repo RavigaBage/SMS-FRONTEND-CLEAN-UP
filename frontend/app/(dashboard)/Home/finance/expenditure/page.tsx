@@ -299,13 +299,11 @@ export default function ExpenditurePage() {
     }
   });
 
-  // 3. Find max value to determine percentage heights
   const maxSpend = Math.max(...monthlyTotals.map(m => m.total), 1); // Avoid division by zero
   return monthlyTotals.map((m, index) => ({
     ...m,
     height: `${(m.total / maxSpend) * 100}%`,
     active: index === currentMonthIndex,
-    // Add this line for the tooltip
     formattedTotal: `₵${m.total.toLocaleString(undefined, { minimumFractionDigits: 0 })}`
   }));
   }, [expenses]);

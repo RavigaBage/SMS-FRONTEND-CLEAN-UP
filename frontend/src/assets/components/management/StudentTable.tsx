@@ -1,7 +1,7 @@
 
 import Link from "next/dist/client/link";
 import { Student } from "../../types/api";
-import { Trash2 } from "lucide-react";
+import { Trash2,Users } from "lucide-react";
 interface StudentTableProps {
   students: Student[];
   onDelete: (id: number) => void; 
@@ -11,6 +11,22 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
   
   return (
     <div className="bg-white border-x border-b rounded-b-2xl overflow-hidden">
+      {students.length <= 0 ? (
+        <div className="bg-white border border-slate-200 rounded-3xl p-10 text-center shadow-sm">
+          <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center">
+            <Users className="w-6 h-6 text-slate-400" />
+          </div>
+
+          <h3 className="text-sm font-black text-slate-800 tracking-wide">
+            No Student Data Found
+          </h3>
+
+          <p className="mt-2 text-xs text-slate-400 max-w-xs mx-auto">
+            There are currently no student records available. Add a student to get started.
+          </p>
+        </div>
+
+      ):(
       <table className="w-full text-left">
         <thead className="bg-slate-50 border-y text-[10px] font-bold text-slate-400 uppercase tracking-widest">
           <tr>
@@ -58,6 +74,8 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
           ))}
         </tbody>
       </table>
+      )}
+          
     </div>
   );
 }

@@ -351,11 +351,7 @@ const [formData, setFormData] = useState({
       page,
     });
 
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
+   
   }, [debouncedSearch, selectedDate, departmentFilter, statusFilter, page]);
 
   /* ---------------- API ---------------- */

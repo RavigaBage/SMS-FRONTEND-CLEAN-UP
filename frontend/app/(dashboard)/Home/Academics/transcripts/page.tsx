@@ -31,6 +31,35 @@ export type StudentResponse = {
     status: "active" | "on_leave";
   }[];
 };
+export interface UserInfo {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  is_active: boolean;
+  is_staff: boolean;
+  created_at: string;
+}
+export interface Teacher {
+  id: number;
+  user: UserInfo;
+  first_name: string;
+  last_name: string;
+  specialization: string;
+}
+export interface ClassData {
+  id: number;
+  class_name: string;
+  teachers: Teacher[];
+}
+
+export interface ClassesBase {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: ClassData[];
+}
 
 
 export async function fetchStudentsByClass(
@@ -56,6 +85,7 @@ export async function fetchStudentsByClass(
 
 export default function TranscriptHome() {
   const [students, setStudents] = useState<StudentRow[]>([]);
+  const [Classes, setClasses] = useState<ClassData[]>([]);
   const [summary, setSummary] = useState<SummaryRow>({ total: 0, active: 0, on_leave: 0 });
   const [selectedClass, setSelectedClass] = useState('Grade 10-B');
   const [selectedYear, setSelectedYear] = useState('2025/26');
@@ -63,6 +93,39 @@ export default function TranscriptHome() {
   useEffect(() => {
     loadData();
   }, [selectedClass, selectedYear]);
+
+    const fetchClasses = async () => {
+      try {
+        const res = await fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN_VAL}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+    
+        if (!res.ok) {
+            throw new Error(`Server error: ${res.status}`);
+        }
+    
+        const data: ClassesBase = await res.json();
+        
+    
+        if (data && data.results) {
+          setClasses(data.results);
+        } else {
+          console.warn("API returned success but results array is missing:", data);
+        }
+        
+      } catch (err) {
+        console.error("Failed to load Classes:", err);
+      }
+    };
+    useEffect(()=>{
+        fetchClasses();
+    })
 
     const loadData = async () => {
         try {
@@ -85,10 +148,10 @@ export default function TranscriptHome() {
     ): string[] => {
     return Array.from({ length: count }, (_, i) => {
         const year = startYear - i;
-        return `${year}/${String(year + 1).slice(2)}`;
+        return `${year}-${String(year + 1)}`;
     });
     };
-    const academicYears = generateAcademicYears(2025, 5);
+    const academicYears = generateAcademicYears(2030, 10);
 
 
     return(
@@ -100,9 +163,17 @@ export default function TranscriptHome() {
                         <div className="filter-group">
                             <label>Select Class</label>
                             <select className="nav-select">
-                                <option>Grade 10-B</option>
-                                <option>Grade 10-A</option>
-                                <option>Grade 9-C</option>
+                                <option>Select Class</option>
+                                {
+                                    Classes && (
+                                        Classes.map((c,index)=>(
+                                            <option key={`peskey${c.id} paskey${index}`} value={c.id}>
+                                                {c.class_name}
+                                            </option>
+                                        ))
+                                    )}:(
+                                        <option>No classes to show, add contact administration to add a class</option>
+                                    )
                             </select>
                         </div>
                         <div className="filter-group">
