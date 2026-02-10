@@ -7,7 +7,6 @@ interface StatsCardProps {
 }
 
 export function StatsCard({ label, value, subValue, color }: StatsCardProps) {
-  // 2. Add the Tailwind classes for the new colors
   const colorClasses = {
     cyan: "bg-cyan-50 text-cyan-600",
     blue: "bg-blue-50 text-blue-600",

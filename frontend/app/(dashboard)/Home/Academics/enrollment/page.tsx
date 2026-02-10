@@ -8,6 +8,7 @@ import EnrollPopup from "@/components/ui/enrollmentPopup";
 import SkeletonTable from '@/components/ui/SkeletonLoader';
 import { fetchWithAuth } from "@/src/lib/apiClient";
 import Pagination from '@/src/assets/components/dashboard/Pagnation';
+import {ErrorState} from '@/src/assets/components/dashboard/ErrorState';
 
 export interface UserInfo {
   id: string;
@@ -251,7 +252,7 @@ useEffect(() => {
 const displayData = enrollmentData;
 
   return (
-    <div className="dashboardWrapper">
+    <div className="dashboardWrapper ENROLLDATA">
       <div className="dashboard">
         
         <EnrollPopup
@@ -311,7 +312,6 @@ const displayData = enrollmentData;
                 {Classes.map((t) => (
                     <option key={t.id} value={t.id}>
                     {t.class_name} 
-                    {/* {t.teachers.map(t => `${t.first_name} ${t.last_name}`).join(', ')} */}
                     </option>
                 ))}
             </select>
@@ -386,7 +386,9 @@ const displayData = enrollmentData;
                 ) : (
                   <tr>
                     <td colSpan={5} style={{ textAlign: "center", padding: "2rem" }}>
-                      No enrollments found.
+                      <div>
+                        <ErrorState code={6} message="No Student Enrollment Found"/>
+                      </div>
                     </td>
                   </tr>
                 )}

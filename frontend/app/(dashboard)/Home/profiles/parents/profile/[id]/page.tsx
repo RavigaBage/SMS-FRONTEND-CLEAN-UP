@@ -7,7 +7,9 @@ import {
   ChevronRight, MessageSquare, Edit3, GraduationCap 
 } from 'lucide-react';
 
-/* ---------- Types ---------- */
+type IconProps = {
+  className?: string;
+};
 interface Ward {
   id: number;
   full_name: string;
@@ -137,7 +139,7 @@ export default function ParentProfile() {
 }
 const ContactItem = ({ icon, text }: { icon: React.ReactNode, text: string }) => (
   <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-    {React.cloneElement(icon as React.ReactElement, { className: "w-3.5 h-3.5 text-slate-400" })}
+    {React.cloneElement(icon as React.ReactElement<IconProps>, { className: "w-3.5 h-3.5 text-slate-400" })}
     <span className="font-medium">{text}</span>
   </div>
 );

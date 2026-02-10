@@ -9,6 +9,15 @@ interface EnrollModalProps {
   onClose: () => void;
   onSuccess: () => void;
 }
+type StudentResponse = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  date_of_birth: string;
+  gender: string;
+};
 
 export function EnrollStudentModal({ isOpen, onClose, onSuccess }: EnrollModalProps) {
   const [loading, setLoading] = useState(false);
@@ -33,7 +42,7 @@ export function EnrollStudentModal({ isOpen, onClose, onSuccess }: EnrollModalPr
       const fetchClasses = async () => {
         try {
           const data = await apiRequest("/classes/", { method: "GET" });
-          setClasses(data.results || data);
+          setClasses(data.results as any || data);
         } catch (err) { console.error("Error loading classes:", err); }
       };
       fetchClasses();
@@ -45,7 +54,7 @@ export function EnrollStudentModal({ isOpen, onClose, onSuccess }: EnrollModalPr
     setLoading(true);
     try {
       // 1. Create the Student first
-      const student = await apiRequest("/students/", {
+      const student = await apiRequest<StudentResponse>("/students/", {
         method: "POST",
         body: JSON.stringify({
           first_name: formData.first_name,
@@ -58,7 +67,7 @@ export function EnrollStudentModal({ isOpen, onClose, onSuccess }: EnrollModalPr
       });
 
       // 2. Use the returned student ID to create the enrollment
-      if (student && student.id) {
+      if (student && student?.id) {
         await apiRequest("/enrollments/", {
           method: "POST",
           body: JSON.stringify({

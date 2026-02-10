@@ -8,7 +8,6 @@ import { QuickNotes } from "@/src/assets/components/dashboard/QuickNotesCard";
 export default function StudentProfilePage() {
   const response = mockStudentProfile;
 
-  // 1. Handle Response Errors (Code 1-8) [cite: 24, 59, 61]
   if (response.responseCode !== 0) {
     return (
       <div className="p-20 max-w-xl mx-auto">
@@ -20,7 +19,6 @@ export default function StudentProfilePage() {
     );
   }
 
-  // 2. Handle Empty Success State (dataCount: 0) [cite: 11, 68]
   if (response.dataCount === 0 || !response.data) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh]">
@@ -44,8 +42,35 @@ export default function StudentProfilePage() {
             <p className="text-slate-500">ID: {student.studentId} • {student.gradeLevel} • {student.stream}</p>
           </div>
           <div className="flex gap-2">
-            <button className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-slate-50">Message Parent</button>
-            <button className="px-4 py-2 bg-cyan-500 text-white rounded-lg text-sm font-medium hover:bg-cyan-600">Edit Profile</button>
+            <button
+              onClick={() => {
+                const email = student.personalDetails.email;
+                const subject = encodeURIComponent("Regarding Your Ward");
+                const body = encodeURIComponent(
+                  `Hello,\n\nI would like to discuss matters concerning your child.\n\nThank you.`
+                );
+
+                window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+              }}
+              className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-slate-50"
+            >
+              Message Parent (Email)
+            </button>
+
+            <button
+              onClick={() => {
+                const phone = student.personalDetails.phone.replace(/\D/g, "");
+                const message = encodeURIComponent(
+                  "Hello, I would like to discuss matters concerning your child."
+                );
+
+                window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+              }}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600"
+            >
+              Message Parent (WhatsApp)
+            </button>
+
           </div>
         </div>
       </section>

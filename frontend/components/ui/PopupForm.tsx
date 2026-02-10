@@ -4,8 +4,6 @@ import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import "@/styles/formStyles.css";
 import { fetchWithAuth } from "@/src/lib/apiClient";
 
-/* ===== Types ===== */
-
 type OptionBase = {
   id: number | string;
   name?: string;

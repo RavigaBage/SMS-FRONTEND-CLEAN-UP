@@ -37,12 +37,7 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: var(--bg-main);
-  color: var(--text-primary);
-  line-height: 1.6;
-}
+
 
 .STUDENT_GRADE .dashboard-container {
   min-height: 100vh;
@@ -374,7 +369,7 @@ body {
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
-.btn-primary:disabled {
+.STUDENT_GRADE .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -385,7 +380,7 @@ body {
   border: 2px solid var(--primary);
 }
 
-.STUDENT_GRADE.btn-secondary:hover {
+.STUDENT_GRADE .btn-secondary:hover {
   background: var(--primary);
   color: white;
   transform: translateY(-2px);

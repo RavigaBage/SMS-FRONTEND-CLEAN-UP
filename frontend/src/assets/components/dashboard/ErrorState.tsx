@@ -1,4 +1,3 @@
-// frontend/src/components/dashboard/ErrorState.tsx
 "use client";
 
 interface ErrorStateProps {
@@ -20,11 +19,11 @@ export function ErrorState({ code, message }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center p-12 bg-white rounded-2xl border border-red-100 shadow-sm">
       <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4">
-        {/* Warning Icon here */}
+        
       </div>
       <h2 className="text-xl font-bold text-slate-800">{getErrorType(code)}</h2>
       <p className="text-slate-500 mt-2 text-center max-w-xs">
-        {message} {/* Rule: responseMessage must be user-safe [cite: 67] */}
+        {message} 
       </p>
       <button 
         onClick={() => window.location.reload()}

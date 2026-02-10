@@ -1,4 +1,3 @@
-// frontend/src/assets/components/dashboard/QuickNotes.tsx
 
 import { StickyNote } from "lucide-react";
 

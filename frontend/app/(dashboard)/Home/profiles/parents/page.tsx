@@ -180,14 +180,21 @@ const handleCreateParent = async (payload: MyFormData) => {
 
   const handleEditParent = async (id: number, payload: MyFormData) => {
     try {
-      const updated = await apiRequest<Parent>(`/parents/${id}/`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-      body: JSON.stringify(payload),
+      const response = await apiRequest<Parent>(`/parents/${id}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
-      setParents(prev => prev.map(p => (p.id === id ? updated : p)));
+
+      const updated = response.data;
+      
+      if (!updated || Array.isArray(updated)) {
+        throw new Error("Invalid parent response");
+      }
+
+      setParents(prev =>
+        prev.map(p => (p.id === id ? updated : p))
+      );
       setEditParent(null);
       setOpenForm(false);
       alert('Parent updated ✅');

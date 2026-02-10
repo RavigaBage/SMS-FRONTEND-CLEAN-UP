@@ -14,23 +14,18 @@ const CreateInvoicePage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // Invoice Header State
   const [formData, setFormData] = useState({
     studentId: '',
     academicYearId: '',
     term: '1',
-    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 14 days from now
+    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 
   });
 
-  // Line Items State
   const [feeItems, setFeeItems] = useState<FeeItem[]>([
     { id: crypto.randomUUID(), description: '', amount: 0 }
   ]);
 
-  // Totals Calculation
   const totalAmount = feeItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-
-  // --- Handlers ---
 
   const addRow = () => {
     setFeeItems([...feeItems, { id: crypto.randomUUID(), description: '', amount: 0 }]);
@@ -102,7 +97,6 @@ const CreateInvoicePage = () => {
         </div>
       </div>
 
-      {/* Header Inputs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div>
           <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Student ID</label>
@@ -148,7 +142,6 @@ const CreateInvoicePage = () => {
         </div>
       </div>
 
-      {/* Line Items Table */}
       <div className="mb-6">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -200,7 +193,6 @@ const CreateInvoicePage = () => {
         </button>
       </div>
 
-      {/* Footer / Summary */}
       <div className="flex flex-col items-end border-t pt-6">
         <div className="w-64">
           <div className="flex justify-between mb-2">

@@ -15,17 +15,17 @@ body {
     color: var(--text-dark);
 }
 
-.dashboard-container { display: flex; min-height: 100vh; }
+.dashboard-container .TRANSCRIPTDATA { display: flex; min-height: 100vh; }
 
 /* Sidebar - Matches Students/Finance modules */
-.sidebar { width: 260px; background: white; border-right: 1px solid var(--border); padding: 24px; position: fixed; height: 100vh; }
-.nav-item { padding: 12px; color: var(--text-muted); cursor: pointer; border-radius: 8px; margin-top: 5px; }
-.nav-item.active { background: #ECFEFF; color: var(--primary-teal); font-weight: 600; }
-
+.TRANSCRIPTDATA .sidebar { width: 260px; background: white; border-right: 1px solid var(--border); padding: 24px; position: fixed; height: 100vh; }
+.TRANSCRIPTDATA .nav-item { padding: 12px; color: var(--text-muted); cursor: pointer; border-radius: 8px; margin-top: 5px; }
+.TRANSCRIPTDATA .nav-item.active { background: #ECFEFF; color: var(--primary-teal); font-weight: 600; }
+.TRANSCRIPTDATA 
 .content { flex: 1;padding: 20px 40px; }
 
 /* Top Nav Bar with Filters */
-.main-header { 
+.TRANSCRIPTDATA .main-header { 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
@@ -34,11 +34,11 @@ body {
     margin-bottom: 30px;
 }
 
-.nav-filters { display: flex; gap: 24px; }
-.filter-group { display: flex; flex-direction: column; }
-.filter-group label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+.TRANSCRIPTDATA .nav-filters { display: flex; gap: 24px; }
+.TRANSCRIPTDATA .filter-group { display: flex; flex-direction: column; }
+.TRANSCRIPTDATA .filter-group label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
 
-.nav-select {
+.TRANSCRIPTDATA .nav-select {
     border: 1px solid var(--border);
     padding: 6px 12px;
     border-radius: 6px;
@@ -46,19 +46,19 @@ body {
     font-size: 13px;
     font-weight: 600;
 }
-.nav-select.short { width: 100px; }
+.TRANSCRIPTDATA .nav-select.short { width: 100px; }
 
 /* Summary Stats */
-.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-.stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.stat-card label { font-size: 10px; font-weight: 700; color: var(--text-muted); }
-.stat-card .val { font-size: 22px; font-weight: 700; color: var(--text-dark); margin: 5px 0; }
-.sub-text { font-size: 11px; color: #F59E0B; font-weight: 600; }
+.TRANSCRIPTDATA .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+.TRANSCRIPTDATA .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.TRANSCRIPTDATA .stat-card label { font-size: 10px; font-weight: 700; color: var(--text-muted); }
+.TRANSCRIPTDATA .stat-card .val { font-size: 22px; font-weight: 700; color: var(--text-dark); margin: 5px 0; }
+.TRANSCRIPTDATA .sub-text { font-size: 11px; color: #F59E0B; font-weight: 600; }
 
 /* Table Design */
-.table-card { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-.student-list-table { width: 100%; border-collapse: collapse; }
-.student-list-table th { 
+.TRANSCRIPTDATA .table-card { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+.TRANSCRIPTDATA .student-list-table { width: 100%; border-collapse: collapse; }
+.TRANSCRIPTDATA .student-list-table th { 
     text-align: left; 
     padding: 16px; 
     background: #F1F5F9; 
@@ -68,16 +68,16 @@ body {
     position: sticky; 
     top: 0; 
 }
-.student-list-table td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
-.student-list-table tr:hover { background-color: #F8FAFC; cursor: default; }
+.TRANSCRIPTDATA .student-list-table td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+.TRANSCRIPTDATA .student-list-table tr:hover { background-color: #F8FAFC; cursor: default; }
 
-.student-avatar { width: 36px; height: 36px; border-radius: 50%; }
-.status-pill { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.status-pill.active { background: #DCFCE7; color: #166534; }
-.status-pill.leave { background: #FEF3C7; color: #92400E; }
+.TRANSCRIPTDATA .student-avatar { width: 36px; height: 36px; border-radius: 50%; }
+.TRANSCRIPTDATA .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.TRANSCRIPTDATA .status-pill.active { background: #DCFCE7; color: #166534; }
+.TRANSCRIPTDATA .status-pill.leave { background: #FEF3C7; color: #92400E; }
 
-.text-right { text-align: right; }
-.btn-table { 
+.TRANSCRIPTDATA .text-right { text-align: right; }
+.TRANSCRIPTDATA .btn-table { 
     background: white; 
     border: 1px solid var(--primary-teal); 
     color: var(--primary-teal); 
@@ -87,11 +87,11 @@ body {
     cursor: pointer;
     transition: 0.2s;
 }
-.btn-table:hover { background: var(--primary-teal); color: white; }
+.TRANSCRIPTDATA .btn-table:hover { background: var(--primary-teal); color: white; }
 
 /* Pagination */
-.pagination { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); }
-.page-info { font-size: 12px; color: var(--text-muted); }
-.page-btns { display: flex; gap: 5px; }
-.page-btn { padding: 6px 12px; border: 1px solid var(--border); background: white; border-radius: 4px; cursor: pointer; font-size: 12px; }
-.page-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+.TRANSCRIPTDATA .pagination { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); }
+.TRANSCRIPTDATA .page-info { font-size: 12px; color: var(--text-muted); }
+.TRANSCRIPTDATA .page-btns { display: flex; gap: 5px; }
+.TRANSCRIPTDATA .page-btn { padding: 6px 12px; border: 1px solid var(--border); background: white; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.TRANSCRIPTDATA .page-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }

@@ -11,40 +11,40 @@
   --radius: 14px;
 }
 
-.dashboardWrapper {
+.dashboardWrapper .SUBJECTDATA{
   min-height: 100vh;
   background: linear-gradient(135deg, #eef2ff, #f8fafc);
   padding: 40px 0;
   font-family: 'Inter', sans-serif;
 }
 
-.dashboard {
+.SUBJECTDATA .dashboard {
   max-width: 1300px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
 /* Header */
-.header {
+.SUBJECTDATA .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 26px;
 }
 
-.header h1 {
+.SUBJECTDATA .header h1 {
   font-size: 26px;
   font-weight: 700;
   color: var(--text-dark);
 }
 
-.header p {
+.SUBJECTDATA .header p {
   color: var(--text-muted);
   margin-top: 4px;
 }
 
 /* Primary Button */
-.primaryBtn {
+.SUBJECTDATA .primaryBtn {
   background: linear-gradient(135deg, var(--primary), #2563eb);
   color: white;
   padding: 12px 18px;
@@ -57,50 +57,50 @@
   transition: all 0.25s ease;
 }
 
-.primaryBtn:hover {
+.SUBJECTDATA .primaryBtn:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 30px rgba(37,99,235,0.35);
 }
 
 /* Table Card */
-.tableCard {
+.SUBJECTDATA .tableCard {
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
 
-.subjectTable {
+.SUBJECTDATA .subjectTable {
   width: 100%;
   border-collapse: collapse;
 }
 
-.subjectTable thead {
+.SUBJECTDATA .subjectTable thead {
   background: #f1f5f9;
 }
 
-.subjectTable th, 
-.subjectTable td {
+.SUBJECTDATA .subjectTable th, 
+.SUBJECTDATA .subjectTable td {
   padding: 18px;
   text-align: left;
   font-size: 14px;
 }
 
-.subjectTable th {
+.SUBJECTDATA .subjectTable th {
   font-weight: 600;
   color: var(--text-muted);
 }
 
-.subjectTable tbody tr {
+.SUBJECTDATA .subjectTable tbody tr {
   border-top: 1px solid var(--border);
   transition: background 0.25s ease;
 }
 
-.subjectTable tbody tr:hover {
+.SUBJECTDATA .subjectTable tbody tr:hover {
   background: #f8fafc;
 }
 
 /* Status Badges */
-.status {
+.SUBJECTDATA .status {
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -108,23 +108,23 @@
   display: inline-block;
 }
 
-.statusActive {
+.SUBJECTDATA .statusActive {
   background: #ecfdf5;
   color: var(--emerald);
 }
 
-.statusInactive {
+.SUBJECTDATA .statusInactive {
   background: #fee2e2;
   color: #b91c1c;
 }
 
 /* Actions */
-.actionGroup {
+.SUBJECTDATA .actionGroup {
   display: flex;
   gap: 8px;
 }
 
-.actionBtn {
+.SUBJECTDATA .actionBtn {
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -135,14 +135,14 @@
   transition: all 0.25s ease;
 }
 
-.actionBtn:hover {
+.SUBJECTDATA .actionBtn:hover {
   background: #f1f5f9;
   transform: translateY(-1px);
 }
 
-.btnEdit { color: #2563eb; }
-.btnAssign { color: var(--emerald); }
+.SUBJECTDATA .btnEdit { color: #2563eb; }
+.SUBJECTDATA .btnAssign { color: var(--emerald); }
 
-.footerSpace {
+.SUBJECTDATA .footerSpace {
   height: 40px;
 }

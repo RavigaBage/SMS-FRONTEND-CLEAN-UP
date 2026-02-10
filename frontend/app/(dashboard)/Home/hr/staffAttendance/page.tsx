@@ -358,9 +358,6 @@ const [formData, setFormData] = useState({
 
   const fetchAttendanceData = useCallback(async (opts?: FetchOptions) => {
 
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
 
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
@@ -533,7 +530,7 @@ console.log(summary);
 };
 
   return (
-    <div className="container">
+    <div className="container staffAttendance">
       {/* Error Banner */}
       {error && (
         <div style={{

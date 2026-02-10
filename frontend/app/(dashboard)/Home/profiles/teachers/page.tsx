@@ -33,13 +33,20 @@ export default function StaffDirectoryPage() {
         page: page.toString(),
         search: search,
       });
-
-      const data: PaginatedResponse = await apiRequest(`/staff/?${query}`, {
+      const res = await apiRequest<any>(`/staff/?${query}`, {
         method: "GET",
       });
 
+
+      const data: PaginatedResponse = {
+        count: res.count ?? 0,
+        next: res.next ?? null,
+        previous: res.previous ?? null,
+        results: res.results ?? [],
+      };
+
       const formattedStaff = data.results.map((s: any) => ({
-        id: s.user_id || s.id, // Support for the manual user_id
+        id: s.user_id || s.id,
         fullName: `${s.first_name} ${s.last_name}`,
         role: s.role || "Staff",
         department: s.department || "General",

@@ -46,6 +46,7 @@ export interface StudentRaw {
 
 // Update your ApiResponse generic to handle paginated DRF responses
 export interface ApiResponse<T> {
+  id: ApiResponse<{ id: number; first_name: string; last_name: string; email: string; phone: string; date_of_birth: string; gender: string; }>;
   responseCode: number;
   responseMessage: string;
   data: T[];

@@ -1,9 +1,7 @@
-// frontend/src/components/dashboard/GradeTable.tsx
 
 export function GradeTable({ grades = [] }: { grades: any[] }) {
   const safeGrades = Array.isArray(grades) ? grades : [];
 
-  // 1. Helper for the Status Label and Color
   const getStatusDetails = (letter: string) => {
     const l = letter?.toUpperCase() || '';
     if (['A+', 'A', 'A-'].includes(l)) return { label: 'Excellent', color: 'text-emerald-600 bg-emerald-50 border-emerald-100' };

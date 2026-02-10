@@ -8,6 +8,7 @@ import EnrollPopup from "@/components/ui/subjectPopup"
 import { fetchWithAuth } from "@/src/lib/apiClient";
 import SkeletonTable from '@/components/ui/SkeletonLoader';
 import Pagination from '@/src/assets/components/dashboard/Pagnation';
+import {ErrorState} from '@/src/assets/components/dashboard/ErrorState';
 export interface Subject {
   id: number;
   subject_name: string;
@@ -44,6 +45,7 @@ const [formData, setFormData] = useState({
   const [isLoading, setIsLoading] = useState(true);
   const [pagination, setPagination] = useState<PaginatedResponse<Subject> | null>(null);
   const [page, setPage] = useState(1);
+  
 
 const fetchSubjects = async () => {
   setIsLoading(true);
@@ -125,7 +127,7 @@ useEffect(() => {
 }, []);
 
   return (
-    <div className="dashboardWrapper">
+    <div className="dashboardWrapper SUBJECTDATA">
       <div className="dashboard">
         
         <EnrollPopup
@@ -197,9 +199,11 @@ useEffect(() => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={3} style={{ textAlign: "center", padding: "2rem" }}>
-                    No subjects found.
-                  </td>
+                    <td colSpan={3} style={{ textAlign: "center", padding: "2rem" }}>
+                      <div>
+                        <ErrorState code={6} message="No Subject Found"/>
+                      </div>
+                    </td>
                 </tr>
               )}
             </tbody>

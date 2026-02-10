@@ -5,7 +5,7 @@ import ClassPopup from "@/components/ui/classPopup";
 import { fetchWithAuth } from '@/src/lib/apiClient';
 import SkeletonTable from '@/components/ui/SkeletonLoader';
 import Pagination from '@/src/assets/components/dashboard/Pagnation';
-
+import {ErrorState} from '@/src/assets/components/dashboard/ErrorState';
 import '@/styles/classM.css'
 import '@/styles/global.css'
 
@@ -305,7 +305,7 @@ export default function ClassesManagement() {
   };
   return (
 
-    <div className="dashboardWrapper">
+    <div className="dashboardWrapper CLASSDATA">
       <ClassPopup
         active={active}
         togglePopup={handlePopup}
@@ -389,8 +389,10 @@ export default function ClassesManagement() {
             <tbody>
               {classData.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>
-                    No classes found. Click "Add Class" to create one.
+                  <td colSpan={6} style={{ textAlign: "center", padding: "2rem" }}>
+                    <div>
+                      <ErrorState code={6} message="No Subject Found"/>
+                    </div>
                   </td>
                 </tr>
               ) : (

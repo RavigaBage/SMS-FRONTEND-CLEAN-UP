@@ -29,7 +29,6 @@ export function EditStaffModal({
     health_info: "",
   });
 
-  // 2. Load existing data (Hook must be at the top)
   useEffect(() => {
     if (staffData && isOpen) {
       setFormData({
@@ -48,12 +47,11 @@ export function EditStaffModal({
 
   if (!isOpen) return null;
 
- // Add this state at the top
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg(null); // Clear previous errors
+    setErrorMsg(null); 
 
     try {
       await apiRequest(`/staff/${staffData.id}/`, {
@@ -63,14 +61,11 @@ export function EditStaffModal({
       onSuccess();
       onClose();
     } catch (err: any) {
-      // Logic to strip "django.core.exceptions.ValidationError"
       const rawError = err.message || "An error occurred";
       
-      // If Django sends an object like { email: ["..."] }
       if (typeof err === 'object' && err !== null) {
           const firstKey = Object.keys(err)[0];
           const message = Array.isArray(err[firstKey]) ? err[firstKey][0] : err[firstKey];
-          // Remove potential bracket/quote residue from Django's string representation
           setErrorMsg(message.replace(/[\[\]']+/g, ''));
       } else {
           setErrorMsg(rawError);
@@ -84,7 +79,6 @@ export function EditStaffModal({
     <div className="fixed inset-0 z-60 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
       <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
-        {/* Header */}
         <div className="p-6 border-b flex justify-between items-center bg-white">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-cyan-50 text-cyan-600 rounded-xl">
@@ -110,13 +104,11 @@ export function EditStaffModal({
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[80vh] overflow-y-auto">
           
-          {/* Section: Names */}
           <div className="grid grid-cols-2 gap-4">
             <FormInput label="First Name" value={formData.first_name} onChange={(val: string) => setFormData({...formData, first_name: val})} />
             <FormInput label="Last Name" value={formData.last_name} onChange={(val: string) => setFormData({...formData, last_name: val})} />
           </div>
 
-          {/* Section: Contact */}
           <div className="grid grid-cols-2 gap-4">
             <FormInput label="Email Address" icon={<Mail size={12}/>} value={formData.email} onChange={(val: string) => setFormData({...formData, email: val})} />
             <FormInput label="Phone (e.g. +233...)" icon={<Phone size={12}/>} value={formData.phone_number} onChange={(val: string) => setFormData({...formData, phone_number: val})} />
@@ -124,7 +116,6 @@ export function EditStaffModal({
 
           <hr className="border-slate-100" />
 
-          {/* Section: Professional (Using Django StaffType Choices) */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -172,7 +163,6 @@ export function EditStaffModal({
             />
           </div>
 
-          {/* Section: Health Info */}
           <div className="space-y-1">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 text-rose-500">
               <HeartPulse size={10}/> Medical / Health Info
@@ -186,7 +176,6 @@ export function EditStaffModal({
             />
           </div>
 
-          {/* Footer Actions */}
           <div className="flex gap-3 pt-4">
             <button type="button" onClick={onClose} className="flex-1 py-4 text-sm font-black text-slate-500 hover:bg-slate-50 rounded-2xl transition-all uppercase tracking-widest">
               Cancel

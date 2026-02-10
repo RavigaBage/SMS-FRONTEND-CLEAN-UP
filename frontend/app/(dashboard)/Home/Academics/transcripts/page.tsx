@@ -155,7 +155,7 @@ export default function TranscriptHome() {
 
 
     return(
-        <div className="dashboard-container">
+        <div className="dashboard-container TRANSCRIPTDATA">
 
             <main className="content">
                 <header className="main-header">

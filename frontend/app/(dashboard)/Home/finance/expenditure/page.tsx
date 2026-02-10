@@ -190,12 +190,7 @@ export default function ExpenditurePage() {
   /* ---------------- API ---------------- */
 
   const fetchExpenditureData = useCallback(async (opts?: FetchExpenditureOptions) => {
-    // Cancel any pending request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
 
-    // Create new abort controller
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
 
@@ -299,7 +294,7 @@ export default function ExpenditurePage() {
     }
   });
 
-  const maxSpend = Math.max(...monthlyTotals.map(m => m.total), 1); // Avoid division by zero
+  const maxSpend = Math.max(...monthlyTotals.map(m => m.total), 1); 
   return monthlyTotals.map((m, index) => ({
     ...m,
     height: `${(m.total / maxSpend) * 100}%`,

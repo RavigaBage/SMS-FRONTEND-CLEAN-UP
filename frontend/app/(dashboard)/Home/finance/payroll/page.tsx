@@ -38,7 +38,14 @@ function normalizeRecord(raw: PayrollRecordRaw): PayrollRecord {
   const bs = Number(raw.basic_salary ?? raw.basic ?? raw.salary ?? 0);
   const allowances = Number(raw.allowances ?? raw.allowance_total ?? raw.total_allowances ?? 0);
   const deductions = Number(raw.deductions ?? raw.deduction_total ?? raw.total_deductions ?? 0);
-  const net = Number(raw.net_pay ?? raw.net ?? bs + allowances - deductions ?? 0);
+  const computedNet = bs + allowances - deductions;
+  const net = Number(
+    raw.net_pay ??
+    raw.net ??
+    computedNet ??
+    0
+  );
+
 
   const staffName = raw.staff_name ?? raw.staff?.full_name ?? raw.staff_full_name ?? "Unknown";
 

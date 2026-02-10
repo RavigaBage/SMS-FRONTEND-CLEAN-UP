@@ -16,8 +16,13 @@ export default function ClassManagementPage() {
     setLoading(true);
     try {
       // Adjust the endpoint to match your Django URL
-      const data = await apiRequest("/classes/", { method: "GET" });
-      setClasses(data.results || data);
+      const res = await apiRequest<any[]>("/classes/", { method: "GET" });
+      
+      const classes = Array.isArray(res.data)
+        ? res.data
+        : res.results ?? [];
+
+      setClasses(classes);
     } catch (err) {
       console.error("Failed to fetch classes:", err);
     } finally {

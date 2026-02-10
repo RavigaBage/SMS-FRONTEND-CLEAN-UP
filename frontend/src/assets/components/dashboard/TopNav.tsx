@@ -1,4 +1,4 @@
-// frontend/src/assets/components/dashboard/TopNav.tsx
+
 "use client";
 import React,{useEffect,useState} from 'react'
 import { usePathname } from "next/navigation";
@@ -15,7 +15,7 @@ export function TopNav() {
     const isProfilePage = pathname.includes("/students/") && pathname !== "/students";
   return (
     <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-20">
-      {/* Left side: Dynamic Breadcrumbs */}
+      
       <div className="flex items-center text-xs font-medium">
         {isManagementPage && (
           <>

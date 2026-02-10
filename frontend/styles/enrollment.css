@@ -11,40 +11,40 @@
   --radius: 14px;
 }
 
-.dashboardWrapper {
+.dashboardWrapper .ENROLLDATA{
   min-height: 100vh;
   background: linear-gradient(135deg, #eef2ff, #f8fafc);
   padding: 40px 0;
   font-family: 'Inter', sans-serif;
 }
 
-.dashboard {
+.ENROLLDATA .dashboard {
   max-width: 1300px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
 /* Header */
-.header {
+.ENROLLDATA .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 26px;
 }
 
-.header h1 {
+.ENROLLDATA .header h1 {
   font-size: 26px;
   font-weight: 700;
   color: var(--text-dark);
 }
 
-.header p {
+.ENROLLDATA .header p {
   color: var(--text-muted);
   margin-top: 4px;
 }
 
 /* Primary Button */
-.primaryBtn {
+.ENROLLDATA .primaryBtn {
   background: linear-gradient(135deg, var(--primary), #2563eb);
   color: white;
   padding: 12px 18px;
@@ -57,13 +57,13 @@
   transition: all 0.25s ease;
 }
 
-.primaryBtn:hover {
+.ENROLLDATA .primaryBtn:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 30px rgba(37,99,235,0.35);
 }
 
 /* Controls */
-.controls {
+.ENROLLDATA .controls {
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -71,12 +71,12 @@
   flex-wrap: wrap;
 }
 
-.searchBox {
+.ENROLLDATA .searchBox {
   flex: 1;
   max-width: 420px;
 }
 
-.searchBox input {
+.ENROLLDATA .searchBox input {
   width: 100%;
   padding: 4px 14px;
   border-radius: 12px;
@@ -88,12 +88,12 @@
   margin:0px !important;
 }
 
-.filters {
+.ENROLLDATA .filters {
   display: flex;
   gap: 12px;
 }
 
-.filters select,input[type="number"] {
+.ENROLLDATA .filters select,input[type="number"] {
   padding: 10px 14px;
   border-radius: 10px;
   border: 1px solid var(--border);
@@ -104,44 +104,44 @@
 }
 
 /* Table Card */
-.tableCard {
+.ENROLLDATA .tableCard {
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
 
-.enrollmentTable {
+.ENROLLDATA .enrollmentTable {
   width: 100%;
   border-collapse: collapse;
 }
 
-.enrollmentTable thead {
+.ENROLLDATA .enrollmentTable thead {
   background: #f1f5f9;
 }
 
-.enrollmentTable th, 
-.enrollmentTable td {
+.ENROLLDATA .enrollmentTable th, 
+.ENROLLDATA .enrollmentTable td {
   padding: 18px;
   text-align: left;
   font-size: 14px;
 }
 
-.enrollmentTable th {
+.ENROLLDATA .enrollmentTable th {
   font-weight: 600;
   color: var(--text-muted);
 }
 
-.enrollmentTable tbody tr {
+.ENROLLDATA .enrollmentTable tbody tr {
   border-top: 1px solid var(--border);
   transition: background 0.25s ease;
 }
 
-.enrollmentTable tbody tr:hover {
+.ENROLLDATA .enrollmentTable tbody tr:hover {
   background: #f8fafc;
 }
 
 /* Status Tags */
-.status {
+.ENROLLDATA .status {
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -149,28 +149,28 @@
   display: inline-block;
 }
 
-.statusActive {
+.ENROLLDATA .statusActive {
   background: #ecfdf5;
   color: var(--emerald);
 }
 
-.statusPending {
+.ENROLLDATA .statusPending {
   background: #fffbeb;
   color: var(--amber);
 }
 
-.statusWithdrawn {
+.ENROLLDATA .statusWithdrawn {
   background: #fee2e2;
   color: #b91c1c;
 }
 
 /* Actions */
-.actionGroup {
+.ENROLLDATA .actionGroup {
   display: flex;
   gap: 8px;
 }
 
-.actionBtn {
+.ENROLLDATA .actionBtn {
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -181,33 +181,33 @@
   transition: all 0.25s ease;
 }
 
-.actionBtn:hover {
+.ENROLLDATA .actionBtn:hover {
   background: #f1f5f9;
   transform: translateY(-1px);
 }
 
-.btnView { color: var(--primary); }
-.btnEdit { color: #2563eb; }
-.btnRemove { color: #b91c1c; }
+.ENROLLDATA .btnView { color: var(--primary); }
+.ENROLLDATA .btnEdit { color: #2563eb; }
+.ENROLLDATA .btnRemove { color: #b91c1c; }
 
-.footerSpace {
+.ENROLLDATA .footerSpace {
   height: 40px;
 }
 
-.full-width-cell p {
+.ENROLLDATA .full-width-cell p {
   text-align: center;
   padding-block: 20px;
   color: #666;
   font-style: italic;
 }
-.searchBox{
+.ENROLLDATA .searchBox{
   display: flex;
   align-items: center;
   border-radius: 12px;
   border: 1px solid var(--border);
   background-color: var(--card);
 }
-.search-button {
+.ENROLLDATA .search-button {
   color: white;
   border-radius: 6px;
   display: flex;
@@ -218,22 +218,22 @@
   background-color: transparent;
 }
 
-.search-button:hover {
+.ENROLLDATA .search-button:hover {
   background-color: #0882a7;
 }
-.search-button:hover svg{
+.ENROLLDATA .search-button:hover svg{
   fill: #fff;
 }
-.search-results-text {
+.ENROLLDATA .search-results-text {
   font-size: 0.9rem;
   color: #666;
   margin-top: -15px;
   margin-bottom: 15px;
 }
-.filters {
+.ENROLLDATA .filters {
   margin-bottom: 0px !important;
 }
-.filter-group {
+.ENROLLDATA .filter-group {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -243,11 +243,11 @@
   border: 1px solid #e5e7eb;
 }
 
-.filter-group svg {
+.ENROLLDATA .filter-group svg {
   color: #6b7280;
 }
 
-.filter-group select {
+.ENROLLDATA .filter-group select {
   border: none;
   background: transparent;
   font-size: 14px;
@@ -256,7 +256,7 @@
   outline: none;
 }
 
-.clear-filters {
+.ENROLLDATA .clear-filters {
   font-size: 12px;
   color: #ef4444;
   background: none;
@@ -264,11 +264,11 @@
   cursor: pointer;
   text-decoration: underline;
 }
-.filters select {
+.ENROLLDATA .filters select {
   border:none !important;
   box-shadow: none !important;
 }
-.status-dot-container {
+.ENROLLDATA .status-dot-container {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -277,22 +277,22 @@
     color: #374151;
   }
 
-  .dot {
+  .ENROLLDATA .dot {
     height: 8px;
     width: 8px;
     border-radius: 50%;
   }
 
-  .dot-active {
+  .ENROLLDATA .dot-active {
     background-color: #22c55e;
     box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2); 
   }
 
-  .dot-inactive {
+  .ENROLLDATA .dot-inactive {
     background-color: #9ca3af;
   }
 
-.status-badge {
+.ENROLLDATA .status-badge {
     display: inline-flex;
     align-items: center;
     padding: 4px 12px;
@@ -303,13 +303,13 @@
     letter-spacing: 0.025em;
   }
 
-  .status-active {
+  .ENROLLDATA .status-active {
     background-color: #dcfce7;
     color: #15803d;          
     border: 1px solid #bbf7d0;
   }
 
-  .status-inactive {
+  .ENROLLDATA .status-inactive {
     background-color: #f3f4f6; /* Light Gray */
     color: #4b5563;           /* Dark Gray */
     border: 1px solid #e5e7eb;

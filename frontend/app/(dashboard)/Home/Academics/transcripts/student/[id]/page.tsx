@@ -108,7 +108,7 @@ export default function StudentTranscript() {
   const terms = Array.from(new Set(records.map(r => r.term))).sort();
 
   return (
-    <div className="dashboardWrapper">
+    <div className="dashboardWrapper TRANSCRIPTDATA">
       <div className="dashboard">
         <header className="header no-print">
           <div>
