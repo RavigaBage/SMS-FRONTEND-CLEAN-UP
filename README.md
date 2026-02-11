@@ -1,53 +1,108 @@
+
 # School Management System
 
 A comprehensive school management platform for academic and administrative operations.
 
+---
+
 ## Overview
 
-Modern web application built with a React frontend and Django REST API backend. Designed to streamline student records, academic management, financial tracking, and communication.
+A modern full-stack web application built with a **Next.js frontend** and **Django REST Framework backend**.
+
+The platform streamlines:
+
+* Student records
+* Academic management
+* Financial tracking
+* Attendance monitoring
+* Internal communication
+
+Designed for performance, scalability, and maintainability.
+
+---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | React, TypeScript, Vite, Tailwind CSS, shadcn/ui |
-| Backend | Django, Django REST Framework |
-| Database | SQLite (dev) / PostgreSQL (prod) |
-| Deployment | Docker, GitHub Actions, VPS |
+| Layer      | Technology                                     |
+| ---------- | ---------------------------------------------- |
+| Frontend   | Next.js (App Router), TypeScript, Tailwind CSS |
+| Backend    | Django, Django REST Framework                  |
+| Database   | SQLite (Development) / PostgreSQL (Production) |
+| Charts     | Chart.js                                       |
+| Deployment | Docker, GitHub Actions, VPS                    |
+
+---
 
 ## Project Structure
+
 ```
-├── frontend/          # React SPA
+├── frontend/              # Next.js App Router application
 │   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── lib/
+│   │   ├── app/           # Routes & layouts
+│   │   ├── components/    # Reusable UI components
+│   │   ├── lib/           # API utilities
+│   │   └── styles/
+│   ├── public/
 │   └── package.json
-├── backend/           # Django API
+│
+├── backend/               # Django REST API
 │   ├── apps/
 │   ├── config/
 │   └── requirements.txt
-└── .github/workflows/ # CI/CD
+│
+└── .github/workflows/     # CI/CD pipelines
 ```
 
-## Quick Start
+---
 
-### Prerequisites
+# 🚀 Quick Start
 
-- Node.js 20+
-- Python 3.12+
-- Docker (optional)
+## Prerequisites
 
-### Frontend
+* Node.js 18+
+* Python 3.12+
+* Docker (optional)
+
+---
+
+## Frontend (Next.js)
+
 ```bash
 cd frontend
 npm install
+```
+
+Create a `.env` file in the `frontend` directory:
+
+```
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NODE_ENV=development
+```
+
+Start development server:
+
+```bash
 npm run dev
 ```
 
-Runs at `http://localhost:5173`
+Runs at:
 
-### Backend
+```
+http://localhost:3000
+```
+
+Build for production:
+
+```bash
+npm run build
+npm start
+```
+
+---
+
+## Backend (Django API)
+
 ```bash
 cd backend
 python -m venv .venv
@@ -58,79 +113,113 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Runs at `http://localhost:8000`
+Runs at:
 
-### Docker (Backend)
+```
+http://localhost:8000
+```
+
+---
+
+## Docker (Backend Only)
+
 ```bash
 cd backend
 cp .env.example .env
-docker compose up
+docker compose up --build
 ```
 
-## API Documentation
+---
+
+# 🔐 Environment Variables
+
+## Frontend (`frontend/.env`)
+
+| Variable               | Description                   |
+| ---------------------- | ----------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | Base URL of the frontend      |
+| `NEXT_PUBLIC_API_URL`  | Backend API base URL          |
+| `NODE_ENV`             | `development` or `production` |
+
+---
+
+## Backend (`backend/.env`)
+
+| Variable               | Description                         | Example                                        |
+| ---------------------- | ----------------------------------- | ---------------------------------------------- |
+| `DJANGO_SECRET_KEY`    | Django secret key                   | Required                                       |
+| `DEBUG`                | Debug mode                          | True                                           |
+| `ALLOWED_HOSTS`        | Allowed hostnames                   | localhost,127.0.0.1                            |
+| `CORS_ALLOWED_ORIGINS` | Frontend URL                        | [http://localhost:3000](http://localhost:3000) |
+| `DATABASE_URL`         | PostgreSQL connection string (prod) | postgres://...                                 |
+
+---
+
+# 📘 API Documentation
 
 Once backend is running:
 
-- Swagger UI: `http://localhost:8000/api/docs/`
-- OpenAPI Schema: `http://localhost:8000/api/schema/`
+* Swagger UI → `http://localhost:8000/api/docs/`
+* OpenAPI Schema → `http://localhost:8000/api/schema/`
 
-## Environment Variables
+---
 
-### Backend (.env)
+# 🧩 Core Modules
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DJANGO_SECRET_KEY` | Secret key for Django | Required |
-| `DEBUG` | Debug mode | `True` |
-| `ALLOWED_HOSTS` | Allowed hostnames | `localhost,127.0.0.1` |
-| `CORS_ALLOWED_ORIGINS` | Frontend URL | `http://localhost:5173` |
+* Student Management — Enrollment, profiles, academic history
+* Staff Management — Registration, assignments, attendance
+* Academic Management — Classes, subjects, timetables
+* Attendance — Daily tracking, reports
+* Examinations — Grading and report cards
+* Fees — Billing, payments, financial reports
+* Communications — Announcements and notifications
 
-## Core Modules
+---
 
-- **Student Management** – Enrollment, profiles, academic history
-- **Staff Management** – Registration, assignments, attendance
-- **Academic Management** – Classes, subjects, timetables
-- **Attendance** – Daily tracking, reports, alerts
-- **Examinations** – Assessments, grading, report cards
-- **Fees** – Billing, payments, financial reports
-- **Communications** – Announcements, messaging, notifications
+# 🧪 Development
 
-## Development
+### Backend Tests
 
-### Running Tests
 ```bash
-# Backend
 cd backend
 python manage.py test
-
-# Frontend
-cd frontend
-npm run test
 ```
 
-### Linting
-```bash
-# Backend
-pip install ruff
-ruff check .
+### Frontend Lint
 
-# Frontend
+```bash
+cd frontend
 npm run lint
 ```
 
-## Deployment
+---
 
-### Quick Deploy
+# 🚢 Deployment Flow
 
-1. Push to `main` branch
+1. Push to `main`
 2. GitHub Actions builds Docker image
 3. Image pushed to GitHub Container Registry
-4. Auto-deploys to VPS via SSH
+4. Deployment triggered on VPS
 
-## Contributing
+---
+
+# 🤝 Contributing
 
 1. Fork the repository
-2. Create feature branch (`git checkout -b feature/name`)
-3. Commit changes (`git commit -m "Add feature"`)
-4. Push to branch (`git push origin feature/name`)
+2. Create a feature branch
+
+   ```bash
+   git checkout -b feature/name
+   ```
+3. Commit changes
+
+   ```bash
+   git commit -m "Add feature"
+   ```
+4. Push branch
+
+   ```bash
+   git push origin feature/name
+   ```
 5. Open a Pull Request
+
