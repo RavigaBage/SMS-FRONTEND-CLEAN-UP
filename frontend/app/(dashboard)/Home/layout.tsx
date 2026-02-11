@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { TopNav } from "@/src/assets/components/dashboard/TopNav";
+import PageTransition from "@/src/assets/components/dashboard/PagnationTransition";
 
 export default function DashboardLayout({
   children,
@@ -51,7 +52,7 @@ export default function DashboardLayout({
 
       <div className="content-shell">
         <TopNav />
-        <main className="page-content">{children}</main>
+        <main className="page-content"><PageTransition>{children}</PageTransition></main>
       </div>
     </div>
   );

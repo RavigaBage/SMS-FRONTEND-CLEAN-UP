@@ -168,47 +168,6 @@ if (error && !loading) {
 
   return (
     <div className="main-view bg-slate-50 min-h-screen">
-      {/* Header */}
-      <header className="top-bar bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-        {loading ? (
-          <div className="flex items-center gap-4 w-full">
-            <SkeletonBox className="h-8 w-32" />
-            <SkeletonBox className="h-8 w-24" />
-            <div className="flex-1 flex justify-end gap-4">
-              <SkeletonBox className="h-10 w-32" />
-              <SkeletonBox className="h-10 w-10 rounded-full" />
-            </div>
-          </div>
-        ) : (
-          <div className="flex justify-between items-center w-full">
-            <div className="flex gap-3">
-              <button className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg">Main Dashboard</button>
-
-            <span className="px-3 py-1.5 bg-slate-100 text-slate-800 rounded-lg text-xs font-extrabold tracking-wide shadow-sm">
-              {new Date().toLocaleDateString("en-US", {
-                month: "short",
-                day: "2-digit",
-                year: "numeric",
-              })}
-            </span>
-
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right hidden sm:block">
-                <p className="font-bold text-slate-900 text-sm">{UserName}</p>
-                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1">{UserRole}</p>
-              </div>
-              <Image
-                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(UserName)}&background=random`}
-                alt="User avatar"
-                width={40}
-                height={40}
-                className="rounded-full"
-              />
-            </div>
-          </div>
-        )}
-      </header>
 
       <div className="dashboard-grid p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Left Column */}

@@ -57,7 +57,7 @@ const handleSubmit = async (e: FormEvent) => {
             <div className="login-left">
                 <div className="form-wrapper">
                     <div className="logo">
-                        <i className="fa-solid fa-code"></i> SoftQA
+                        <i className="fa-solid fa-code"></i>
                     </div>
                     <div className={`response ${Response.status=='success'?'success':''} ${Response.status=='error'?'error':''}`}>
                         <div className={`loader_wrapper ${loader ?'play':'active'}`}>

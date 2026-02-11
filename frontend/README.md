@@ -1,8 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# School Management System — Frontend
 
-First, run the development server:
+This is a **Next.js** application built using `create-next-app`.
+It powers the School Management System dashboard and connects to the backend API for authentication, student management, staff management, and more.
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+---
+
+### 2️⃣ Configure Environment Variables
+
+Before running the project, create a `.env` file in the root of the frontend project.
+
+Example:
+
+```
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:5000
+NODE_ENV=development
+```
+
+### Required Environment Variables
+
+| Variable               | Description                                      |
+| ---------------------- | ------------------------------------------------ |
+| `NEXT_PUBLIC_SITE_URL` | The base URL where the frontend is running       |
+| `NEXT_PUBLIC_API_URL`  | The base URL of your backend API                 |
+| `NODE_ENV`             | Environment mode (`development` or `production`) |
+
+If your backend runs on another port or domain, update `NEXT_PUBLIC_API_URL` accordingly.
+
+⚠️ Important: Restart the development server after modifying environment variables.
+
+---
+
+### 3️⃣ Run the Development Server
 
 ```bash
 npm run dev
@@ -14,23 +60,59 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open your browser and navigate to:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The application will automatically reload as you edit files.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* `app/` — Application routes and layouts
+* `components/` — Reusable UI components
+* `public/` — Static assets
+* `globals.css` — Global styles
+* `.env` — Environment configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🌐 Production Build
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+To create an optimized production build:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+```
+
+To start the production server:
+
+```bash
+npm start
+```
+
+---
+
+## 📦 Deployment
+
+This project can be deployed on:
+
+* Vercel
+* Netlify
+* AWS
+* Any Node.js hosting environment
+
+Make sure to configure all required environment variables in your hosting provider’s dashboard before deployment.
+
+---
+
+## 📘 Learn More
+
+To learn more about Next.js, visit:
+
+* [https://nextjs.org/docs](https://nextjs.org/docs)
+* [https://nextjs.org/learn](https://nextjs.org/learn)
+
