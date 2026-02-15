@@ -413,24 +413,18 @@ export default function ClassResults() {
   return (
     <div className="results-container GRADEDATA">
       <main className="content">
-        {/* Header */}
-        <header className="main-header">
-          <div className="breadcrumb">
-            Reports / <strong>Class Results & Grading</strong>
-          </div>
-          <div className="header-right">
-            <div className="header-icons" style={{ marginRight: 20, cursor: "pointer" }}>🔔 ⚙️</div>
-            <div className="profile-chip">
-              <div className="profile-info" style={{ textAlign: "right" }}>
-                <span className="name" style={{ display: "block", fontWeight: 600 }}>Alex Sterling</span>
-                <span className="role" style={{ fontSize: 10, color: "var(--text-muted)" }}>ADMINISTRATOR</span>
-              </div>
-              <div className="avatar"></div>
-            </div>
-          </div>
-        </header>
-
         {/* Filters */}
+         <header className="header px-6 py-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-b-3xl shadow-lg">
+            <div className="max-w-7xl mx-auto flex flex-col gap-2">
+              <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-sm">
+                Grade Management
+              </h1>
+              <p className="text-sm sm:text-base text-indigo-100/90">
+                Manage academic grades for each class on a student level
+              </p>
+            </div>
+          </header>
+
         <section className="controls-card">
           <div className="dropdown-group">
            <select

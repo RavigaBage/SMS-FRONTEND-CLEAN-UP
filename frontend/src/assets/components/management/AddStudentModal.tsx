@@ -33,7 +33,7 @@ export function AddStudentModal({ isOpen, onClose, onSuccess }: {
     first_name: "",
     last_name: "",
     middle_name: "",
-    admission_number: "",
+    admission_number: GenerateStudentAdmissionNumber(),
     date_of_birth: "",
     admission_date: new Date().toISOString().split('T')[0], // Default to today
     gender: "male",
@@ -94,6 +94,13 @@ export function AddStudentModal({ isOpen, onClose, onSuccess }: {
       setLoading(false);
     }
   };
+  
+  function GenerateStudentAdmissionNumber(classCode='SNS', lastNumber = 0){
+  const year = new Date().getFullYear();         
+    const seq = String(lastNumber + 1).padStart(3, '0'); 
+    return `${year}${classCode}${seq}`;
+    
+  }
 
   if (!isOpen) return null;
 

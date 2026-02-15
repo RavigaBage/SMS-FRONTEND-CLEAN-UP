@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Bar, Line } from 'react-chartjs-2';
 import "@/styles/home.css";
 import Image from "next/image";
+import FirstTimeGuide from '@/src/assets/components/dashboard/guide'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,6 +40,19 @@ export default function HomePage() {
   const [activities, setActivities] = useState<any[]>([]);
   const [UserName, setUsername] = useState("");
   const [UserRole, setRole] = useState("");
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('hasSeenFirstTimeGuide');
+    
+    if (!hasSeenGuide) {
+      setShowGuide(true);
+    }
+  }, []);
+  const handleGuideComplete = () => {
+    localStorage.setItem('hasSeenFirstTimeGuide', 'true');
+    setShowGuide(false);
+  };
   
     const fetchDashboardData = async () => {
       setLoading(true);
@@ -168,6 +182,9 @@ if (error && !loading) {
 
   return (
     <div className="main-view bg-slate-50 min-h-screen">
+      {showGuide ?
+        ( <FirstTimeGuide onFinish={handleGuideComplete}/> ):("")
+      }
 
       <div className="dashboard-grid p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Left Column */}
@@ -251,7 +268,7 @@ if (error && !loading) {
                   <Link href="/Home/profiles/students/"><QuickBtn icon={<Plus />} label="Add Student" color="bg-blue-600" /></Link>
                   <Link href="/Home/finance/invoices/"><QuickBtn icon={<FileText />} label="Invoice" color="bg-slate-900" /></Link>
                   <Link href="/Home/academics/grades/"><QuickBtn icon={<ClipboardList />} label="Exam Result" color="bg-emerald-600" /></Link>
-                  <Link href="/Home/profiles/staff"><QuickBtn icon={<MessageSquare />} label="Teachers & Staffs" color="bg-indigo-600" /></Link>
+                  <Link href="/Home/profiles/teachers&staff/"><QuickBtn icon={<MessageSquare />} label="Teachers & Staffs" color="bg-indigo-600" /></Link>
                 </>
               )}
             </div>

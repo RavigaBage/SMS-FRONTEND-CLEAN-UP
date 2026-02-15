@@ -46,11 +46,14 @@ export interface StudentRaw {
 
 // Update your ApiResponse generic to handle paginated DRF responses
 export interface ApiResponse<T> {
+  map(arg0: (s: any) => { student_id: any; status: string; remarks: string; }): import("react").SetStateAction<any[]>;
   id: ApiResponse<{ id: number; first_name: string; last_name: string; email: string; phone: string; date_of_birth: string; gender: string; }>;
   responseCode: number;
   responseMessage: string;
-  data: T[];
+  data: T[] | null;
+  error: string | null;
   results?: T[];
+  status:number;
   count?: number;
   next?: string | null;
   previous?: string | null;
@@ -256,7 +259,19 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
-    throw new Error(raw.error || raw.detail || `Request failed with status ${response.status}`);
+   alert(
+  raw.detail 
+    ? `Oops! Something's wrong: ${raw.detail}. Please check if your data already exists or if any required fields are missing.` 
+    : raw.error 
+      ? `Error: ${raw.error}` 
+      : `Unexpected error ${response.status}: ${response.statusText}. Please try again.`
+);
+
+    return {
+        data: null,
+        status: response.status,
+        error: raw.detail || raw.error || `Error ${response.status}: ${response.statusText}`
+      }as ApiResponse<T>;
   }
 
   const isPaginated = Array.isArray(raw.results);
@@ -268,6 +283,7 @@ export async function apiRequest<T>(
     results: raw.results,
     count: raw.count,
     next: raw.next,
+    error:null,
     previous: raw.previous,
   } as unknown as ApiResponse<T>;
 }

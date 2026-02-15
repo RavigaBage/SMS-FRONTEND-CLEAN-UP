@@ -211,7 +211,10 @@ const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
   return (
     <div className="form-page">
       <div className="form-wrapper">
-        <h2>Enrollment Form</h2>
+       <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">
+        Enrollment Form
+      </h2>
+
 
         <form onSubmit={handleSubmit} className="teaching-form">
           <div className={`loader_wrapper ${responseMsg ? "play" : ""}`}>

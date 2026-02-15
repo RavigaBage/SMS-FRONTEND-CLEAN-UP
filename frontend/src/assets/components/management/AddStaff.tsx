@@ -9,16 +9,18 @@ export function AddStaffModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, any>>({});
-
-  const [formData, setFormData] = useState({
+  const InitialData = {
     first_name: "",
     last_name: "",
-    user_id: "", // Manual Staff ID
+    user_id: GenerateStudentAdmissionNumber(),
     email: "",
     staff_type: "teacher",
     status: "Active",
-    gender: "Male",
-  });
+    gender: "male",
+  }
+  
+  const [formData, setFormData] = useState(InitialData);
+
 
   if (!isOpen) return null;
 
@@ -35,21 +37,51 @@ export function AddStaffModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
 
       onClose();
       router.refresh();
-      setFormData({ 
-        first_name: "", last_name: "", user_id: "", 
-        email: "", staff_type: "teacher", status: "Active", gender: "Male" 
-      });
+      setFormData(InitialData);
     } catch (err: any) {
-      try {
-        const backendErrors = JSON.parse(err.message);
-        setErrors(backendErrors);
-      } catch {
-        setErrors({ general: "Failed to save staff member. Please try again." });
-      }
+      console.log(err);
+try {
+  if (err.response && err.response.data) {
+    const backendErrors = err.response.data;
+    console.log(backendErrors);
+    // Handle different error formats from backend
+    if (backendErrors.detail) {
+      setErrors({ general: backendErrors.detail });
+    } else if (backendErrors.error && backendErrors.detail) {
+      // Structured error with error type and detail
+      setErrors({ general: `${backendErrors.error}: ${backendErrors.detail}` });
+    } else if (typeof backendErrors === 'object') {
+      // Field-specific errors
+      setErrors(backendErrors);
+    } else {
+      // Fallback for unexpected error format
+      setErrors({ general: String(backendErrors) });
+    }
+  } else if (err.message) {
+    try {
+      const parsedErrors = JSON.parse(err.message);
+      setErrors(parsedErrors);
+    } catch {
+      setErrors({ general: err.message });
+    }
+  } else {
+    // Complete fallback
+    setErrors({ general: "Failed to save staff member. Please try again." });
+  }
+} catch (parseError) {
+  console.error("Error parsing backend error:", parseError);
+  setErrors({ general: "Failed to save staff member. Please try again." });
+}
     } finally {
       setLoading(false);
     }
   };
+  function GenerateStudentAdmissionNumber(classCode='TNS', lastNumber = 0){
+    const year = new Date().getFullYear();         
+      const seq = String(lastNumber + 1).padStart(3, '0'); 
+      return `${year}${classCode}${seq}`;
+      
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">

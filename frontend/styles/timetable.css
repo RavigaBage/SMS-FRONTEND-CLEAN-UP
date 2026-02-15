@@ -1,19 +1,11 @@
- * {
-  box-sizing: border-box;
-  font-family: Inter, system-ui, sans-serif;
-}
 
-body {
-  margin: 0;
-  background: #f7f9fc;
-}
-.dropdown {
+.timetableApp .dropdown {
   position: relative;
   min-width: 150px;
   width: fit-content;
 }
 
-.dropdown-button {
+.timetableApp .dropdown-button {
   width: 100%;
   padding: 12px 16px;
   background-color: white;
@@ -26,21 +18,21 @@ body {
   transition: all 0.2s ease;
 }
 
-.dropdown-button:hover {
+.timetableApp .dropdown-button:hover {
   border-color: #7b61ff;
 }
 
-.dropdown-button::after {
+.timetableApp .dropdown-button::after {
   content: '▼';
   font-size: 12px;
   transition: transform 0.3s ease;
 }
 
-.dropdown.open .dropdown-button::after {
+.timetableApp .dropdown.open .timetableApp .dropdown-button::after {
   transform: rotate(-180deg);
 }
 
-.dropdown-menu {
+.timetableApp .dropdown-menu {
   position: absolute;
   top: 100%;
   left: 0;
@@ -57,43 +49,22 @@ body {
   z-index: 10;
 }
 
-.dropdown.open .dropdown-menu {
+.timetableApp .dropdown.open .timetableApp .dropdown-menu {
   max-height: 300px; /* adjust based on items */
   opacity: 1;
 }
 
-.dropdown-item {
+.timetableApp .dropdown-item {
   padding: 10px 16px;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
-.dropdown-item:hover {
+.timetableApp .dropdown-item:hover {
   background-color: #f0eaff;
 }
-.app {
-  display: flex;
-  height: 100vh;
-  overflow-x:hidden;
-  overflow-y: auto;
-}
 
-/* Sidebar */
-.sidebar {
-  width: 240px;
-  background: #ffffff;
-  border-right: 1px solid #e5e7eb;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.logo {
-  font-weight: 700;
-  margin-bottom: 30px;
-}
-
-.menu a {
+.timetableApp .menu a {
   display: block;
   padding: 10px;
   border-radius: 6px;
@@ -102,69 +73,71 @@ body {
   cursor: pointer;
 }
 
-.menu a.active {
+.timetableApp .menu a.active {
   background: #e0f2fe;
   color: #0284c7;
 }
 
-.sidebar-footer {
+.timetableApp .sidebar-footer {
   margin-top: auto;
   font-size: 12px;
 }
 
 /* Main */
-.main {
+.timetableApp .main {
   flex: 1;
   padding: 24px;
 }
 
 /* Header */
-.header {
+.timetableApp .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.header h1 {
+.timetableApp .header h1 {
   margin: 0;
+  font-weight: bolder;
+  font-size: 24px;
 }
 
-.actions .btn {
+.timetableApp .actions .btn {
   margin-left: 10px;
 }
 
 /* Buttons */
-.btn {
+.timetableApp .btn {
   padding: 8px 14px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
 }
 
-.btn.primary {
+.timetableApp .btn.primary {
   background: #0ea5e9;
   color: #fff;
 }
 
-.btn.outline {
+.timetableApp .btn.outline {
   background: #fff;
   border: 1px solid #d1d5db;
 }
 
 /* Filters */
-.filters {
+.timetableApp .filters {
   margin: 20px 0;
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.chips {
+.timetableApp .chips {
   display: flex;
   gap: 10px;
 }
 
-.chip , select{
+.timetableApp .chip , .timetableApp select{
   padding: 12px;
   border-radius: 999px;
   background: #e5e7eb;
@@ -172,73 +145,73 @@ body {
   min-width: 150px;
   text-align: center;
 }
-select{
+.timetableApp select{
   border-radius:10px;
   padding:10px;
   min-width: 150px;
   font-size: 20px;
 }
 
-.chip.active {
+.timetableApp .chip.active {
   background: #bae6fd;
 }
 
 /* Content */
-.content {
+.timetableApp .content {
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
 }
 
 /* Timetable */
-.timetable {
+.timetableApp .timetable {
   background: #fff;
   border-radius: 12px; 
   border:1px solid #cacaca;
   overflow: hidden;
 }
 
-.grid-header {
+.timetableApp .grid-header {
   display: grid;
   grid-template-columns: 80px repeat(5, 1fr);
   font-weight: 600;
   background: #b1bcd433;
   overflow: hidden;
 }
-.grid-header span{
+.timetableApp .grid-header span{
   border-right:1px solid #cacaca;
   text-align: center;
   padding-block: 20px;
   padding-inline: 10px;
 }
 
-.grid {
+.timetableApp .grid {
   display: grid;
   grid-template-columns: 80px repeat(5, 1fr);
   grid-auto-rows: auto
 }
 
-.time {
+.timetableApp .time {
   font-size: 12px;
   color: #6b7280;
   text-align: center;
   font-weight: bolder;
 }
-.grid .grid_feild, .time{
+.timetableApp .grid .grid_feild, .timetableApp .time{
   padding:10px;
   border-bottom:1px solid #ccc;
   border-top:1px solid #ccc;
   border-left:1px solid #e9e7e7;
   border-right:1px solid #e9e7e7;
 }
-.grid .grid_feild{
+.timetableApp .grid .grid_feild{
   padding: 0px;
   position: relative;
 }
-.grid .grid_feild .slot_options{
+.timetableApp .grid .grid_feild .slot_options{
   display: none;
 }
-.grid .grid_feild.active .slot_options{
+.timetableApp .grid .grid_feild.active .slot_options{
   width: 50px;
   height: fit-content;
   padding-block: 10px;
@@ -250,10 +223,10 @@ select{
   background: #fff;
   display: block;
 }
-.grid .grid_feild.active .slot_options.clt{
+.timetableApp .grid .grid_feild.active .slot_options.clt{
   display: none;
 }
-.grid .grid_feild .slot_options .item_{
+.timetableApp .grid .grid_feild .slot_options .item_{
   display: grid;
   place-items: center;
   width: 30px;
@@ -262,17 +235,17 @@ select{
   border:1px solid #ccc;
   border-radius: 4px;
 }
-.grid .grid_feild .slot_options .item_:hover{
+.timetableApp .grid .grid_feild .slot_options .item_:hover{
   background-color: #6b7280;
 }
-.grid .grid_feild .slot_options .item_ svg.delete:hover{
+.timetableApp .grid .grid_feild .slot_options .item_ svg.delete:hover{
   fill:crimson ;
 }
-.grid .grid_feild .slot_options .item_ svg.update:hover{
+.timetableApp .grid .grid_feild .slot_options .item_ svg.update:hover{
   fill:greenyellow;
 }
 /* Cards */
-.grid .grid_feild .card {
+.timetableApp .grid .grid_feild .card {
   border-radius: 10px;
   padding: 10px;
   font-size: 13px;
@@ -283,31 +256,31 @@ select{
   min-height: 150px;
   
 }
-.grid .grid_feild .card.empty{
+.timetableApp .grid .grid_feild .card.empty{
   border:5px dashed #ccc;
 }
 
 /* Color tokens */
-div[data-color="1"] { background: #e0f2fe;border-left:5px solid #0195f7; }
-div[data-color="2"] { background: #ecfdf5;border-left:5px solid #41f09e; }
-div[data-color="3"] { background: #fee2e2;border-left:5px solid #fd4e4e; }
-div[data-color="4"] { background: #fef3c7;border-left:5px solid #ffdc51; }
-div[data-color="6"] { background: #ede9fe;border-left:5px solid #7b5dff; }
-div[data-color="7"] { background: #fce7f3;border-left:5px solid #fd4bb0; }
-div[data-color="8"] { background: #ffedd5;border-left:5px solid #fdae46; }
-div[data-color="9"] { background: #cffafe;border-left:5px solid #30e4f5; }
-div[data-color="0"] { background: #06e6fa;border-left:5px solid #046068; }
+.timetableApp div[data-color="1"] { background: #e0f2fe;border-left:5px solid #0195f7; }
+.timetableApp div[data-color="2"] { background: #ecfdf5;border-left:5px solid #41f09e; }
+.timetableApp div[data-color="3"] { background: #fee2e2;border-left:5px solid #fd4e4e; }
+.timetableApp div[data-color="4"] { background: #fef3c7;border-left:5px solid #ffdc51; }
+.timetableApp div[data-color="6"] { background: #ede9fe;border-left:5px solid #7b5dff; }
+.timetableApp div[data-color="7"] { background: #fce7f3;border-left:5px solid #fd4bb0; }
+.timetableApp div[data-color="8"] { background: #ffedd5;border-left:5px solid #fdae46; }
+.timetableApp div[data-color="9"] { background: #cffafe;border-left:5px solid #30e4f5; }
+.timetableApp div[data-color="0"] { background: #06e6fa;border-left:5px solid #046068; }
 
-div{
+.timetableApp div{
   cursor: pointer;
 }
-.conflict {
+.timetableApp .conflict {
   background: #fee2e2;
   border: 1px dashed #ef4444;
 }
 
 /* Break */
-.break {
+.timetableApp .break {
   grid-column: 1 / -1;
   text-align: center;
   background: repeating-linear-gradient(
@@ -324,7 +297,7 @@ div{
 }
 
 /* Empty */
-.empty {
+.timetableApp .empty {
   border: 2px dashed #e5e7eb;
   border-radius: 10px;
   display: flex;
@@ -334,20 +307,20 @@ div{
 }
 
 /* Unscheduled */
-.unscheduled {
+.timetableApp .unscheduled {
   background: #fff;
   border-radius: 12px;
   padding: 16px;
   display: none;
 }
 
-.unscheduled input {
+.timetableApp .unscheduled input {
   width: 100%;
   padding: 8px;
   margin: 10px 0;
 }
 
-.item {
+.timetableApp .item {
   padding: 10px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -355,24 +328,24 @@ div{
   font-size: 13px;
 }
 
-.hint {
+.timetableApp .hint {
   font-size: 12px;
   color: #6b7280;
 }
-.slot_title h1{
+.timetableApp .slot_title h1{
   font-size: 18px;
 }
-.slot_location{
+.timetableApp .slot_location{
   border-radius: 999px;
   padding:5px;
   text-align: center;
   width: fit-content;
 }
-.slot_assigned p{
+.timetableApp .slot_assigned p{
   font-weight: 600;
 }
 
-.popup-overlay {
+.timetableApp .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -387,13 +360,12 @@ div{
   transition: opacity 0.3s ease;
   z-index: 999;
 }
-.popup-overlay.active {
+.timetableApp .popup-overlay.active {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* Popup container */
-.popup-container {
+.timetableApp .popup-container {
   background: transparent;
   border-radius: 12px;
   width: 700px;
@@ -405,13 +377,13 @@ div{
   opacity: 0;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
-.popup-container.active {
+.timetableApp .popup-container.active {
   transform: scale(1);
   opacity: 1;
 }
 
 /* Close button */
-.close-btn {
+.timetableApp .close-btn {
   margin-top: 16px;
   padding: 8px 16px;
   background: #e74c3c;
@@ -421,6 +393,87 @@ div{
   cursor: pointer;
   transition: background 0.3s;
 }
-.close-btn:hover {
+.timetableApp .close-btn:hover {
   background: #c0392b;
+}
+
+
+.timetableApp .form-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.timetableApp .form-header-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.timetableApp .form-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.timetableApp .form-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+
+.timetableApp button {
+  position: relative;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #4f46e5;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.timetableApp button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.timetableApp .btn-loader {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.timetableApp .top-loader {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, #4f46e5, #06b6d4);
+  animation: slide 1s infinite linear;
+}
+
+@keyframes slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }

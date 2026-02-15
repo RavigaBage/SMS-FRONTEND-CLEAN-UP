@@ -50,7 +50,6 @@ export default function TeachingForm({
   Update,
   setFormData,
 }: TeachingFormProps) {
-  console.log(Update);
   const [timeSlots, setTimeSlots] = useState<TimePoint[]>([]);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [subjects, setSubjects] = useState<SubjectBase[]>([]);
@@ -58,6 +57,10 @@ export default function TeachingForm({
   const [responseMsg, setResponseMsg] = useState<boolean>(false);
   const [messageMsg, setMessageMsg] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
+  const [loadingTeachers, setLoadingTeachers] = useState(true);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
 
   useEffect(() => {
     fetchTeachers();
@@ -99,6 +102,7 @@ export default function TeachingForm({
 
 
   const fetchTeachers = async () => {
+    setLoadingTeachers(true);
     try {
       const res = await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}/teachers/`,
@@ -113,31 +117,32 @@ export default function TeachingForm({
     } catch (err) {
       console.error("Failed to load teachers", err);
     }
+    setLoadingTeachers(false);
   };
 
   const fetchSubjects = async () => {
     try {
+      setLoadingSubjects(true);
       const res = await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}/subjects/`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { headers: { "Content-Type": "application/json" } }
       );
       const subject_result = await res.json();
       setSubjects(subject_result.results);
     } catch (err) {
       console.error("Failed to load subjects", err);
+    } finally {
+      setLoadingSubjects(false);
     }
   };
+
 
 useEffect(() => {
   setTimeSlots(generateTimePoints(7, 18, 30));
 }, []);
 
 const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-
+  setSubmitting(true);
   e.preventDefault();
 
   setResponseMsg(true);
@@ -166,8 +171,8 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
   setMessageMsg("Submitting class data...");
 
   try {
-    const Url = typeof Update == 'number' ?  `${process.env.NEXT_PUBLIC_API_URL}/timetables/${Update}/`
-    : `${process.env.NEXT_PUBLIC_API_URL}/timetables/`;
+    const Url = typeof Update == 'number' ?  `${process.env.NEXT_PUBLIC_API_URL}/timetable/${Update}/`
+    : `${process.env.NEXT_PUBLIC_API_URL}/timetable/`;
 
     const method_config = typeof Update == 'number' ? "PUT":"POST";
      
@@ -199,6 +204,8 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
       setMessageMsg("");
     }, 3000);
   }
+  setSubmitting(false);
+
 };
 
 
@@ -213,7 +220,19 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
   return (
     <div className="form-page">
       <div className="form-wrapper">
-        <h2>Teaching Assignment Form</h2>
+        <div className="form-header">
+      <div className="form-header-icon">📚</div>
+      {submitting && <div className="top-loader"></div>}
+      <div>
+        <h2 className="form-title">
+          {typeof Update === "number" ? "Update Teaching Assignment" : "Create Teaching Assignment"}
+        </h2>
+        <p className="form-subtitle">
+          Assign subjects, teachers, rooms and schedule time slots.
+        </p>
+      </div>
+    </div>
+
 
         <form onSubmit={handleSubmit} className="teaching-form">
           <div className={`loader_wrapper ${responseMsg ? "play" : ""}`}>
@@ -231,8 +250,8 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
             <div className="feild">
               <label>
                 Subject:
-                <select name="subject" onChange={handleChange} value={formData.subject || ""} required>
-                  <option value="">Select subject</option>
+                <select name="subject" onChange={handleChange} value={formData.subject || ""} required  disabled={loadingSubjects}>
+                  <option value="">{loadingSubjects ? "Loading subjects..." : "Select subject"}</option>
                   {subjects.length === 0 && (
                     <option>No list available</option>
                   )}
@@ -248,8 +267,8 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
             <div className="feild">
               <label>
                 Teacher:
-                <select name="teacher" onChange={handleChange} value={formData.teacher || ""} required>
-                  <option value="">Select teacher</option>
+                <select name="teacher" onChange={handleChange} value={formData.teacher || ""} required  disabled={loadingTeachers}>
+                  <option value=""> {loadingTeachers ? "Loading teachers..." : "Select teacher"}</option>
                   {teachers.length === 0 && (
                     <option>No list available</option>
                   )}
@@ -319,7 +338,13 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
               </label>
             </div>
 
-          <button type="submit">Submit</button>
+          <button className="submit_btn" type="submit" disabled={submitting}>
+          {submitting ? (
+              <span className="btn-loader"></span>
+            ) : (
+              "Submit"
+            )}
+          </button>
         </form>
       </div>
     </div>

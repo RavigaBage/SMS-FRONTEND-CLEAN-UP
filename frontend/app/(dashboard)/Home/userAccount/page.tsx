@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import '@/styles/userAcc.css';
 import { apiRequest } from '@/src/lib/apiClient';
 import Pagination from '@/src/assets/components/dashboard/Pagnation';
+import Loading from '@/src/assets/components/dashboard/loader';
 
 interface User {
   id: number;
@@ -38,6 +39,7 @@ export default function UserAccounts() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [fetchLoader, setfetchLoader] = useState(false);
   
   // Pagination
   const [pagination, setPagination] = useState<PaginatedResponse | null>(null);
@@ -72,7 +74,6 @@ export default function UserAccounts() {
   }, [currentPage, roleFilter, statusFilter]);
 
   useEffect(() => {
-    // Debounce search
     const timer = setTimeout(() => {
       if (searchQuery || searchQuery === '') {
         fetchUsers();
@@ -110,8 +111,16 @@ export default function UserAccounts() {
           results: response.results,
         });
       } else {
-        setUsers(Array.isArray(response.data) ? response.data : [response.data]);
-      }
+        const data = response.data;
+
+        if (Array.isArray(data)) {
+          setUsers(data.filter((u): u is User => u !== null));
+        } else if (data) {
+          setUsers([data]);
+        } else {
+          setUsers([]);
+        }
+              }
     } catch (error) {
       console.error('Error fetching users:', error);
       showMessage('error', 'Failed to fetch users');
@@ -122,6 +131,7 @@ export default function UserAccounts() {
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    setfetchLoader(true);
     
     if (!formData.username || !formData.email || !formData.password || !formData.role) {
       showMessage('error', 'Please fill in all required fields');
@@ -142,10 +152,12 @@ export default function UserAccounts() {
       console.error('Error creating user:', error);
       showMessage('error', error.message || 'Failed to create user');
     }
+    setfetchLoader(false);
   };
 
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    setfetchLoader(true);
     
     if (!selectedUser) return;
     
@@ -169,9 +181,11 @@ export default function UserAccounts() {
       console.error('Error updating user:', error);
       showMessage('error', error.message || 'Failed to update user');
     }
+    setfetchLoader(false);
   };
 
   const handleDeactivateUser = async (userId: number, currentStatus: boolean) => {
+
     const action = currentStatus ? 'deactivate' : 'activate';
     
     if (!confirm(`Are you sure you want to ${action} this user?`)) {
@@ -205,6 +219,7 @@ export default function UserAccounts() {
     }
     
     try {
+      setfetchLoader(true);
       await apiRequest(`/users/${resetPasswordData.userId}/change_password/`, {
         method: 'POST',
         body: JSON.stringify({
@@ -220,6 +235,7 @@ export default function UserAccounts() {
       console.error('Error resetting password:', error);
       showMessage('error', error.message || 'Failed to reset password');
     }
+    setfetchLoader(false);
   };
 
   const openEditModal = (user: User) => {
@@ -436,10 +452,11 @@ export default function UserAccounts() {
             resetForm();
           }}>
             <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+              <div> {fetchLoader ? <Loading /> : ''}</div>
               <h2>{isEditMode ? 'Edit User' : 'Create New User'}</h2>
               
               <form onSubmit={isEditMode ? handleUpdateUser : handleCreateUser}>
-                <label className="modalLabel">Username *</label>
+                <label className="modalLabel">Username <span className="text-red-500">*</span></label>
                 <input
                   className="modalInput"
                   type="text"
@@ -449,7 +466,7 @@ export default function UserAccounts() {
                   required
                 />
 
-                <label className="modalLabel">Email *</label>
+                <label className="modalLabel">Email <span className="text-red-500">*</span></label>
                 <input
                   className="modalInput"
                   type="email"
@@ -461,7 +478,7 @@ export default function UserAccounts() {
 
                 {!isEditMode && (
                   <>
-                    <label className="modalLabel">Password *</label>
+                    <label className="modalLabel">Password <span className="text-red-500">*</span></label>
                     <input
                       className="modalInput"
                       type="password"
@@ -474,7 +491,7 @@ export default function UserAccounts() {
                   </>
                 )}
 
-                <label className="modalLabel">Role *</label>
+                <label className="modalLabel">Role <span className="text-red-500">*</span></label>
                 <select
                   className="modalInput"
                   value={formData.role}
@@ -488,7 +505,7 @@ export default function UserAccounts() {
                   <option value="teacher">Teacher</option>
                 </select>
 
-                <label className="modalLabel">Status *</label>
+                <label className="modalLabel">Status <span className="text-red-500">*</span></label>
                 <select
                   className="modalInput"
                   value={formData.is_active ? 'true' : 'false'}
@@ -532,9 +549,10 @@ export default function UserAccounts() {
           <div className="modalOverlay" onClick={() => setIsResetPasswordModalOpen(false)}>
             <div className="modalContent" onClick={(e) => e.stopPropagation()}>
               <h2>Reset User Password</h2>
+              <div> {fetchLoader ? <Loading /> : ''}</div>
               
               <form onSubmit={handleResetPassword}>
-                <label className="modalLabel">New Password *</label>
+                <label className="modalLabel">New Password <span className="text-red-500">*</span></label>
                 <input
                   className="modalInput"
                   type="password"
@@ -547,7 +565,7 @@ export default function UserAccounts() {
                   required
                 />
 
-                <label className="modalLabel">Confirm Password *</label>
+                <label className="modalLabel">Confirm Password <span className="text-red-500">*</span></label>
                 <input
                   className="modalInput"
                   type="password"

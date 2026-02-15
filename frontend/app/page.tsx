@@ -13,7 +13,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // Countdown timer
+    
     const timer = setInterval(() => {
       setCountdown((prev) => prev - 1);
     }, 1000);

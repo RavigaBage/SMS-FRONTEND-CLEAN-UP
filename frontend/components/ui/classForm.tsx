@@ -262,19 +262,19 @@ export default function classForm({
           <div className="feild_x_x">
             <div className="feild"> 
               <label>
-                "Grade level"
+                Grade level
                 <input type="text" name="grade_level" value={formData.grade_level || ""} onChange={handleChange} placeholder="Enter the grade level eg Grade 1, Grade 2, Form 1, Form 2 etc" required />
               </label>
             </div>
             <div className="feild"> 
               <label>
-                "Section"
+                Section
                 <input type="text" name="section" value={formData.section || ""} onChange={handleChange} placeholder="Enter the section of the class" required />
               </label>
             </div>
             <div className="feild"> 
               <label>
-                "capacity"
+                capacity
                 <input type="text" name="capacity" value={formData.capacity || ""} onChange={handleChange} placeholder="Enter the capacity of the class" required />
               </label>
             </div>

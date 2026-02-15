@@ -8,6 +8,7 @@ import Pagination from '@/src/assets/components/dashboard/Pagnation';
 import {ErrorState} from '@/src/assets/components/dashboard/ErrorState';
 import '@/styles/classM.css'
 import '@/styles/global.css'
+import Loading from '@/src/assets/components/dashboard/loader';
 
 export interface User {
   id: string;
@@ -152,13 +153,14 @@ export default function ClassesManagement() {
   };
   useEffect(() => {
     loadData();
+    setLoading(false)
   }, [selectedClass, selectedYear]);
 
     const loadData = async () => {
+        setLoading(true);
         if (!selectedClass) return;
         try {
             const data = await fetchStudentsByClass(selectedClass.class_name, selectedYear);
-            setLoading(true)
         } catch (err) {
             console.error("Error loading students:", err);
         }

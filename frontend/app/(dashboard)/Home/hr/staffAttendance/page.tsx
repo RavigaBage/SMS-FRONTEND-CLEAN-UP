@@ -90,6 +90,7 @@ interface ApiError {
   details?: unknown;
 }
 interface StaffApiData {
+  created_at: string;
   user_id?: number;
   id: number;
   first_name: string;
@@ -253,6 +254,7 @@ const [editingRecord, setEditingRecord] = useState<StaffAttendance | null>(null)
       department: String(s.specialization || "General"),
       email: String(s.email),
       phone: String(s.phone || "N/A"),
+      created_at:s.created_at || '',
       status: (s.status || "Active") as "Active" | "On Leave" | "Inactive",
       profileImage: s.profile_image || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}`,
       // Add these to match the new interface
@@ -588,7 +590,7 @@ console.log(summary);
           
           <button className="btn btn-primary"  disabled={loading} onClick={openAddModal}> 
             <Plus size={18} />
-            Bulk Mark Attendance
+            Mark Attendance
           </button>
         </div>
       </header>

@@ -220,6 +220,39 @@ const handleCreateParent = async (payload: MyFormData) => {
 
   return (
     <div className="dashboard-container">
+      {/* PAGE HEADER */}
+<div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-slate-800 rounded-3xl p-8 text-white shadow-xl mb-6">
+  
+  {/* Decorative blur accent */}
+  <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+  
+  <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+    
+    {/* Left: Title & Caption */}
+    <div className="flex items-start gap-4">
+      <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
+        <Users className="w-8 h-8 text-white" />
+      </div>
+      
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+          Parent Management
+        </h1>
+        <p className="text-sm md:text-base text-blue-100 mt-1 max-w-xl">
+          Manage parent records, link guardians to students, and keep family connections beautifully organized.
+        </p>
+      </div>
+    </div>
+
+    {/* Right: Quick Stat */}
+    <div className="bg-white/10 backdrop-blur-sm px-6 py-4 rounded-2xl border border-white/20">
+      <p className="text-xs uppercase tracking-wide text-blue-200">Total Parents</p>
+      <p className="text-2xl font-bold">{parents.length}</p>
+    </div>
+
+  </div>
+</div>
+
       <main className="content">
 
         {/* TOP BAR: Search & Main Actions */}
@@ -301,21 +334,6 @@ const handleCreateParent = async (payload: MyFormData) => {
                     </div>
                   </div>
                 )}
-{/* MAIN STATS & TABLE */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-slate-800">Parent Directory</h2>
-            <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full">
-              {parents.length} Records
-            </span>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              {/* ... (Keep your existing table content, just update the CSS classes) */}
-            </table>
-          </div>
-        </section>
 
 <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
   <table className="w-full text-left border-collapse">

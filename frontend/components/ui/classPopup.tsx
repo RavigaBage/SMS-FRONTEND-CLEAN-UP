@@ -39,14 +39,6 @@ export default function Popup({
           isDeleting={isDeleting} 
           isUpdating={isUpdating} 
         />
-
-        <button
-          type="button"
-          onClick={togglePopup}
-          className="close-btn"
-        >
-          Close
-        </button>
       </div>
     </div>
   );

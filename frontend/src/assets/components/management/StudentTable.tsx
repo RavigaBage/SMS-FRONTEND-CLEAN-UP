@@ -10,7 +10,7 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
   console.log(students);
   
   return (
-    <div className="bg-white border-x border-b rounded-b-2xl overflow-hidden">
+    <div className="bg-white overflow-hidden">
       {students.length <= 0 ? (
         <div className="bg-white border border-slate-200 rounded-3xl p-10 text-center shadow-sm">
           <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center">
@@ -48,8 +48,12 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
                   href={`/Home/profiles/students/students/${student.id}`}
                   className="flex items-center gap-3 hover:text-cyan-600 transition-colors"
                 >
-                  <img src={student.profileImage} className="w-9 h-9 rounded-full bg-slate-100" />
-                  <span className="font-bold text-slate-700">{student.fullName}</span>
+                  <img src={
+                      student.profileImage
+                        ? student.profileImage
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(student.fullName)}&background=random&color=fff&rounded=true&size=128`
+                    } className="w-9 h-9 rounded-full bg-slate-100" />
+                                    <span className="font-bold text-slate-700">{student.fullName}</span>
                 </Link>
               </td>
               <td className="px-6 py-4 text-slate-500">{student.gender_display}</td>

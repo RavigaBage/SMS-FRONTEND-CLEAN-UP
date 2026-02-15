@@ -23,7 +23,7 @@ export const TopNav: React.FC<TopNavProps> = ({ loading = false }) => {
   }, []);
 
   return (
-    <header className="top-bar bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+    <header className="top-bar bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-10">
       {loading ? (
         <div className="flex items-center gap-4 w-full">
           <SkeletonBox className="h-8 w-32" />

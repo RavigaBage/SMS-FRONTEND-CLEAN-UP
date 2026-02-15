@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Mail, Phone, Trash2, ExternalLink, X, Check, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { apiRequest } from "@/src/lib/apiClient";
-
+import Image from 'next/image';
 export interface StaffMember {
   id: string;
   fullName: string;
@@ -14,13 +14,13 @@ export interface StaffMember {
   phone: string;
   status: "Active" | "On Leave" | "Inactive";
   profileImage: string;
+  created_at:String;
 }
 
 export function StaffTable({ staff }: { staff: StaffMember[] }) {
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-
   const handleDelete = async (id: string) => {
     setIsProcessing(true);
     try {
@@ -34,9 +34,15 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
       setDeletingId(null);
     }
   };
+  const  ConvertIsoTime = (time:string)=>{
+    console.log(time);
+    const currentDate = new Date(time);
+    console.log(currentDate);
+    return currentDate.toLocaleString();
+  }
 
   return (
-    <div className="bg-white border-x border-b rounded-b-2xl overflow-hidden">
+    <div className="bg-white overflow-hidden">
       <table className="w-full text-left">
         <thead className="bg-slate-50 border-y text-[10px] font-bold text-slate-400 uppercase tracking-widest">
           <tr>
@@ -52,10 +58,18 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
             <tr key={member.id} className="hover:bg-slate-50/50 transition-colors group">
               <td className="px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <img src={member.profileImage} alt="" className="w-10 h-10 rounded-full bg-slate-100 object-cover" />
-                  <div>
+                   <Image
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        member.fullName || "User"
+                      )}&background=random`}
+                      alt="User avatar"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
+                                    <div>
                     <p className="font-bold text-slate-700">{member.fullName}</p>
-                    <p className="text-[11px] text-cyan-600 font-mono">{member.id}</p>
+                    <p className="text-[11px] text-cyan-600 font-mono">{ConvertIsoTime(member.created_at as any)}</p>
                   </div>
                 </div>
               </td>
@@ -103,7 +117,7 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
                       </Link>
                       <button 
                         onClick={() => setDeletingId(member.id)}
-                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all group-hover:opacity-100"
                       >
                         <Trash2 size={18} />
                       </button>

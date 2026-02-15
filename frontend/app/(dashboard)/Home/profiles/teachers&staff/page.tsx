@@ -24,6 +24,7 @@ interface StaffApiData {
   profile_image?: string;
   managed_classes:[];
   assigned_subjects:[];
+  created_at:String;
 
 }
 
@@ -49,7 +50,6 @@ export default function StaffDirectoryPage() {
     setCurrentPage(1);
   };
 
-  // Logic to reset everything
   const handleClearAll = () => {
     setSearchTerm("");
     setFilters({
@@ -95,6 +95,7 @@ export default function StaffDirectoryPage() {
       specialization: s.specialization ? String(s.specialization) : undefined,
       managed_classes: s.managed_classes || [],
       assigned_subjects: s.assigned_subjects || [],
+      created_at:s.created_at || ""
     }));
 
       setStaff(formattedStaff);
@@ -130,10 +131,6 @@ export default function StaffDirectoryPage() {
         </div>
 
         <div className="staff-actions">
-          <button className="btn-outline">
-            <Download size={18} /> Export
-          </button>
-
           <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
             <UserPlus size={18} /> Add Staff
           </button>

@@ -21,7 +21,7 @@ export function Pagination({
   const endResult = Math.min(currentPage * resultsPerPage, totalResults);
 
   return (
-    <div className="bg-white border-x border-b rounded-b-2xl px-6 py-4 flex items-center justify-between">
+    <div className="  rounded-b-2xl px-6 py-4 flex items-center justify-between">
       <p className="text-sm text-slate-500 font-medium">
         Showing <span className="text-slate-800 font-bold">{startResult}</span> to{" "}
         <span className="text-slate-800 font-bold">{endResult}</span> of{" "}

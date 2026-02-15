@@ -34,7 +34,7 @@ export function RecordExpenseModal({ isOpen, onClose, onSuccess,editData }: Expe
       const fetchStaff = async () => {
         try {
           const data = await apiRequest("/staff/", { method: "GET" });
-          setStaffList(data.data);
+          setStaffList(data.data as any);
         } catch (err) {
           console.error("Error loading staff:", err);
         }

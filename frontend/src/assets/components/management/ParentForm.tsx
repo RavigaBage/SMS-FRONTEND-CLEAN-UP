@@ -78,110 +78,196 @@ export default function ParentForm({
 
   return (
 
-    <div className="modal-backdrop" onClick={onClose}>
-      {/* stopPropagation prevents the modal from closing when clicking inside the content */}
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3>{initial ? 'Edit Parent Profile' : 'Register New Parent'}</h3>
-          <p className="modal-subtitle">Ensure all contact information is up to date for school emergencies.</p>
+   <div 
+  className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+  onClick={onClose}
+>
+  <div 
+    className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl border border-slate-200"
+    onClick={(e) => e.stopPropagation()}
+  >
+
+    {/* HEADER */}
+    <div className="sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-200 px-8 py-6 rounded-t-3xl flex items-start justify-between">
+      <div>
+        <h2 className="text-xl font-bold text-slate-800">
+          {initial ? 'Edit Parent Profile' : 'Register New Parent'}
+        </h2>
+        <p className="text-sm text-slate-500 mt-1">
+          Keep guardian information accurate for communication and emergency coordination.
+        </p>
+      </div>
+
+      {/* CLOSE BUTTON */}
+      <button
+        onClick={onClose}
+        className="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form onSubmit={handleSubmit} className="px-8 py-8 space-y-8">
+
+      {/* PERSONAL INFO */}
+      <section>
+        <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+          Personal Information
+        </h3>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label className="form-label">First Name*</label>
+            <input 
+              className="form-input"
+              name="first_name"
+              value={form.first_name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="form-label">Last Name*</label>
+            <input 
+              className="form-input"
+              name="last_name"
+              value={form.last_name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section>
+        <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+          Contact Details
+        </h3>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label className="form-label">Phone Number*</label>
+            <input 
+              className="form-input"
+              name="phone_number"
+              value={form.phone_number}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="form-label">Email</label>
+            <input 
+              type="email"
+              className="form-input"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+            />
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="parent-form">
-          {/* Section: Basic Identity */}
-          <div className="form-section">
-            <label className="section-title">Personal Information</label>
-            <div className="row">
-              <div className="form-group">
-                <label>First Name*</label>
-                <input name="first_name" value={form.first_name} onChange={handleChange} placeholder="e.g. Jane" required />
-              </div>
-              <div className="form-group">
-                <label>Last Name*</label>
-                <input name="last_name" value={form.last_name} onChange={handleChange} placeholder="e.g. Doe" required />
-              </div>
-            </div>
-          </div>
+        <div className="mt-6">
+          <label className="form-label">Residential Address</label>
+          <textarea
+            rows={2}
+            className="form-input"
+            name="address"
+            value={form.address}
+            onChange={handleChange}
+          />
+        </div>
+      </section>
 
-          {/* Section: Contact */}
-          <div className="form-section">
-            <label className="section-title">Contact Details</label>
-            <div className="row">
-              <div className="form-group">
-                <label>Phone Number*</label>
-                <input name="phone_number" value={form.phone_number} onChange={handleChange} placeholder="+1 (555) 000-0000" required />
-              </div>
-              <div className="form-group">
-                <label>Email Address</label>
-                <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="jane.doe@example.com" />
-              </div>
-            </div>
-            <div className="form-group full-width">
-              <label>Residential Address</label>
-              <textarea name="address" value={form.address} onChange={handleChange} placeholder="Street, City, Zip Code" rows={2} />
-            </div>
-          </div>
+      {/* IDENTITY */}
+      <section>
+        <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+          Identity & Employment
+        </h3>
 
-          {/* Section: Professional & ID */}
-          <div className="form-section">
-            <label className="section-title">Identity & Employment</label>
-            <div className="row">
-              <div className="form-group">
-                <label>Occupation</label>
-                <input name="occupation" value={form.occupation} onChange={handleChange} placeholder="e.g. Software Engineer" />
-              </div>
-              <div className="form-group">
-                <label>Workplace</label>
-                <input name="workplace" value={form.workplace} onChange={handleChange} placeholder="Company Name" />
-              </div>
-            </div>
-            <div className="row">
-              <div className="form-group">
-                <label>National ID / Passport</label>
-                <input name="national_id" value={form.national_id} onChange={handleChange} placeholder="ID Number" />
-              </div>
-              <div className="form-group">
-                <label>Relationship to Student</label>
-                <select name="relationship" value={form.relationship} onChange={handleChange}>
-                  <option value="father">Father</option>
-                  <option value="mother">Mother</option>
-                  <option value="guardian">Guardian</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-            </div>
-          </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          <input className="form-input" name="occupation" value={form.occupation} onChange={handleChange} placeholder="Occupation" />
+          <input className="form-input" name="workplace" value={form.workplace} onChange={handleChange} placeholder="Workplace" />
+        </div>
 
-          {/* Section: Permissions */}
-          <div className="form-section permissions-box">
-            <div className="checkbox-row">
-              <label className="checkbox-container">
-                <input type="checkbox" name="is_primary_contact" checked={form.is_primary_contact} onChange={handleChange} />
-                <span className="checkmark"></span>
-                <div className="checkbox-text">
-                  <strong>Primary Contact</strong>
-                  <span>Main point of contact for school alerts</span>
-                </div>
-              </label>
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          <input className="form-input" name="national_id" value={form.national_id} onChange={handleChange} placeholder="National ID / Passport" />
 
-              <label className="checkbox-container">
-                <input type="checkbox" name="can_pickup" checked={form.can_pickup} onChange={handleChange} />
-                <span className="checkmark"></span>
-                <div className="checkbox-text">
-                  <strong>Authorized Pickup</strong>
-                  <span>Allowed to pick up student from campus</span>
-                </div>
-              </label>
+          <select
+            className="form-input"
+            name="relationship"
+            value={form.relationship}
+            onChange={handleChange}
+          >
+            <option value="father">Father</option>
+            <option value="mother">Mother</option>
+            <option value="guardian">Guardian</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </section>
+
+      {/* PERMISSIONS */}
+      <section className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+        <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+          Permissions
+        </h3>
+
+        <div className="space-y-4">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="is_primary_contact"
+              checked={form.is_primary_contact}
+              onChange={handleChange}
+              className="mt-1"
+            />
+            <div>
+              <p className="font-semibold text-slate-800">Primary Contact</p>
+              <p className="text-xs text-slate-500">Receives official school alerts and emergency notifications.</p>
             </div>
-          </div>
+          </label>
 
-          <div className="modal-footer">
-            <button type="button" className="btn-secondary" onClick={onClose}>Discard</button>
-            <button type="submit" className="btn-primary">
-              {initial ? 'Update Record' : 'Create Profile'}
-            </button>
-          </div>
-        </form>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="can_pickup"
+              checked={form.can_pickup}
+              onChange={handleChange}
+              className="mt-1"
+            />
+            <div>
+              <p className="font-semibold text-slate-800">Authorized Pickup</p>
+              <p className="text-xs text-slate-500">Allowed to collect the student from campus.</p>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <div className="flex justify-end gap-3 pt-6 border-t border-slate-200">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-5 py-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          className="px-6 py-2.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition font-semibold"
+        >
+          {initial ? 'Update Record' : 'Create Profile'}
+        </button>
       </div>
-    </div>
+    </form>
+  </div>
+</div>
+
   );
 }

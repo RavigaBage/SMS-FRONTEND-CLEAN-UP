@@ -61,8 +61,7 @@ export default function Home() {
   const [Updating, setUpdate] = useState(false);
   const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
   const boxRef = useRef<HTMLDivElement | null>(null);
-
-  const [formData, setFormData] = useState<Record<string, any>>({
+  const InitialData = {
     schoolClass: "",
     term: "",
     weekdays: "",
@@ -71,12 +70,14 @@ export default function Home() {
     teachingAssignment: "",
     status: "",
     teachers: "",
+    day_of_week:"",
     subjects: "",
     year: "",
     academic_year: "",
     class_id:"",
     
-  });
+  }
+  const [formData, setFormData] = useState<Record<string, any>>(InitialData);
 
   const updateFormField = (field: string, value: any) => {
       const fieldMap: Record<string, string> = {
@@ -253,19 +254,20 @@ const handleDelete = async (id: number) => {
   }
 
   function TimetableDiv(match:any,index?:number){
-
     const colorIndex = useMemo(() => (index! * 7) % 10, [index]);
       const Fetch_data = match[0];
       if (!match || match.length === 0) 
          return(
         <div className="grid_feild">
-          <div className="card empty" onClick={() => handlePopup("",false)}>
+          <div className="card empty"  onClick={() =>{const weekday_s = weekdays[index as number];
+  updateFormField("day_of_week", weekday_s); handlePopup("",false)}}>
             <svg xmlns="http://www.w3.org/2000/svg" height="60px" viewBox="0 -960 960 960" width="60px" fill="#e3e3e3"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
           </div>
         </div>
       );
       return(
-        <div className="grid_feild" onClick={(e) => handlePopupOption(e)}>
+        <div className="grid_feild" onClick={(e) =>{const weekday_s = weekdays[index as number];
+  updateFormField("day_of_week", weekday_s); handlePopupOption(e)}}>
           <div className="card " data-color={colorIndex}>
             <div className="slot_title">
               <h1>{Fetch_data.subject.subject_name}</h1>
@@ -288,7 +290,7 @@ const handleDelete = async (id: number) => {
   }
 
   return (
-    <div className="app">
+    <div className="app timetableApp">
       <main className="main">
         <header className="header">
           <div>
@@ -297,7 +299,6 @@ const handleDelete = async (id: number) => {
           </div>
 
           <div className="actions">
-            <button className="btn outline">Export</button>
             <button className="btn primary">Save Changes</button>
           </div>
         </header>
