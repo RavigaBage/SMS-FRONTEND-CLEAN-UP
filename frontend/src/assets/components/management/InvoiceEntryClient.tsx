@@ -46,7 +46,7 @@ export default function InvoiceEntry() {
     dt.setDate(dt.getDate() + 30);
     return dt.toISOString().split("T")[0];
   });
-  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<number | "">("");
+  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<String | "">("");
   const [term, setTerm] = useState<string>("1");
   const [paymentTerms, setPaymentTerms] = useState<string>("Bank Transfer / Cheque");
   const [notes, setNotes] = useState<string>("");
@@ -60,7 +60,8 @@ export default function InvoiceEntry() {
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 useEffect(() => {
-  setInvoiceNumber(`INV-${Date.now()}`);
+  const date = new Date().getTime();
+  setInvoiceNumber(`INV-${date}`);
   const today = new Date().toISOString().split("T")[0];
   const due = new Date();
   due.setDate(due.getDate() + 30);
@@ -68,17 +69,36 @@ useEffect(() => {
   setDueDate(due.toISOString().split("T")[0]);
 }, []);
   /* ---------- Effects: fetch students & years ---------- */
+    const generateAcademicYears = (
+  startYear: number,
+  count: number
+  ): any => {
+  return Array.from({ length: count }, (_, i) => {
+      const year = startYear - i;
+      const date_year = new Date().getFullYear();
+      const is_current_status = true ? year == date_year : false;
+      return {
+        end_date:`${year}-${String(year + 1)}`,
+        start_date:year,
+        id:i,
+        is_current:is_current_status,
+        year_name: `${year}-${String(year + 1)}`,
+
+      }
+  });
+  };
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true);
       try {
+        const date_now = new Date().getFullYear();
         const [stuRes, yearRes] = await Promise.all([
           fetchWithAuth(`${baseUrl}/students/`),
-          fetchWithAuth(`${baseUrl}/academic-years/`),
+          generateAcademicYears(date_now,10),
         ]);
 
         const stuJson = await stuRes.json();
-        const yearJson = await yearRes.json();
+        const yearJson = yearRes;
 
         const stuArr = Array.isArray(stuJson)
           ? stuJson
@@ -87,12 +107,13 @@ useEffect(() => {
           : [];
         const yearArr = Array.isArray(yearJson)
           ? yearJson
-          : Array.isArray(yearJson.results)
-          ? yearJson.results
+          : Array.isArray(yearJson)
+          ? yearJson
           : [];
 
         setStudents(stuArr);
         setAcademicYears(yearArr);
+        console.log(yearJson)
 
         // If student_id present in URL, preselect (find in results)
         if (preselectedStudentId) {
@@ -197,11 +218,13 @@ useEffect(() => {
     // Build payload according to previously discussed serializer expectations
     return {
       student_id: recipient?.id,
-      academic_year_id: selectedAcademicYearId,
+      student: recipient?.id,
+      academic_year: selectedAcademicYearId,
       term,
       invoice_number: invoiceNumber,
       due_date: dueDate,
-      total_amount: grandTotal.toFixed(2),
+      balance:0,
+      total_amount: Number(grandTotal.toFixed(2)),
       items: items.map(i => ({ description: i.description || "Item", amount: (i.qty * i.unitPrice).toFixed(2) })),
       notes,
       payment_terms: paymentTerms,
@@ -215,7 +238,7 @@ useEffect(() => {
     setError(null);
     try {
       const payload = makePayload(isDraft);
-      const res = await fetchWithAuth(`${baseUrl}/invoices/`, {
+      const res = await fetchWithAuth(`${baseUrl}/invoices/generate/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -235,10 +258,10 @@ useEffect(() => {
       alert(isDraft ? "Draft saved." : "Invoice issued.");
       if (createdId) {
         // navigate to invoice detail if you have such a route
-        router.push(`/finance/invoices/${createdId}`);
+        router.push(`/Home/finance/invoices/${createdId}`);
       } else {
         // otherwise go back to list
-        router.push("/finance/invoices");
+        router.push("/Home/finance/invoices");
       }
     } catch (e) {
       console.error(e);
@@ -346,9 +369,9 @@ useEffect(() => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-semibold text-lg">Invoice Items</h2>
             <div className="flex items-center gap-3">
-              <select className="border rounded px-2 py-1" value={selectedAcademicYearId as any} onChange={e => setSelectedAcademicYearId(e.target.value ? Number(e.target.value) : "")}>
+              <select className="border rounded px-2 py-1" value={selectedAcademicYearId as any} onChange={e => setSelectedAcademicYearId(e.target.value ? String(e.target.value) : "")}>
                 <option value="">Select Academic Year</option>
-                {academicYears.map(y => <option key={y.id} value={y.id}>{y.year_name}</option>)}
+                {academicYears.map(y => <option key={y.id} value={y.year_name}>{y.year_name}</option>)}
               </select>
               <select className="border rounded px-2 py-1" value={term} onChange={e => setTerm(e.target.value)}>
                 <option value="1">Term 1</option>

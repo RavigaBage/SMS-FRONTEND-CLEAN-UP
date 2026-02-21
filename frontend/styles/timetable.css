@@ -28,7 +28,7 @@
   transition: transform 0.3s ease;
 }
 
-.timetableApp .dropdown.open .timetableApp .dropdown-button::after {
+.timetableApp .dropdown.open .dropdown-button::after {
   transform: rotate(-180deg);
 }
 
@@ -49,7 +49,7 @@
   z-index: 10;
 }
 
-.timetableApp .dropdown.open .timetableApp .dropdown-menu {
+.timetableApp .dropdown.open .dropdown-menu {
   max-height: 300px; /* adjust based on items */
   opacity: 1;
 }
@@ -209,19 +209,25 @@
   position: relative;
 }
 .timetableApp .grid .grid_feild .slot_options{
-  display: none;
-}
-.timetableApp .grid .grid_feild.active .slot_options{
-  width: 50px;
+  width: fit-content;
   height: fit-content;
   padding-block: 10px;
   position: absolute;
-  top:10;
-  right: -10px;
+  top: 8px;
+  right: 8px;
   z-index: 9;
   border-radius: 10px;
   background: #fff;
-  display: block;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.timetableApp .grid .grid_feild .card:hover .slot_options,
+.timetableApp .grid .grid_feild .card:focus-within .slot_options{
+  opacity: 1;
+  pointer-events: auto;
 }
 .timetableApp .grid .grid_feild.active .slot_options.clt{
   display: none;
@@ -476,4 +482,340 @@
 @keyframes slide {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TIMETABLE — design improvements & skeleton loader
+   Add this block to the bottom of timetable.css (or import as a separate file)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Grid layout ─────────────────────────────────────────────────────────── */
+.tt-grid-header {
+  display: grid;
+  grid-template-columns: 72px repeat(5, 1fr);
+  gap: 0 8px;
+  padding: 0 4px 6px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg, #f8fafc);
+}
+
+.tt-col-time { /* empty corner */ }
+
+.tt-col-day {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+  text-align: center;
+  padding: 6px 0;
+}
+
+.tt-grid-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tt-row {
+  display: grid;
+  grid-template-columns: 72px repeat(5, 1fr);
+  gap: 0 8px;
+  align-items: stretch;
+  min-height: 90px;
+}
+
+.tt-time-cell {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  padding-top: 10px;
+  text-align: right;
+  padding-right: 10px;
+  user-select: none;
+}
+
+.tt-cell {
+  padding: 3px;
+}
+
+.tt-break-row {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 6px,
+    #e2e8f0 6px,
+    #e2e8f0 7px
+  );
+  padding: 7px 0;
+  margin: 2px 0;
+  border-radius: 4px;
+}
+
+
+/* ── Filled card ─────────────────────────────────────────────────────────── */
+.tt-card {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 100%;
+  min-height: 84px;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+
+.tt-card--filled {
+  background: var(--card-bg, #eef2ff);
+  display: flex;
+  align-items: stretch;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  cursor: default;
+}
+
+.tt-card--filled:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.10);
+}
+
+/* left accent bar */
+.tt-card__bar {
+  display: block;
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--card-accent, #6366f1);
+  border-radius: 10px 0 0 10px;
+}
+
+.tt-card__body {
+  flex: 1;
+  padding: 9px 8px 8px 9px;
+  min-width: 0;
+}
+
+.tt-card__subject {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--card-text, #3730a3);
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tt-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tt-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tt-meta-row svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* action buttons — reveal on hover */
+.tt-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 5px 6px 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.tt-card--filled:hover .tt-card__actions {
+  opacity: 1;
+}
+
+.tt-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.12s;
+}
+
+.tt-action-btn:active {
+  transform: scale(0.92);
+}
+
+.tt-action-btn--edit {
+  background: rgba(99,102,241,.12);
+  color: #6366f1;
+}
+
+.tt-action-btn--edit:hover {
+  background: rgba(99,102,241,.22);
+}
+
+.tt-action-btn--delete {
+  background: rgba(244, 63, 94, .1);
+  color: #f43f5e;
+}
+
+.tt-action-btn--delete:hover {
+  background: rgba(244, 63, 94, .2);
+}
+
+
+/* ── Empty / + card ──────────────────────────────────────────────────────── */
+.tt-card--empty {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: border-color 0.18s, background 0.18s, color 0.18s, transform 0.18s;
+  padding: 10px 6px;
+}
+
+.tt-card--empty:hover {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #6366f1;
+  transform: translateY(-1px);
+}
+
+.tt-add-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: currentColor;
+  color: inherit;
+  transition: transform 0.18s;
+}
+
+/* the SVG inside needs to be white */
+.tt-add-icon svg {
+  color: #fff;
+}
+
+.tt-card--empty:hover .tt-add-icon {
+  transform: scale(1.15) rotate(90deg);
+}
+
+.tt-add-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+
+/* ── Skeleton loader ─────────────────────────────────────────────────────── */
+@keyframes tt-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.tt-card--skeleton {
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 84px;
+  border: none;
+}
+
+.sk-line {
+  border-radius: 4px;
+  height: 10px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+  background-size: 800px 100%;
+  animation: tt-shimmer 1.4s ease-in-out infinite;
+}
+
+.sk-line--title  { height: 13px; width: 75%; }
+.sk-line--sub    { height: 10px; width: 90%; }
+.sk-line--short  { height: 10px; width: 55%; }
+.sk-line--time   { height: 10px; width: 36px; margin-left: auto; }
+
+
+/* ── Empty state (before first load) ────────────────────────────────────── */
+.tt-empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 20px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.tt-empty-icon {
+  font-size: 42px;
+  line-height: 1;
+}
+
+.tt-empty-state p {
+  font-size: 14px;
+  max-width: 300px;
+  line-height: 1.6;
+}
+
+.tt-empty-state strong {
+  color: #475569;
+}
+
+
+/* ── "Load table" chip loading state ────────────────────────────────────── */
+.chip--loading {
+  opacity: 0.75;
+  cursor: not-allowed;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.chip-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: chip-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes chip-spin {
+  to { transform: rotate(360deg); }
 }

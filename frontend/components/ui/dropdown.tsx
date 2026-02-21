@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ClassData } from "./enrollmentForm";
-
 type DropdownOption = {
   class_id: number | string;
   class_name: string;
+  id:number;
 };
 
 type DropdownProps = {
@@ -21,6 +20,7 @@ export default function Dropdown({
   fieldName,
   setFormData,
 }: DropdownProps) {
+  console.log(options);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -28,14 +28,13 @@ export default function Dropdown({
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
 
-  const handleSelect = (option: any, item: any) => {
-    setSelected(option);
+  const handleSelect = (item: DropdownOption) => {
+    setSelected(item.class_name);
     setIsOpen(false);
-    setFormData(fieldName, option);
-    
-    if(fieldName == 'schoolClass'){
-      console.log(fieldName);
-      setFormData('class_id',item.id)
+    setFormData(fieldName, item.class_name);
+    console.log(fieldName);
+    if (fieldName === "schoolClass") {
+      setFormData("class_id", item.id);
     }
   };
 
@@ -73,8 +72,9 @@ export default function Dropdown({
         {isOpen &&
           options.map((cls,index) => (
             <div key={index} 
-              onClick={() => handleSelect(cls.class_name, cls)}
+              onClick={() => handleSelect(cls)}
               className="dropdown-item"
+              data-value={`${cls.id}`}
             >
               {cls.class_name}
             </div>

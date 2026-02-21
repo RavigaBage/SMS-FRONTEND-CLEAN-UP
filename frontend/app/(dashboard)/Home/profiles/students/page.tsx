@@ -7,18 +7,44 @@ import { StudentTable } from "@/src/assets/components/management/StudentTable";
 import { AddStudentModal } from "@/src/assets/components/management/AddStudentModal";
 import { Student } from "@/src/assets/types/api";
 import { FilterBar } from "@/src/assets/components/management/FilterBar";
+import { Pagination } from "@/src/assets/components/management/Pagination";
+
+
 import '@/styles/student_page.css';
+
+interface PaginatedResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: any[];
+}
+
 export default function StudentsManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+
+  const resultsPerPage = 10;
+
+      const totalPages = Math.ceil(totalResults / resultsPerPage);
 
   const fetchStudents = async () => {
     try {
-      const data = await apiRequest("/students/", { method: "GET" });
-      const result:any = data.data;
+      const res = await apiRequest<PaginatedResponse>(`/students/`);
+      const result: PaginatedResponse = {
+        count: res.count ?? 0,
+        next: res.next ?? null,
+        previous: res.previous ?? null,
+        results: res.results ?? [],
+      };
+
+      // Fix: Django Rest Framework returns result in a .results array when paginated
+      const rawList = result.results || [];
+      setTotalResults(result.count);
       
-      const formattedData = result.map((s: any) => ({
+      const formattedData = rawList.map((s: any) => ({
         id: s.user_id || s.id, 
         fullName: `${s.first_name} ${s.last_name}`,
         email: s.email || "N/A",
@@ -28,7 +54,7 @@ export default function StudentsManagementPage() {
         profileImage: s.profile_image || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}&background=random`,
       }));
       
-      setStudents(formattedData);
+      setStudents(formattedData as any);
     } catch (err) {
       console.error("Failed to load students:", err);
     }
@@ -105,6 +131,13 @@ const handleDelete = async (studentId: number) => {
         students={filteredStudents}
         onDelete={handleDelete}
       />
+      <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalResults={totalResults}
+            resultsPerPage={resultsPerPage}
+          />
     </div>
 
     {/* Modal */}

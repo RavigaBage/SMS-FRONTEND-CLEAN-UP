@@ -25,7 +25,7 @@ export default function GradeEntry() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
   const [isNewGrade, setIsNewGrade] = useState(false);
-
+  const [remarks, setRemarks] = useState("");
   // Assessment scores (you can break these down as needed)
   const [assessmentScore, setAssessmentScore] = useState(0);
   const [assessmentTotal, setAssessmentTotal] = useState(0);
@@ -72,25 +72,23 @@ export default function GradeEntry() {
           academicYear: academicYear,
           term: term,
         });
+
         
         setGrade(data);
         setIsNewGrade(false);
-        
-        // Populate form fields with fetched data
-        setAssessmentScore(data.assessment_score || 0);
-        setAssessmentTotal(data.assessment_total || 0);
-        setTestScore(data.test_score || 0);
-        setTestTotal(data.test_total || 0);
-        setExamScore(data.exam_score || 0);
-        setExamTotal(data.exam_total || 0);
+
+        setAssessmentScore(data.assessment_score ?? 0);
+        setAssessmentTotal(data.assessment_total ?? 0);
+        setTestScore(data.test_score ?? 0);
+        setTestTotal(data.test_total ?? 0);
+        setExamScore(data.exam_score ?? 0);
+        setExamTotal(data.exam_total ?? 0);
+        setRemarks(data.remarks ?? ""); 
         
       } catch (err) {
         console.error("Failed to fetch grade:", err);
-        // Don't set error - just keep default values (all 0s)
-        // This allows teachers to enter new grades
         setGrade(null);
         setIsNewGrade(true);
-        // Keep all default values at 0 (already initialized)
       } finally {
         setLoading(false);
       }
@@ -159,9 +157,11 @@ const get_letter_grade = (score: number): string => {
           exam_total: examTotal,
           weighted_assessment: w_assessment,
           weighted_test: w_test,
+          remarks: remarks, 
           weighted_exam: w_exam,
           total_score: displayScore,
-          grade_letter: get_letter_grade(displayScore)
+          grade_letter: get_letter_grade(displayScore),
+          
         },
       });
 
@@ -347,8 +347,49 @@ const get_letter_grade = (score: number): string => {
                 </div>
               </div>
             </div>
+
+            <div className="card">
+            <div className="card-header">
+              <h3>Remarks</h3>
+            </div>
+            <div style={{ padding: "20px" }}>
+              <div className="input-field">
+                <label>Teacher's Remarks</label>
+                <textarea
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  placeholder="Add any notes or remarks about this student's performance..."
+                  rows={4}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                    color: "#0f172a",
+                    background: "#f8fafc",
+                    border: "1px solid #e2e8f0",
+                    outline: "none",
+                    resize: "vertical",
+                    lineHeight: 1.6,
+                    transition: "border-color 0.2s",
+                    boxSizing: "border-box",
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "#1a56db"}
+                  onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+                />
+              </div>
+
+              {/* character count */}
+              <p style={{
+                marginTop: 6, textAlign: "right",
+                fontSize: 11, color: remarks.length > 400 ? "#ef4444" : "#94a3b8",
+              }}>
+                {remarks.length} / 500
+              </p>
+            </div>
           </div>
 
+          </div>
           {/* RIGHT COLUMN: SUMMARY & SETTINGS */}
           <div className="summary-column">
             <div className="card settings-card">
@@ -359,19 +400,19 @@ const get_letter_grade = (score: number): string => {
                 <div className="setting-item">
                   <div className="setting-label">
                     <span>Weighted Assessment (20%)</span> 
-                    <span>{w_assessment}</span>
+                    <span>{w_assessment || 0}</span>
                   </div>
                 </div>
                 <div className="setting-item">
                   <div className="setting-label">
                     <span>Weighted Test (30%)</span> 
-                    <span>{w_test}</span>
+                    <span>{w_test || 0}</span>
                   </div>
                 </div>
                 <div className="setting-item">
                   <div className="setting-label">
                     <span>Weighted Exam (50%)</span> 
-                    <span>{w_exam}</span>
+                    <span>{w_exam || 0}</span>
                   </div>
                 </div>
                 <div className="setting-item">
@@ -400,7 +441,7 @@ const get_letter_grade = (score: number): string => {
               </div>
               <div className="sum-box final">
                 <label>OVERALL TOTAL</label>
-                <div className="val">{displayScore}</div>
+                <div className="val">{displayScore || 0}</div>
               </div>
             </div>
 

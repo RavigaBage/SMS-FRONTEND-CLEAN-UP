@@ -66,7 +66,7 @@ export default function StudentAttendancePage() {
         ...filterParams,
       });
 
-      const res = await apiRequest<PaginatedResponse>(`/student-attendance/?${query}`, {
+      const res = await apiRequest<PaginatedResponse>(`/attendance/?${query}`, {
         method: "GET",
       });
 
@@ -118,7 +118,7 @@ export default function StudentAttendancePage() {
   // Update Attendance
   const handleUpdateAttendance = async (id: number, status: string, remarks?: string) => {
     try {
-      await apiRequest(`/student-attendance/${id}/`, {
+      await apiRequest(`/attendance/${id}/`, {
         method: "PATCH",
         body: JSON.stringify({ status, remarks }),
       });
@@ -138,7 +138,7 @@ export default function StudentAttendancePage() {
     }
 
     try {
-      await apiRequest(`/student-attendance/${id}/`, {
+      await apiRequest(`/attendance/${id}/`, {
         method: "DELETE",
       });
 
@@ -161,7 +161,7 @@ export default function StudentAttendancePage() {
       });
 
       const res = await apiRequest<PaginatedResponse>(
-        `/student-attendance/?${query}&page_size=1000`,
+        `/attendance/?${query}&page_size=1000`,
         { method: "GET" }
       );
 

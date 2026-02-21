@@ -58,7 +58,7 @@ export function RecordExpenseModal({ isOpen, onClose, onSuccess,editData }: Expe
       onSuccess();
       onClose();
       setFormData({
-        expenditure_number: "",
+        expenditure_number:  generateExpenditureNumber(),
         item_name: "",
         category: "",
         description: "",
@@ -79,11 +79,16 @@ export function RecordExpenseModal({ isOpen, onClose, onSuccess,editData }: Expe
       setLoading(false);
     }
   };
+  const generateExpenditureNumber = () => {
+    const year = new Date().getFullYear();
+    const random = Math.floor(1000 + Math.random() * 9000);
+    return `EXP-${year}-${random}`;
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200 !m-0">
       <div className="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden transform animate-in zoom-in-95 duration-200">
         <div className="px-6 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
           <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">New Expenditure</h2>
@@ -100,7 +105,7 @@ export function RecordExpenseModal({ isOpen, onClose, onSuccess,editData }: Expe
                 required
                 type="text"
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none text-sm"
-                value={editData?.expenditure_number||formData.expenditure_number}
+                value={editData?.expenditure_number||formData.expenditure_number || 'auto gen'}
                 onChange={(e) => setFormData({ ...formData, expenditure_number: e.target.value })}
               />
               {errors.expenditure_number && <p className="text-rose-600 text-[10px] font-bold">{errors.expenditure_number.join(", ")}</p>}
@@ -194,20 +199,20 @@ export function RecordExpenseModal({ isOpen, onClose, onSuccess,editData }: Expe
             </div>
           </div>
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-4 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 bg-slate-50 text-slate-400 font-black rounded-xl hover:bg-slate-100 transition-all text-[10px] uppercase tracking-widest"
+              className="flex-1 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-2 py-3 bg-slate-900 text-white font-black rounded-xl hover:bg-slate-800 transition-all text-[10px] uppercase tracking-widest flex items-center justify-center gap-2"
+              className="flex-1 py-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition flex items-center justify-center"
             >
-              {loading ? <Loader2 className="animate-spin" size={14} /> : "Save Entry"}
+              {loading ? <Loader2 size={16} className="animate-spin" /> : "Save Entry"}
             </button>
           </div>
         </form>

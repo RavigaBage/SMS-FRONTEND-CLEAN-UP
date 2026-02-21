@@ -5,6 +5,8 @@ import { useState, useEffect, use } from "react";
 import { apiRequest } from "@/src/lib/apiClient";
 import { EditStaffModal } from "@/src/assets/components/management/EditStaffModal";
 import Link from "next/link";
+import Image from 'next/image';
+
 
 export default function StaffProfilePage({ params }: { params: Promise<{ staffId: string }> }) {
   const { staffId } = use(params);
@@ -44,20 +46,21 @@ export default function StaffProfilePage({ params }: { params: Promise<{ staffId
 
   return (
     <div className="p-8 bg-slate-50 min-h-screen space-y-8">
-      {/* Navigation */}
       <Link href="/management/staff" className="flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors font-bold text-xs uppercase tracking-widest">
         <ArrowLeft size={14} /> Back to Directory
       </Link>
 
-      {/* 1. Profile Header */}
       <div className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-200 mb-8">
         <div className="h-32 bg-gradient-to-r from-cyan-600 to-blue-700" />
         <div className="px-8 pb-8 flex flex-col md:flex-row items-end gap-6 -mt-12">
           <div className="relative">
-            <img 
-              src={currentStaff.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${currentStaff.first_name}`} 
+
+            <Image
+              src={`https://api.dicebear.com/7.x/initials/svg?seed=${currentStaff.first_name}`} 
               className="w-32 h-32 rounded-[2rem] border-8 border-white bg-slate-100 shadow-sm object-cover" 
               alt="Staff Profile"
+              height={1}
+              width={1}
             />
             {currentStaff.user?.is_active && (
                 <span className="absolute bottom-3 right-3 w-5 h-5 bg-green-500 border-4 border-white rounded-full shadow-sm" />
@@ -83,7 +86,6 @@ export default function StaffProfilePage({ params }: { params: Promise<{ staffId
       </div>
 
       <div className="grid grid-cols-12 gap-8">
-        {/* LEFT COLUMN: PERSONAL & PROFESSIONAL */}
         <div className="col-span-12 lg:col-span-4 space-y-8">
           <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
             <h3 className="flex items-center gap-2 text-slate-800 font-black uppercase tracking-[0.2em] text-[10px] mb-8">
@@ -109,7 +111,6 @@ export default function StaffProfilePage({ params }: { params: Promise<{ staffId
           </div>
         </div>
 
-        {/* RIGHT COLUMN: STATS & CONTENT */}
         <div className="col-span-12 lg:col-span-8 space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard label="Account Status" value={currentStaff.user?.is_active ? "Active" : "Inactive"} trend="System Verified" icon={<Star size={18} className="text-amber-400" />} />
@@ -118,7 +119,7 @@ export default function StaffProfilePage({ params }: { params: Promise<{ staffId
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  {/* Column 1: Managed Classes (Form Teacher) */}
+  
   <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6">
     <h3 className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-4 flex items-center gap-2">
       <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
@@ -146,7 +147,6 @@ export default function StaffProfilePage({ params }: { params: Promise<{ staffId
     </div>
   </div>
 
-  {/* Column 2: Subject Assignments */}
   <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6">
     <h3 className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-4 flex items-center gap-2">
       <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
@@ -188,7 +188,6 @@ export default function StaffProfilePage({ params }: { params: Promise<{ staffId
   );
 }
 
-// Internal Helpers
 function DetailItem({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
   return (
     <div className="flex gap-4 items-center">

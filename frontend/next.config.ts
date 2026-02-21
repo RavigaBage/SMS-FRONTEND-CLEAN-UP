@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
         hostname: 'i.pravatar.cc',
       },
       {
+        protocol:'https',
+        hostname:'api.dicebear.com'
+      },
+      {
         protocol: "https",
         hostname: "ui-avatars.com",
       }
@@ -55,7 +59,6 @@ const nextConfig: NextConfig = {
   },
 
   experimental: {
-    // optimizeCss is often the cause of slow dev/build times
     optimizeCss: false, 
     optimizePackageImports: ['lucide-react', 'date-fns', 'chart.js'],
   },

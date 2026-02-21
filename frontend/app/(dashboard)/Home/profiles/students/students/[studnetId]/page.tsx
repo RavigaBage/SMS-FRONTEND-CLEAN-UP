@@ -11,6 +11,7 @@ import { Loader2, Download, Printer, ArrowLeft, MessageSquare, Edit } from "luci
 import { EditStudentModal } from '@/src/assets/components/management/EditStudentModal';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import Image from 'next/image'
 
 export default function StudentProfilePage() {
   const params = useParams();
@@ -130,10 +131,12 @@ const handleUpdateStudent = async (updatedFields: any) => {
       <section className="bg-white rounded-2xl border overflow-hidden shadow-sm">
         <div className="h-32 bg-gradient-to-r from-blue-500 to-cyan-400" />
         <div className="p-6 flex flex-col md:flex-row gap-6 items-center md:items-end -mt-12">
-          <img 
+          <Image 
             src={`https://ui-avatars.com/api/?name=${student.first_name}+${student.last_name}&background=random`} 
             className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-white object-cover" 
             alt="Student Profile"
+            width={200}
+            height={200}
           />
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-2xl font-bold text-slate-800">{student.first_name} {student.last_name}</h1>

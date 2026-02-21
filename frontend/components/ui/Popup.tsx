@@ -9,7 +9,8 @@ type PopupProps = {
   formData: Record<string, any>;
   fieldNames: string | string[];
   setFormData:  (field: string, value: any) => void;
-
+  onSuccess?: () => void;
+  onOutsideClose?: () => void;
 };
 
 export default function Popup({
@@ -19,11 +20,16 @@ export default function Popup({
   formData,
   fieldNames,
   setFormData,
+  onSuccess,
+  onOutsideClose,
 }: PopupProps) {
   return (
     <div
       className={`popup-overlay ${active ? "active" : ""}`}
-      onClick={togglePopup}
+      onClick={() => {
+        onOutsideClose?.();
+        togglePopup();
+      }}
     >
       <div
         className={`popup-container ${active ? "active" : ""}`}
@@ -36,6 +42,7 @@ export default function Popup({
           fieldName={fieldNames}
           Update={setUpdating}
           setFormData={setFormData}
+          onSuccess={onSuccess}
         />
 
       </div>

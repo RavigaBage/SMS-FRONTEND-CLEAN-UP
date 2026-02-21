@@ -418,7 +418,7 @@ export default function ExpenditurePage() {
             Track school spending, utility costs, and resource procurement.
           </p>
         </div>
-        <div className="flex gap-3">
+        {/* <div className="flex gap-3">
           <button 
             onClick={handleExport} 
             className="flex items-center gap-2 px-5 py-2.5 bg-white border rounded-xl text-slate-700 hover:bg-slate-50 text-xs font-bold uppercase shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -433,7 +433,7 @@ export default function ExpenditurePage() {
           >
             <Plus size={16} /> Record Expense
           </button>
-        </div>
+        </div> */}
       </header>
 
       {/* Stats Cards */}
@@ -471,7 +471,7 @@ export default function ExpenditurePage() {
       {/* Trend */}
       {/* Trend Section */}
 <section className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-  <div className="flex justify-between items-center mb-10 relative z-10">
+  <div className="flex justify-between items-center mb-10 relative z-1">
     <div>
       <h3 className="font-black text-slate-800 uppercase tracking-widest text-xs">Expenditure Pulse</h3>
       <p className="text-[10px] text-slate-400 font-bold uppercase">Real-time cashflow wave</p>
@@ -587,12 +587,12 @@ export default function ExpenditurePage() {
               disabled={loading}
             />
           </div>
-          <button 
+          {/* <button 
             className="p-3 bg-white border rounded-xl hover:bg-slate-50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loading}
           >
             <Filter size={18} className="text-slate-600" />
-          </button>
+          </button> */}
         </div>
 
         <div className="overflow-x-auto">

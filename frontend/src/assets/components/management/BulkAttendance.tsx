@@ -47,9 +47,11 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
   const fetchStudents = async (classId: string) => {
     try {
       const res = await apiRequest<any>(`/classes/${classId}/students/`, { method: "GET" });
-      setStudents(res as any);
+      const students = (res.results || res.data || []) as any[];
+
+      setStudents(students);
       setAttendanceData(
-        res.map((s: any) => ({
+        students.map((s: any) => ({
           student_id: s.id,
           status: defaultStatus,
           remarks: "",
@@ -89,33 +91,34 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
     setLoading(true);
 
     try {
-      const payload = attendanceData.map(item => ({
-        ...item,
-        attendance_date: selectedDate,
-      }));
-
-      await apiRequest("/attendance/students/bulk/", {
+      const res = await apiRequest("/attendance/bulk_mark/", {
         method: "POST",
-        body: JSON.stringify({ attendance_records: payload }),
+        body: JSON.stringify({
+          class_id:        parseInt(selectedClass),  // ← top level
+          attendance_date: selectedDate,             // ← top level
+          attendance_records: attendanceData.map(item => ({
+            student_id: item.student_id,
+            status:     item.status,
+            remarks:    item.remarks || "",
+          })),
+        }),
       });
 
-      toast.success(`Attendance marked for ${payload.length} students!`);
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
+
+      const summary = (res.data as any)?.summary;
+      toast.success(
+        summary
+          ? `Created: ${summary.created}, Updated: ${summary.updated}, Failed: ${summary.failed}`
+          : `Attendance marked for ${attendanceData.length} students!`
+      );
       onClose();
       resetForm();
     } catch (err: any) {
-      console.error("Error marking bulk attendance:", err);
-      
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        
-        if (errorData.error && errorData.detail) {
-          toast.error(errorData.detail);
-        } else {
-          toast.error("Failed to mark bulk attendance");
-        }
-      } else {
-        toast.error(err?.detail || "Failed to mark bulk attendance");
-      }
+      toast.error("Failed to mark bulk attendance. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -9,6 +9,7 @@ type PopupProps = {
   fieldNames: string | string[];
   selectedIM:number | number[] | null;
   setFormData:  (field: string, value: any) => void;
+  onSuccess?: () => void; 
 
 };
 
@@ -18,7 +19,8 @@ export default function Popup({
   formData,
   fieldNames,
   setFormData,
-  selectedIM
+  selectedIM,
+  onSuccess
 }: PopupProps) {
   return (
     <div
@@ -36,6 +38,7 @@ export default function Popup({
           fieldName={fieldNames}
           setFormData={setFormData}
           selectedIM={selectedIM}
+          onSuccess={onSuccess}
         />
       </div>
     </div>

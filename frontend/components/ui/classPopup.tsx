@@ -9,7 +9,8 @@ type PopupProps = {
   fieldNames: string | string[];
   setFormData:  (field: string, value: any) => void;
   isDeleting:Boolean;
-  isUpdating:Boolean
+  isUpdating:Boolean;
+  onSuccess?: (payload?: any) => void;
 };
 
 export default function Popup({
@@ -19,7 +20,8 @@ export default function Popup({
   fieldNames,
   setFormData,
   isDeleting,
-  isUpdating
+  isUpdating,
+  onSuccess
 }: PopupProps) {
   return (
     <div
@@ -37,7 +39,8 @@ export default function Popup({
           fieldName={fieldNames}
           setFormData={setFormData}
           isDeleting={isDeleting} 
-          isUpdating={isUpdating} 
+          isUpdating={isUpdating}
+          onSuccess={onSuccess}
         />
       </div>
     </div>

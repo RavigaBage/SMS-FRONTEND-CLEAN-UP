@@ -333,87 +333,101 @@ const [formData, setFormData] = useState({
 
   /* ---------------- EFFECTS ---------------- */
 
-  // Debounce search
-  useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 400);
-    return () => clearTimeout(t);
-  }, [searchTerm]);
+ // ── Replace your three separate useEffects with these two ──────────────────
 
-  // Reset page when filters change
-  useEffect(() => setPage(1), [debouncedSearch, selectedDate, departmentFilter, statusFilter]);
+// 1. Staff fetch — debounced
+useEffect(() => {
+  const t = setTimeout(() => fetchStaff(currentPage, searchTerm), 300);
+  return () => clearTimeout(t);
+}, [currentPage, searchTerm, filters]);
 
-  // Fetch data when filters or page changes
-  useEffect(() => {
+// 2. Attendance fetch — single consolidated effect
+useEffect(() => {
+  // Skip if a fetch is already in flight
+  if (abortControllerRef.current) {
+    abortControllerRef.current.abort();
+  }
+  
+  setPage(1); // reset page when filters change
+  setError(null); // clear previous error before new fetch
+
+  const t = setTimeout(() => {
     fetchAttendanceData({
-      search: debouncedSearch,
+      search: searchTerm.trim(),
       date: selectedDate,
       department: departmentFilter,
-      role:departmentFilter,
+      role: departmentFilter,
       status: statusFilter,
-      page,
+      page: 1,
     });
+  }, 400); // debounce attendance fetch too
 
-   
-  }, [debouncedSearch, selectedDate, departmentFilter, statusFilter, page]);
+  return () => clearTimeout(t);
+}, [searchTerm, selectedDate, departmentFilter, statusFilter]);
+
+// 3. Separate effect only for page changes (not filter changes)
+useEffect(() => {
+  if (page === 1) return; // avoid double-fetch on filter reset
+  fetchAttendanceData({
+    search: searchTerm.trim(),
+    date: selectedDate,
+    department: departmentFilter,
+    role: departmentFilter,
+    status: statusFilter,
+    page,
+  });
+}, [page]);
 
   /* ---------------- API ---------------- */
 
-  const fetchAttendanceData = useCallback(async (opts?: FetchOptions) => {
+const fetchAttendanceData = useCallback(async (opts?: FetchOptions) => {
+  // Cancel any in-flight request
+  if (abortControllerRef.current) {
+    abortControllerRef.current.abort();
+  }
+  abortControllerRef.current = new AbortController();
+  const signal = abortControllerRef.current.signal;
 
+  setLoading(true);
+  // Don't clear error here — cleared before fetch starts in the effect
 
-    abortControllerRef.current = new AbortController();
-    const signal = abortControllerRef.current.signal;
+  try {
+    const query = buildQuery(opts ?? {});
+    const [listResult, summaryResult] = await Promise.allSettled([
+      apiRequest<ApiResponse<StaffAttendanceRaw>>(`/staff-attendance/?${query}`, { method: "GET", signal }),
+      apiRequest<AttendanceSummary>(`/staff-attendance/?date=${opts?.date || getTodayDate()}`, { method: "GET", signal }),
+    ]);
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const query = buildQuery(opts ?? {});
-
-      const [listResult, summaryResult] = await Promise.allSettled([
-        apiRequest<ApiResponse<StaffAttendanceRaw>>(`/staff-attendance/?${query}`, {
-          method: "GET",
-          signal,
-        }),
-        apiRequest<AttendanceSummary>(`/staff-attendance/summary/?date=${opts?.date || getTodayDate()}`, {
-          method: "GET",
-          signal,
-        }),
-      ]);
-
-      // Handle attendance list
-      if (listResult.status === "fulfilled") {
-        const rawList = unwrapArray(listResult.value as any);
-        const normalized = rawList.map(normalizeAttendance as any);
-        setAttendanceRecords(normalized as any);
-        setSummary(calculateSummary(normalized as any));
-        setTotalCount(listResult.value?.count ?? rawList.length);
-      } else {
-        if (listResult.reason?.name !== "AbortError") {
-          console.error("Failed to fetch attendance:", listResult.reason);
-          setAttendanceRecords([]);
-          setTotalCount(0);
-          throw createApiError(listResult.reason, "Failed to fetch attendance records");
-        }
-      }
-
-    } catch (err) {
-      if ((err as Error)?.name === "AbortError") {
-        return;
-      }
-
-      const apiError = createApiError(err);
-      console.error("Attendance fetch error:", apiError);
-
-      setError(apiError.message);
+    if (listResult.status === "fulfilled") {
+      const rawList = unwrapArray(listResult.value as any);
+      const normalized = rawList.map(normalizeAttendance as any);
+      setAttendanceRecords(normalized as any);
+      setSummary(calculateSummary(normalized as any));
+      setTotalCount(listResult.value?.count ?? rawList.length);
+    } else if (listResult.reason?.name !== "AbortError") {
+      // ✅ Set error ONCE — don't re-throw
+      setError("Failed to fetch attendance records. Please try again.");
       setAttendanceRecords([]);
-      setSummary({});
       setTotalCount(0);
-    } finally {
-      setLoading(false);
-      abortControllerRef.current = null;
     }
-  }, []);
+
+    // Summary failure is non-critical — log but don't show error to user
+    if (summaryResult.status === "rejected" && summaryResult.reason?.name !== "AbortError") {
+      console.warn("Summary fetch failed:", summaryResult.reason);
+    }
+
+  } catch (err) {
+    if ((err as Error)?.name === "AbortError") return;
+    // ✅ Only reaches here for truly unexpected errors
+    setError("Something went wrong. Please refresh the page.");
+    setAttendanceRecords([]);
+    setSummary({});
+    setTotalCount(0);
+  } finally {
+    setLoading(false);
+    abortControllerRef.current = null;
+  }
+}, []);
 
   const calculateSummary = (records: StaffAttendance[]): AttendanceSummary => {
   const total_staff = records.length;
@@ -535,32 +549,11 @@ console.log(summary);
     <div className="container staffAttendance">
       {/* Error Banner */}
       {error && (
-        <div style={{
-          background: "#fee",
-          border: "1px solid #fcc",
-          color: "#c33",
-          padding: "1rem 1.5rem",
-          borderRadius: "12px",
-          marginBottom: "1.5rem",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}>
-          <span style={{ fontWeight: 600 }}>{error}</span>
-          <button
-            onClick={() => setError(null)}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#c33 !important",
-              fontSize: "1.5rem",
-              cursor: "pointer",
-            }}
-          >
-            ×
-          </button>
-        </div>
-      )}
+      <div className="error-banner"> {/* style this in your CSS */}
+        <span>{error}</span>
+        <button onClick={() => setError(null)}>×</button>
+      </div>
+    )}
 
       {/* Header */}
       <header className="page-header">
@@ -671,6 +664,7 @@ console.log(summary);
               <option value="late">Late</option>
               <option value="absent">Absent</option>
               <option value="on_leave">On Leave</option>
+              <option value="half_day">Half Day</option>
             </select>
           </div>
         </div>

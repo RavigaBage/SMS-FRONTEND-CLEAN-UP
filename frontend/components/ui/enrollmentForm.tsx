@@ -27,6 +27,7 @@ export interface ClassData {
   id: number;
   class_name: string;
   academic_year: string;
+  teacher_name:String;
   teacher: Teacher | null; 
 }
 
@@ -42,6 +43,8 @@ type enrollFormProps = {
   fieldName: string | string[];
   selectedIM:number | number[] | null;
   setFormData:  (field: string, value: any) => void;
+  onSuccess?: () => void;
+  
 };
 
 export interface UserDetails {
@@ -81,7 +84,8 @@ export interface StudentApiResponse {
 export default function EnrollForm({
   formData,
   setFormData,
-  selectedIM
+  selectedIM,
+  onSuccess,         // ← destructure it
 }: enrollFormProps) {
   const [Classes, setClasses] = useState<ClassData[]>([]);
   const [Students, setStudents] = useState<StudentData[]>([]);
@@ -151,47 +155,45 @@ const fetchStudents = async () => {
     setMessageMsg("Failed to load class list.");
   }
 };
-
-
-
-
-
 const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
   e.preventDefault();
-      const isEditing = selectedIM !== null;
+  const isEditing = selectedIM !== null;
+
   try {
-  const url = isEditing 
-    ? `${process.env.NEXT_PUBLIC_API_URL}/enrollments/${selectedIM}/`
-    : `${process.env.NEXT_PUBLIC_API_URL}/enrollments/`;
-const method = isEditing ? "PATCH" : "POST";
-const payload = {
-  student: Number(formData.student?.id),
-  class_obj: Number(formData.class_obj?.id),
-  student_id: Number(formData.student?.id),
-  class_id: Number(formData.class_obj?.id),
-  
-};
-    const response = await fetchWithAuth(`${url}`, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const url = isEditing
+      ? `${process.env.NEXT_PUBLIC_API_URL}/enrollments/${selectedIM}/`
+      : `${process.env.NEXT_PUBLIC_API_URL}/enrollments/`;
+    const method = isEditing ? "PATCH" : "POST";
+    const payload = {
+      student: Number(formData.student?.id),
+      class_obj: Number(formData.class_obj?.id),
+      student_id: Number(formData.student?.id),
+      class_id: Number(formData.class_obj?.id),
+    };
+
+    const response = await fetchWithAuth(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       const errorDetail = await response.json();
-      setResponseMsg(errorDetail)
+      setError(true);
+      setMessageMsg(errorDetail?.detail || "Something went wrong.");
+      return;   // ← stop here on error
     }
 
+    // ✅ Success
     setError(false);
-    setMessageMsg(`Operation was a success, item has been ${isEditing?'updated':"created"}.`);
+    setMessageMsg(`${isEditing ? "Updated" : "Enrolled"} successfully.`);
+    onSuccess?.();   // ← triggers refetch in parent and closes popup
+
   } catch (err) {
     setError(true);
-    setMessageMsg(`Failed to ${isEditing?'update':"create"} list.`);
+    setMessageMsg(`Failed to ${isEditing ? "update" : "create"} enrollment.`);
   }
 };
-
 const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
   const { name, value } = e.target;
 
@@ -257,7 +259,7 @@ const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
                 {Classes.map((t) => (
                     <option key={t.id} value={t.id}>
                     {t.class_name} 
-                    {t.teacher ? ` — ${t.teacher.first_name} ${t.teacher.last_name}` : " (No Teacher)"}
+                    {t.teacher_name ? ` — ${t.teacher_name}` : " (No Teacher)"}
                     </option>
                 ))}
                 </select>

@@ -23,6 +23,7 @@ interface SubjectApiResponse {
   results: {
     id: number;
     subject_name: string;
+    subject_code:String;
   }[];
 }
 
@@ -34,6 +35,7 @@ interface ClassType {
 interface SubjectType {
   id: number;
   name: string;
+  subject_code:String;
 }
 interface UserType {
   id: string;
@@ -174,6 +176,7 @@ export default function ClassResults() {
     results: {
       id: number;
       subject_name: string;
+      subject_code:String;
     }[];
   }
 
@@ -191,6 +194,7 @@ export default function ClassResults() {
     const subjects: SubjectType[] = subjectsResponse.results.map((s) => ({
       id: s.id,
       name: s.subject_name,
+      subject_code:s.subject_code,
     }));
     setAssignedSubjects(subjects);
     setAvailableSubjects(subjects);
@@ -218,7 +222,8 @@ export default function ClassResults() {
         return `${year}-${String(year + 1)}`;
     });
     };
-    const academicYears = generateAcademicYears(2025, 5);
+    const date = new Date().getFullYear();
+    const academicYears = generateAcademicYears(date, 10);
 
   useEffect(() => {
     async function loadSubjects() {
@@ -227,6 +232,7 @@ export default function ClassResults() {
       if (!assignedSubjects.length) {
         const subjects = await api.getSubjectsForClass(selectedClass.id);
         setAvailableSubjects(subjects);
+        
       }
 
       fetchResults();
@@ -464,12 +470,13 @@ export default function ClassResults() {
               onChange={(e) => {
                 const subj = availableSubjects.find(s => s.id === Number(e.target.value)) || null;
                 setSelectedSubject(subj);
-                setPage(1); // Reset to page 1 when subject changes
+                setPage(1); 
+                
               }}
             >
               <option value="">Select Subject</option>
               {availableSubjects.map(subj => (
-                <option key={subj.id} value={subj.id}>{subj.name}</option>
+                <option key={subj.id} value={subj.id}>{`${subj.name} - ${subj.subject_code}`}</option>
               ))}
             </select>
           </div>

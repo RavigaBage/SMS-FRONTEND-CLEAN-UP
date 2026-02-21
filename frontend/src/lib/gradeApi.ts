@@ -47,23 +47,6 @@ interface StudentType {
   status: "active" | "inactive" | "graduated" | string;
 }
 
-export interface ResultType {
-  id?: number;
-  student?: StudentType;
-  assessment_score: number;
-  assessment_total: number;
-  test_score: number;
-  test_total: number;
-  exam_score: number;
-  exam_total: number;
-  weighted_assessment: number;
-  weighted_test: number;
-  weighted_exam: number;
-  total_score: number;
-  grade_letter: string;
-  grade_date?: string;
-  subject_rank?: string;
-}
 
 
 interface UserType {
@@ -108,13 +91,33 @@ export interface ResultType {
   subject_rank?: string;
   academic_year?: string;
   term?: string;
+  remarks?:string;
 }
-
+  const buildPayload = (
+    studentId: number, classId: number, subjectId: number,
+    academicYear: string, term: string, data: Partial<ResultType>
+  ) => ({
+    student_id:           studentId,
+    class_id:             classId,
+    subject_id:           subjectId,
+    academic_year:        academicYear,
+    term:                 term,
+    assessment_score:     data.assessment_score     ?? 0,
+    assessment_total:     data.assessment_total     ?? 0,
+    test_score:           data.test_score           ?? 0,
+    test_total:           data.test_total           ?? 0,
+    exam_score:           data.exam_score           ?? 0,
+    exam_total:           data.exam_total           ?? 0,
+    weighted_assessment:  data.weighted_assessment  ?? 0,
+    weighted_test:        data.weighted_test        ?? 0,
+    weighted_exam:        data.weighted_exam        ?? 0,
+    total_score:          data.total_score          ?? 0,
+    grade_letter:         data.grade_letter         ?? 'F',
+    remarks:              data.remarks              ?? '' ,  // ← add this
+  });
 // API Methods
 export const gradeApi = {
-  /**
-   * Fetch a grade by its parameters
-   */
+
   getGradeByParams: async ({
     studentId,
     classId,
@@ -135,13 +138,10 @@ export const gradeApi = {
       const error = await res.json();
       throw new Error(error.detail || "Failed to fetch grade");
     }
-    return await res.json();
+    return (await res.json()).grade;
   },
 
-  /**
-   * Create a new grade
-   * Supports both Django serializer field naming conventions
-   */
+
   createGrade: async ({
     studentId,
     classId,
@@ -157,25 +157,7 @@ export const gradeApi = {
     term: string;
     data: Partial<ResultType>;
   }): Promise<ResultType> => {
-    // Prepare payload with proper field names for Django
-    const payload = {
-      student_id: studentId,
-      class_id: classId,
-      subject_id: subjectId,
-      academic_year: academicYear,
-      term: term,
-      assessment_score: data.assessment_score || 0,
-      assessment_total: data.assessment_total || 0,
-      test_score: data.test_score || 0,
-      test_total: data.test_total || 0,
-      exam_score: data.exam_score || 0,
-      exam_total: data.exam_total || 0,
-      weighted_assessment: data.weighted_assessment || 0,
-      weighted_test: data.weighted_test || 0,
-      weighted_exam: data.weighted_exam || 0,
-      total_score: data.total_score || 0,
-      grade_letter: data.grade_letter || 'F',
-    };
+
 
     const res = await fetchWithAuth(
       `${process.env.NEXT_PUBLIC_API_URL}/grades/`,
@@ -184,7 +166,7 @@ export const gradeApi = {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(buildPayload(studentId, classId, subjectId, academicYear, term, data)),
       }
     );
     
@@ -214,6 +196,24 @@ export const gradeApi = {
     term: string;
     data: Partial<ResultType>;
   }): Promise<ResultType> => {
+    const payload = {
+      student_id: studentId,
+      class_id: classId,
+      subject_id: subjectId,
+      academic_year: academicYear,
+      term: term,
+      assessment_score: data.assessment_score || 0,
+      assessment_total: data.assessment_total || 0,
+      test_score: data.test_score || 0,
+      test_total: data.test_total || 0,
+      exam_score: data.exam_score || 0,
+      exam_total: data.exam_total || 0,
+      weighted_assessment: data.weighted_assessment || 0,
+      weighted_test: data.weighted_test || 0,
+      weighted_exam: data.weighted_exam || 0,
+      total_score: data.total_score || 0,
+      grade_letter: data.grade_letter || 'F',
+    };
     const res = await fetchWithAuth(
       `${process.env.NEXT_PUBLIC_API_URL}/grades/by-params/?student=${studentId}&class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
       {
@@ -221,7 +221,7 @@ export const gradeApi = {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(buildPayload(studentId, classId, subjectId, academicYear, term, data)),
       }
     );
     if (!res.ok) {
@@ -232,10 +232,7 @@ export const gradeApi = {
     return await res.json();
   },
 
-  /**
-   * Save a grade (create if new, update if existing)
-   * This is a convenience method that automatically chooses between create and update
-   */
+
   saveGrade: async ({
     studentId,
     classId,

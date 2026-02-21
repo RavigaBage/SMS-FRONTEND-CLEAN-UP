@@ -31,6 +31,7 @@ type ClassFormProps = {
   setFormData:  (field: string, value: any) => void;
   isDeleting:Boolean
   isUpdating:Boolean
+  onSuccess?: (payload?: any) => void;
 };
 
 export interface YearsModel {
@@ -44,7 +45,8 @@ export default function classForm({
   formData,
   setFormData,
   isDeleting,
-  isUpdating
+  isUpdating,
+  onSuccess
 }: ClassFormProps) {
   const [weekdays, setWeekdays] = useState<OptionBase[]>([]);
   const [teachers, setTeachers] = useState<TeacherBase[]>([]);
@@ -52,6 +54,7 @@ export default function classForm({
   const [responseMsg, setResponseMsg] = useState<boolean>(false);
   const [messageMsg, setMessageMsg] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [AcademicYearList, setAcademicYearList] = useState<YearsModel[]>([]);
 
   useEffect(() => {
@@ -85,8 +88,9 @@ export default function classForm({
   }, [formData.teachers]);
 
   useEffect(() => {
+    const date = new Date().getFullYear();
     fetchTeachers();
-    handleYearSync();
+    setAcademicYearList(handleYearSync(date,10));
   }, []);
 
 
@@ -111,25 +115,24 @@ export default function classForm({
     }
   };
 
-  const handleYearSync = async () => {
-    try {
-      const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/academic-years`,
-        {
-          headers: {
-            "Content-Type": "application/json"
-          },
-        }
-      );
-      const data = await res.json();
-      if(data){
-        const result_set = data.results;
-        setAcademicYearList(result_set);
-      }
-    } catch (error) {
-      console.error("Internal Sync Error:", error);
-    }
-  };
+  const handleYearSync  = (
+      startYear: number,
+      count: number
+      ): any => {
+      return Array.from({ length: count }, (_, i) => {
+          const year = startYear - i;
+          const date_year = new Date().getFullYear();
+          const is_current_status = true ? year == date_year : false;
+          return {
+            end_date:`${year}-${String(year + 1)}`,
+            start_date:year,
+            id:i,
+            is_current:is_current_status,
+            year_name: `${year}-${String(year + 1)}`,
+
+          }
+      });
+    };
 
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -137,6 +140,7 @@ export default function classForm({
 
     setResponseMsg(true);
     setError(false);
+    setIsSubmitting(true);
     
     const url = isUpdating 
       ? `${process.env.NEXT_PUBLIC_API_URL}/classes/${formData.id}/`
@@ -160,6 +164,10 @@ export default function classForm({
         console.error("Validation Error:", errorDetails);
         setError(true);
         setMessageMsg("Validation error. Please check your inputs.");
+        setTimeout(() => {
+          setResponseMsg(false);
+          setMessageMsg("");
+        }, 3000);
         return;
       }
       
@@ -168,6 +176,10 @@ export default function classForm({
         console.error("API Error Details:", errorData);
         setError(true);
         setMessageMsg("An error occurred. Please try again.");
+        setTimeout(() => {
+          setResponseMsg(false);
+          setMessageMsg("");
+        }, 3000);
         return;
       }
 
@@ -176,6 +188,7 @@ export default function classForm({
       
       setError(false);
       setMessageMsg(isUpdating ? "Class updated successfully!" : "Class created successfully!");
+      onSuccess?.(data_request);
       
       if (isUpdating) {
         alert("Class updated successfully!");
@@ -190,6 +203,12 @@ export default function classForm({
       console.error("Request failed:", err);
       setError(true);
       setMessageMsg("Network error. Please try again.");
+      setTimeout(() => {
+        setResponseMsg(false);
+        setMessageMsg("");
+      }, 3000);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -200,7 +219,7 @@ export default function classForm({
   ) => {
     const { name, value } = e.target;
 
-    if (name === "class_teacher" || name === "academic_year" || name === "grade_level" || name === "capacity") {
+    if (name === "class_teacher" || name === "grade_level" || name === "capacity") {
       setFormData(name, value ? parseInt(value) : "");
     } 
     else {
@@ -214,14 +233,10 @@ export default function classForm({
         <h2>{formData.id ? "Edit Class" : "Class Creation Form"}</h2>
 
         <form onSubmit={handleSubmit} className="teaching-form">
-          <div className={`loader_wrapper ${responseMsg ? "play" : ""}`}>
-            <div className="load-3">
-              <div className="line"></div>
-              <div className="line"></div>
-              <div className="line"></div>
-            </div>
+          <div className={`form-status ${responseMsg ? "show" : ""} ${error ? "error" : "success"}`}>
+            {isSubmitting && <span className="status-spinner" aria-hidden="true" />}
             {messageMsg && (
-              <p className={error ? "red" : "green"}>{messageMsg}</p>
+              <p className="status-message">{messageMsg}</p>
             )}
           </div>
 
@@ -290,7 +305,7 @@ export default function classForm({
                     <option>No list available</option>
                   )}
                   {AcademicYearList.map((year) => (
-                    <option key={year.id} value={year.id}>
+                    <option key={year.id} value={year.year_name}>
                         {year.year_name}
                     </option>
                     ))}
@@ -307,8 +322,8 @@ export default function classForm({
           </div>
 
           <div className="button-group">
-            <button type="submit">
-              {formData.id ? "Update Class" : "Submit"}
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Please wait..." : formData.id ? "Update Class" : "Submit"}
             </button>
           </div>
         </form>

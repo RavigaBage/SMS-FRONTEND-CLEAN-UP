@@ -164,6 +164,7 @@ export async function fetchStudentsByClass(
 
   return response.json();
 }
+
 export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -259,13 +260,6 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
-   alert(
-  raw.detail 
-    ? `Oops! Something's wrong: ${raw.detail}. Please check if your data already exists or if any required fields are missing.` 
-    : raw.error 
-      ? `Error: ${raw.error}` 
-      : `Unexpected error ${response.status}: ${response.statusText}. Please try again.`
-);
 
     return {
         data: null,

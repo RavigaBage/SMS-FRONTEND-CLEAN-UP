@@ -5,7 +5,7 @@ import Link from 'next/link';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchWithAuth } from '@/src/lib/apiClient';
 import { Pagination } from '@/src/assets/components/management/Pagination';
-
+import Image from "next/image";
 type StudentRow = {
   id: number;
   full_name: string;
@@ -67,10 +67,9 @@ export default function TranscriptHome() {
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [summary, setSummary] = useState<SummaryRow>({ total: 0, active: 0, on_leave: 0 });
-
-  // filters / ui
+  const current_date_now = new Date().getFullYear();
   const [selectedClassId, setSelectedClassId] = useState<number | ''>('');
-  const [selectedYear, setSelectedYear] = useState<string>(generateAcademicYears(2030, 10)[0]);
+  const [selectedYear, setSelectedYear] = useState<string>(generateAcademicYears(current_date_now, 10)[0]);
   const [search, setSearch] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [resultsPerPage] = useState<number>(DEFAULT_RESULTS_PER_PAGE);
@@ -359,16 +358,18 @@ export default function TranscriptHome() {
                   </tr>
                 ) : (
                   students.map((enrollment: any) => {
-                    const s = enrollment.student ?? enrollment; // fallback if API returns student nested or flat
+                    const s = enrollment.student ?? enrollment;
                     return (
                       <tr key={enrollment.id ?? s.id} className="odd:bg-white even:bg-slate-50">
                         <td className="px-4 py-3">
                           <div className="student-avatar w-10 h-10 rounded-full overflow-hidden">
-                            <img
+                            <Image
                               alt={`${s.first_name} ${s.last_name}`}
                               src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
                                 `${s.first_name} ${s.last_name}`
                               )}&background=random`}
+                              width={200}
+                              height={200}
                               className="w-full h-full object-cover"
                             />
                           </div>

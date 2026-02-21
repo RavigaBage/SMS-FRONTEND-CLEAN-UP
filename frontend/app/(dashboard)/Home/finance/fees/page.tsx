@@ -24,6 +24,7 @@ interface FeeStructure {
   id: number;
   academic_year_id: number;
   academic_year_name?: string;
+  academic_year?: string;
   class_obj_id?: number;
   class_obj:Class_obj
   class_name?: string;
@@ -71,6 +72,7 @@ function normalizeFeeStructure(raw: any): FeeStructure {
   return {
     id: raw.id,
     academic_year_id:  raw.academic_year?.id,
+    academic_year:raw.academic_year,
     academic_year_name:  raw.academic_year?.year_name,
     class_obj_id: raw.class_obj_id ?? raw.class_obj?.id,
     class_name: raw.class_obj?.class_name,
@@ -107,6 +109,7 @@ function AddEditModal({
   const [form, setForm] = useState({
     academic_year_id: record?.academic_year_id ?? "",
     class_obj_id: record?.class_obj_id ?? "",
+    academic_year:record?.academic_year??"",
     term: record?.term ?? "",
     category_name: record?.category_name ?? "",
     amount: String(record?.amount ?? ""),
@@ -120,6 +123,7 @@ function AddEditModal({
       setForm({
         academic_year_id: record.academic_year_id ?? "",
         class_obj_id: record.class_obj_id ?? "",
+        academic_year:record.academic_year ??"",
         term: record.term ?? "",
         category_name: record.category_name ?? "",
         amount: String(record.amount ?? ""),
@@ -131,6 +135,7 @@ function AddEditModal({
       setForm({
         academic_year_id: "",
         class_obj_id: "",
+        academic_year:"",
         term: "",
         category_name: "",
         amount: "",
@@ -146,13 +151,13 @@ function AddEditModal({
     e.preventDefault();
     setError(null);
 
-    if (!form.academic_year_id || !form.category_name || !form.amount) {
+    if (!form.academic_year || !form.category_name || !form.amount) {
       setError("Please fill in all required fields.");
       return;
     }
-    console.log(form.class_obj_id)
     const payload = {
       academic_year_id: Number(form.academic_year_id),
+      academic_year:form.academic_year_id,
       class_obj_id: form.class_obj_id ? Number(form.class_obj_id) : null,
       term: form.term,
       category_name: form.category_name,
@@ -204,13 +209,15 @@ function AddEditModal({
           <label>
             Academic Year *
             <select
-              value={form.academic_year_id}
-              onChange={(e) => setForm({ ...form, academic_year_id: e.target.value })}
+              value={form.academic_year}
+              onChange={(e) =>
+                setForm({ ...form, academic_year: e.target.value })
+              }
               required
             >
               <option value="">Select academic year</option>
               {academicYears.map((year) => (
-                <option key={year.id} value={year.id}>
+                <option key={year.id} value={year.year_name}>
                   {year.year_name}
                 </option>
               ))}
@@ -397,6 +404,7 @@ export default function FinancePage() {
       const payload = unwrap<any>(raw);
       const arr = Array.isArray(payload) ? payload : Array.isArray(raw?.results) ? raw.results : [];
       const normalized = arr.map((r: any) => normalizeFeeStructure(r));
+    
       setFeeStructures(normalized);
     } catch (err: any) {
       console.error("Fetch fee structures failed:", err);
@@ -408,16 +416,26 @@ export default function FinancePage() {
   };
 
   // Fetch academic years for dropdown
-  const fetchAcademicYears = async () => {
-    try {
-      const raw = await apiRequest<any>(ACADEMIC_YEARS_ENDPOINT);
-      const payload = unwrap<any>(raw);
-      const arr = Array.isArray(payload) ? payload : Array.isArray(raw?.results) ? raw.results : [];
-      setAcademicYears(arr);
-    } catch (err) {
-      console.error("Failed to fetch academic years:", err);
-    }
+  const generateAcademicYears = (
+  startYear: number,
+  count: number
+  ): any => {
+  return Array.from({ length: count }, (_, i) => {
+      const year = startYear - i;
+      const date_year = new Date().getFullYear();
+      const is_current_status = true ? year == date_year : false;
+      return {
+        end_date:`${year}-${String(year + 1)}`,
+        start_date:year,
+        id:i,
+        is_current:is_current_status,
+        year_name: `${year}-${String(year + 1)}`,
+
+      }
+  });
   };
+
+  
 
   // Fetch classes for dropdown
   const fetchClasses = async () => {
@@ -432,8 +450,9 @@ export default function FinancePage() {
   };
 
   useEffect(() => {
+    const date_now = new Date().getFullYear();
     fetchFeeStructures();
-    fetchAcademicYears();
+    setAcademicYears(generateAcademicYears(date_now,10));
     fetchClasses();
   }, []);
 
@@ -566,7 +585,7 @@ export default function FinancePage() {
                         >
                           <option value="">All Years</option>
                           {academicYears.map((year) => (
-                            <option key={year.id} value={year.id}>
+                            <option key={year.id} value={year.year_name}>
                               {year.year_name}
                             </option>
                           ))}
@@ -664,7 +683,7 @@ export default function FinancePage() {
                           <p className="desc">{fee.description}</p>
                         )}
                       </td>
-                      <td>{fee.academic_year_name || "—"}</td>
+                      <td>{fee.academic_year}</td>
                       <td>{fee.class_name || "All Classes"}</td>
                       <td>
                         <span className="badge-term">

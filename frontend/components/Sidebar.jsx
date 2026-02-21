@@ -44,6 +44,25 @@ const DashboardIcon = (props) => (
     <rect x="0.5" y="9.5" width="7" height="7" rx="1" fill="none" />
   </IconBase>
 );
+const ConfigurationIcon = (props) => (
+  <IconBase
+    id="grad-configuration"
+    gradientFrom="#0EA5E9"
+    gradientTo="#22D3EE"
+    {...props}
+  >
+    {/* Horizontal slider lines */}
+    <line x1="2" y1="4" x2="18" y2="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="8" cy="4" r="2" fill="none" stroke="currentColor" strokeWidth="1.5" />
+
+    <line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="14" cy="10" r="2" fill="none" stroke="currentColor" strokeWidth="1.5" />
+
+    <line x1="2" y1="16" x2="18" y2="16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="6" cy="16" r="2" fill="none" stroke="currentColor" strokeWidth="1.5" />
+  </IconBase>
+);
+
 
 const AcademicIcon = (props) => (
   <IconBase id="grad-academic" gradientFrom="#4EC5A6" gradientTo="#3BB7A1" {...props}>
@@ -129,6 +148,34 @@ const FinanceIcon = (props) => (
     <circle cx="16" cy="15" r="3.2" fill="none" />
   </IconBase>
 );
+const AppAccessIcon = (props) => (
+  <IconBase
+    id="grad-appaccess"
+    gradientFrom="#10B981"
+    gradientTo="#059669"
+    {...props}
+  >
+    {/* Shield outline */}
+    <path
+      d="M10 2 L18 5 V10 C18 14 14.5 17.5 10 19 C5.5 17.5 2 14 2 10 V5 L10 2 Z"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+    />
+
+    {/* Check mark */}
+    <path
+      d="M6.5 10.5 L9 13 L14 8"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </IconBase>
+);
+
 
 const LogoutIcon = (props) => (
   <IconBase id="grad-logout" gradientFrom="#F87171" gradientTo="#FB7185" {...props}>
@@ -404,7 +451,7 @@ export default function Sidebar() {
                 </div>
               </ProtectedLink>
 
-              <ProtectedLink isAdmin={isAdmin} href="/Home/finance/invoices" className={styles.submenuItem}>
+              <ProtectedLink isAdmin={isAdmin} href="/Home/finance/invoices/list/" className={styles.submenuItem}>
                 <div className={styles.navItemContent}>
                   <div className={styles.navIcon}><TranscriptIcon /></div>
                   <span>Invoices</span>
@@ -434,6 +481,18 @@ export default function Sidebar() {
           <div className={styles.navItemContent}>
             <div className={styles.navIcon}><ProfilesIcon /></div>
             <span>User Accounts</span>
+          </div>
+        </ProtectedLink>
+        <ProtectedLink isAdmin={isAdmin} href="/Home/config/" className={styles.navItem}>
+          <div className={styles.navItemContent}>
+            <div className={styles.navIcon}><ConfigurationIcon /></div>
+            <span>Configurations</span>
+          </div>
+        </ProtectedLink>
+        <ProtectedLink isAdmin={isAdmin} href="/Home/appaccess/" className={styles.navItem}>
+          <div className={styles.navItemContent}>
+            <div className={styles.navIcon}><AppAccessIcon /></div>
+            <span>App Access</span>
           </div>
         </ProtectedLink>
 

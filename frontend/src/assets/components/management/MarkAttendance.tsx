@@ -48,53 +48,54 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
     }
   };
 
-  const fetchStudents = async (classId: string) => {
-    try {
-      const res = await apiRequest<any>(`/classes/${classId}/students/`, { method: "GET" });
-      setStudents(res as any);
-    } catch (err) {
-      console.error("Error fetching students:", err);
-      toast.error("Failed to load students");
+const fetchStudents = async (classId: string) => {
+  try {
+    const res = await apiRequest<any>(`/classes/${classId}/students/`, { method: "GET" });
+    // This endpoint returns a plain array, not a paginated response
+    const list = Array.isArray(res.data) ? res.data
+               : res.results || res.data || [];
+    setStudents(list);
+  } catch (err) {
+    console.error("Error fetching students:", err);
+    toast.error("Failed to load students");
+  }
+};
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setErrors({});
+
+  try {
+    const res = await apiRequest("/attendance/", {
+      method: "POST",
+      body: JSON.stringify({
+        student_id:         formData.student_id,   // serializer expects 'student' not 'student_id'
+        // class_obj:       selectedClass,          // serializer expects 'class_obj' not 'class_id'
+        attendance_date: formData.attendance_date,
+        status:          formData.status,
+        remarks:         formData.remarks,
+        class_id:  Number(selectedClass),
+        ...(formData.check_in_time && { check_in_time: formData.check_in_time }),
+      }),
+    });
+
+    // apiRequest returns ApiResponse, not throws — check error field
+    if (res.error) {
+      toast.error(res.error);
+      setErrors({ general: res.error });
+      return;
     }
-  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrors({});
-
-    try {
-      await apiRequest("/attendance/students/", {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
-
-      toast.success("Attendance marked successfully!");
-      onClose();
-      resetForm();
-    } catch (err: any) {
-      console.error("Error marking attendance:", err);
-      
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        
-        if (errorData.error && errorData.detail) {
-          toast.error(errorData.detail);
-          setErrors({ general: errorData.detail });
-        } else if (typeof errorData === 'object') {
-          setErrors(errorData);
-          const firstError = Object.values(errorData)[0];
-          toast.error(Array.isArray(firstError) ? firstError[0] : String(firstError));
-        } else {
-          toast.error("Failed to mark attendance");
-        }
-      } else {
-        toast.error(err.detail || "Failed to mark attendance");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("Attendance marked successfully!");
+    onClose();
+    resetForm();
+  } catch (err: any) {
+    toast.error("Failed to mark attendance. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const resetForm = () => {
     setFormData({

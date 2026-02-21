@@ -154,3 +154,79 @@ h2 { margin-bottom: 10px; font-size: 2rem; }
     font-weight: bold;
     font-size: 0.8rem;
 }
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .login-container {
+        width: 90%;
+        height: auto;
+        flex-direction: column;
+    }
+    .login-left, .login-right {
+        padding: 30px;
+    }
+    .login-right h1 {
+        font-size: 2rem;
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .login {
+        height: auto;
+        padding: 20px 0;
+    }
+    .login-container {
+        flex-direction: column;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .login-left, .login-right {
+        width: 100%;
+        padding: 20px;
+    }
+    .login-left h2, .login-right h1 {
+        font-size: 1.5rem;
+    }
+    .input-icon input {
+        padding: 10px 12px 10px 35px;
+    }
+    .btn-primary, .btn-social {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+    .logo-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-left, .login-right {
+        padding: 15px;
+    }
+    .login-right h1 {
+        font-size: 1.5rem;
+    }
+    h2 {
+        font-size: 1.2rem;
+    }
+    .input-icon input {
+        padding: 8px 10px 8px 30px;
+        font-size: 0.85rem;
+    }
+    .btn-primary, .btn-social {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+    .testimonial p {
+        font-size: 1rem;
+    }
+    .user-info span {
+        font-size: 0.7rem;
+    }
+    .footer-logos p {
+        font-size: 0.6rem;
+    }
+}

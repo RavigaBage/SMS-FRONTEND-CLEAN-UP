@@ -125,9 +125,6 @@ export default function ClassesManagement() {
   const [pagination, setPagination] = useState<PaginatedResponse<Classroom> | null>(null);
   const [page, setPage] = useState(1);
 
-
-
-  
   const handleEditClick = (item: Classroom) => {
     setSelectedClass(item);
     
@@ -135,7 +132,7 @@ export default function ClassesManagement() {
         id: item.id,
         class_name: item.class_name,
         academic_year: item.academic_year,
-        academic_year_name: item.academic_year_name,
+        academic_year_name: item.academic_year,
         room_number: item.room_number,
         class_teacher: item.class_teacher,
         teacher_name: item.teacher_name,
@@ -145,15 +142,15 @@ export default function ClassesManagement() {
         grade_level: item.grade_level,
         section: item.section
     });
-    
     setActive(true); 
-    setClickvelvet(null); 
-    setUpdating(true);
+    setClickvelvet(null);
     
   };
   useEffect(() => {
+    const date = new Date().getFullYear();
     loadData();
     setLoading(false)
+    setAcademicYears(generateAcademicYears(date, 10));
   }, [selectedClass, selectedYear]);
 
     const loadData = async () => {
@@ -195,7 +192,7 @@ export default function ClassesManagement() {
         return;
       }
 
-      await fetcClassData();
+      await fetchClassData();
       setClickvelvet(null);
 
     } catch (err) {
@@ -239,72 +236,99 @@ export default function ClassesManagement() {
     setClickvelvet(prevIndex => (prevIndex === index ? null : index));
   };
 
- 
+
+  const generateAcademicYears = (
+  startYear: number,
+  count: number
+  ): any => {
+  return Array.from({ length: count }, (_, i) => {
+      const year = startYear - i;
+      const date_year = new Date().getFullYear();
+      const is_current_status = true ? year == date_year : false;
+      return {
+        end_date:`${year}-${String(year + 1)}`,
+        start_date:year,
+        id:i,
+        is_current:is_current_status,
+        year_name: `${year}-${String(year + 1)}`,
+
+      }
+  });
+  };
+
+  const handleClearFilter = () => {
+    setSelectedYear('');
+    fetchClassData_();  // fetch all with no filter
+  };
+
   useEffect(() => {
-    fetcClassData();
-    generateAcademicYears();
+    // ✅ removed fetchClassData() from here
     const handleClickOutside = (event: MouseEvent) => {
       if (checkvelvetClick.current && !checkvelvetClick.current.contains(event.target as Node)) {
         setClickvelvet(null);
       }
     };
-
     if (clickvelvet !== null) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [clickvelvet]);
 
-  const fetcClassData = async () => {
-    try {
-      const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data: PaginatedResponse<Classroom> = await res.json();
-      if (data) {
-        setPagination(data);         
-        setClassData(data.results); 
-        setPage(1); 
-        const result_set = data.results;
-        setClassData(result_set);
-      }
-    } catch (err) {
-      console.error("Failed to load classes", err);
-    }
+  const FilterPop = ()=>{
+    fetchClassData(selectedYear);
   }
 
+  useEffect(() => {
+    fetchClassData_();
+  }, [selectedYear]);
+
+  const fetchClassData = async (year: string = selectedYear) => {
+      try {
+        const params = new URLSearchParams();
+        if (year) params.append('academic_year', year);
+
+        const res = await fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}/classes?${params.toString()}`,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        const data: PaginatedResponse<Classroom> = await res.json();
+        if (data) {
+          setPagination(data);
+          setClassData(data.results);
+          setPage(1);
+        }
+      } catch (err) {
+        console.error("Failed to load classes", err);
+      }
+    };
+  const fetchClassData_ = async () => {
+      try {
+        const params = new URLSearchParams();
+        const res = await fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}/classes`,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        const data: PaginatedResponse<Classroom> = await res.json();
+        if (data) {
+          setPagination(data);
+          setClassData(data.results);
+          setPage(1);
+        }
+      } catch (err) {
+        console.error("Failed to load classes", err);
+      }
+    };
   const handleUpdate = () => {
     setDeleting(!isUpdating);
   }
 
 
-  const generateAcademicYears =async ()=> {
-      try {
-        const res = await fetchWithAuth(
-          `${process.env.NEXT_PUBLIC_API_URL}/academic-years`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await res.json();
-        if (data) {
-          const result_set = data.results;
-          setAcademicYears(result_set);
-        }
-      } catch (err) {
-        console.error("Failed to load academic-years", err);
-      }
-  };
   return (
 
     <div className="dashboardWrapper CLASSDATA">
@@ -316,6 +340,9 @@ export default function ClassesManagement() {
         setFormData={updateFormField}
         isDeleting={isDeleting}
         isUpdating={isUpdating}
+        onSuccess={() => {
+          fetchClassData();
+        }}
       />
       {isLoading ? (
                   <SkeletonTable rows={5} columns={3} />
@@ -331,40 +358,42 @@ export default function ClassesManagement() {
 
         {/* Filters */}
         <section className="filters">
-           <select
-                className="nav-select short"
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
+            <select
+              className="nav-select short"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
             >
-              <option>Select academic year</option>
-                {AcademicYears.map((year) => (
-                <option key={year.id} value={year.id}>
-                    {year.year_name}
+              <option value="">Select academic year</option>
+              {AcademicYears.map((year) => (
+                <option key={year.id} value={year.year_name}>
+                  {year.year_name}
                 </option>
-                ))}
+              ))}
             </select>
 
-          <select aria-label="Filter by Class Level">
-            <option>Class Level</option>
-            <option>Primary</option>
-            <option>Junior High</option>
-            <option>Senior High</option>
-          </select>
           
-          <div className="filter" onClick={handlePopup}>
-            <div className="filter_list">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
-                <path d="M400-240v-80h160v80H400ZM240-440v-80h480v80H240ZM120-640v-80h720v80H120Z"/>
-              </svg>
+            <div className="filter" onClick={FilterPop}>
+              <div className="filter_list">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
+                  <path d="M400-240v-80h160v80H400ZM240-440v-80h480v80H240ZM120-640v-80h720v80H120Z"/>
+                </svg>
+              </div>
+              <p>Filter</p>
             </div>
-            <p>Filter</p>
-          </div>
+
+              {selectedYear && (
+                <div className="filter" onClick={handleClearFilter} style={{ background: '#6b7280' }}>
+                  <div className="filter_list">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
+                      <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                    </svg>
+                  </div>
+                  <p>Clear</p>
+                </div>
+              )}
 
           <div className="add_subject" onClick={() => {
-            setUpdating(false);
-            setTimeout(() => {
-                handleEditClick(EmptyForm);
-            }, 100);
+            setTimeout(() => { handleEditClick(EmptyForm); }, 100);
           }}>
             <div className="filter_list">
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff">
@@ -405,7 +434,7 @@ export default function ClassesManagement() {
                   >
                     <td style={{ fontWeight: 600 }}>{item.class_name}</td>
                     
-                    <td>{item.academic_year_name}</td>
+                    <td>{item.academic_year}</td>
                     
                     <td>{item.teacher_name || "Unassigned"}</td>
 

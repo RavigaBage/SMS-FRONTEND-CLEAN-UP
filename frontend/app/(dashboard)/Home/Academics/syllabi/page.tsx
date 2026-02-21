@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { X, BookOpen, Hash, FileText, Target, ChevronDown } from "lucide-react";
 import "@/styles/syllabi.css";
 import { fetchWithAuth } from "@/src/lib/apiClient";
 
@@ -235,7 +236,7 @@ export default function Syllabi() {
               <option value="">All Subjects</option>
               {subjects.map(item => (
                 <option key={item.id} value={item.id}>
-                  {item.subject_name}
+                  {item.subject_name} - {item.subject_code}
                 </option>
               ))}
             </select>
@@ -576,108 +577,223 @@ function UploadModal({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Create New Syllabus</h2>
-          <button className="modal-close" onClick={onClose}>
-            ✕
+      <div
+        className="relative bg-white w-full max-w-2xl mx-4 rounded-2xl shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+
+        {/* ── Top accent bar ─────────────────────────────────────────── */}
+        <div className="h-1 w-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500" />
+
+        {/* ── Header ─────────────────────────────────────────────────── */}
+        <div className="flex items-start justify-between px-7 pt-6 pb-5">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600">
+              <BookOpen size={18} strokeWidth={2} />
+            </span>
+            <div>
+              <h2 className="text-[17px] font-semibold text-slate-800 tracking-tight">
+                Create New Syllabus
+              </h2>
+              <p className="text-[12px] text-slate-400 mt-0.5">
+                Fill in the details below to add a new syllabus entry
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 red"
+          >
+            <X size={15} strokeWidth={2.5} />
           </button>
         </div>
-        <form onSubmit={handleSubmit}>
-          <div className="grid-2x">
-            <div className="form-group">
-              <label>Subject *</label>
-              <select 
-                name="subject_id"
-                className="search-box" 
-                value={formData.subject_id}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">Select a Subject</option>
-                {subjects.map(item => (
-                  <option key={item.id} value={item.id}>
-                    {item.subject_name}
-                  </option>
-                ))}
-              </select>
-            </div>
 
-            <div className="form-group">
-              <label>Class (Optional)</label>
-              <select 
-                name="class_id"
-                className="search-box" 
-                value={formData.class_id}
-                onChange={handleInputChange}
-              >
-                <option value="">Select a Class</option>
-                {classes.map(item => (
-                  <option key={item.id} value={item.id}>
-                    {item.class_name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+        {/* ── Divider ────────────────────────────────────────────────── */}
+        <div className="h-px bg-slate-100 mx-7" />
 
-          <div className="grid-2x">
-            <div className="form-group">
-              <label>Week Number *</label>
-              <input 
-                type="number"
-                name="week_number"
-                min="1"
-                placeholder="Week number" 
-                value={formData.week_number}
+        {/* ── Form ───────────────────────────────────────────────────── */}
+        <form onSubmit={handleSubmit} className="px-7 py-6 space-y-6 overflow-y-auto max-h-[72vh]">
+
+          {/* Section 1 — Assignment */}
+          <fieldset className="space-y-4">
+            <legend className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">1</span>
+              Assignment
+            </legend>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Subject */}
+              <div className="space-y-1.5">
+                <label className="block text-[12px] font-semibold text-slate-600">
+                  Subject <span className="text-rose-400">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    name="subject_id"
+                    value={formData.subject_id}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-2.5 pr-9 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all cursor-pointer"
+                  >
+                    <option value="">Select a subject</option>
+                    {subjects.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.subject_name} - {item.subject_code}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={14}
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+                </div>
+              </div>
+
+              {/* Class */}
+              <div className="space-y-1.5">
+                <label className="block text-[12px] font-semibold text-slate-600">
+                  Class
+                  <span className="ml-1.5 text-[10px] font-normal text-slate-400">(optional)</span>
+                </label>
+                <div className="relative">
+                  <select
+                    name="class_id"
+                    value={formData.class_id}
+                    onChange={handleInputChange}
+                    className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-2.5 pr-9 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all cursor-pointer"
+                  >
+                    <option value="">Select a class</option>
+                    {classes.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.class_name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={14}
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          {/* Section 2 — Topic */}
+          <fieldset className="space-y-4">
+            <legend className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">2</span>
+              Topic Details
+            </legend>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Week Number */}
+              <div className="space-y-1.5">
+                <label className="block text-[12px] font-semibold text-slate-600">
+                  Week Number <span className="text-rose-400">*</span>
+                </label>
+                <div className="relative">
+                  <Hash
+                    size={13}
+                    className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+                  <input
+                    type="number"
+                    name="week_number"
+                    min="1"
+                    placeholder="e.g. 4"
+                    value={formData.week_number}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Topic Title */}
+              <div className="space-y-1.5">
+                <label className="block text-[12px] font-semibold text-slate-600">
+                  Topic Title <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="topic_title"
+                  placeholder="e.g. Algebra Fundamentals"
+                  value={formData.topic_title}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all"
+                />
+              </div>
+            </div>
+          </fieldset>
+
+          {/* Section 3 — Content */}
+          <fieldset className="space-y-4">
+            <legend className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">3</span>
+              Content
+            </legend>
+
+            {/* Content Summary */}
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <FileText size={12} className="text-slate-400" />
+                <label className="block text-[12px] font-semibold text-slate-600">
+                  Content Summary <span className="text-rose-400">*</span>
+                </label>
+              </div>
+              <textarea
+                name="content_summary"
+                value={formData.content_summary}
                 onChange={handleInputChange}
+                placeholder="Describe what will be covered in this topic…"
                 required
+                rows={3}
+                className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all resize-none leading-relaxed"
               />
             </div>
 
-            <div className="form-group">
-              <label>Topic Title *</label>
-              <input 
-                type="text"
-                name="topic_title"
-                placeholder="Topic title" 
-                value={formData.topic_title}
+            {/* Learning Objectives */}
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <Target size={12} className="text-slate-400" />
+                <label className="block text-[12px] font-semibold text-slate-600">
+                  Learning Objectives <span className="text-rose-400">*</span>
+                </label>
+              </div>
+              <textarea
+                name="learning_objectives"
+                value={formData.learning_objectives}
                 onChange={handleInputChange}
+                placeholder={"• Students will be able to…\n• Students will understand…"}
                 required
+                rows={3}
+                className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all resize-none leading-relaxed"
               />
+              <p className="text-[11px] text-slate-400 pl-1">
+                Enter each objective on a new line.
+              </p>
             </div>
-          </div>
+          </fieldset>
 
-          <div className="form-group">
-            <label>Content Summary *</label>
-            <textarea
-              name="content_summary"
-              value={formData.content_summary}
-              onChange={handleInputChange}
-              placeholder="Describe what will be covered in this topic"
-              required
-              rows={4}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Learning Objectives *</label>
-            <textarea
-              name="learning_objectives"
-              value={formData.learning_objectives}
-              onChange={handleInputChange}
-              placeholder="Enter each objective on a new line"
-              required
-              rows={4}
-            />
-          </div>
-
-          <div className="modal-actions">
-            <button type="button" className="btn btn-outline" onClick={onClose}>
+          {/* ── Footer actions ────────────────────────────────────────── */}
+          <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={uploading}>
-              {uploading ? "Creating..." : "Create Syllabus"}
+            <button
+              type="submit"
+              disabled={uploading}
+              className="relative px-6 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center gap-2 shadow-sm shadow-indigo-200"
+            >
+              {uploading && (
+                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              )}
+              {uploading ? "Creating…" : "Create Syllabus"}
             </button>
           </div>
         </form>
