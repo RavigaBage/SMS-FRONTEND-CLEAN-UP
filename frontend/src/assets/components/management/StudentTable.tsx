@@ -2,6 +2,8 @@
 import Link from "next/dist/client/link";
 import { Student } from "../../types/api";
 import { Trash2,Users } from "lucide-react";
+import Image from 'next/image';
+import { image } from "framer-motion/client";
 interface StudentTableProps {
   students: Student[];
   onDelete: (id: number) => void; 
@@ -48,15 +50,19 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
                   href={`/Home/profiles/students/students/${student.id}`}
                   className="flex items-center gap-3 hover:text-cyan-600 transition-colors"
                 >
-                  <img src={
-                      student.profileImage
-                        ? student.profileImage
-                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(student.fullName)}&background=random&color=fff&rounded=true&size=128`
-                    } className="w-9 h-9 rounded-full bg-slate-100" />
+                  <Image
+                    width={100}
+                    height={100}
+                    alt="description"
+                   src={
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(student.fullName)}&background=random&color=fff&rounded=true&size=128`
+                    } className="w-9 h-9 rounded-full bg-slate-100"
+                   
+                     />
                                     <span className="font-bold text-slate-700">{student.fullName}</span>
                 </Link>
               </td>
-              <td className="px-6 py-4 text-slate-500">{student.gender_display}</td>
+              <td className="px-6 py-4 text-slate-500">{student.gender}</td>
               <td className="px-6 py-4 text-center">
                 <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded text-[10px] font-bold">
                   {student.classInfo}

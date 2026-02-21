@@ -46,6 +46,7 @@ export interface StudentRaw {
 
 // Update your ApiResponse generic to handle paginated DRF responses
 export interface ApiResponse<T> {
+  detail: string;
   map(arg0: (s: any) => { student_id: any; status: string; remarks: string; }): import("react").SetStateAction<any[]>;
   id: ApiResponse<{ id: number; first_name: string; last_name: string; email: string; phone: string; date_of_birth: string; gender: string; }>;
   responseCode: number;

@@ -21,7 +21,6 @@ export default function StudentsManagementPage() {
     setFilters({});
   };
 const handleDeleteStudent = async (id: number) => {
-  // 1. Confirm with the user
   const confirmed = window.confirm(
     "Are you sure you want to delete this student? All enrollment records will be removed."
   );
@@ -29,7 +28,6 @@ const handleDeleteStudent = async (id: number) => {
   if (!confirmed) return;
 
   try {
-    // 2. Optional: You could set a 'isDeleting' state here to show a spinner
     console.log(`Attempting to delete student ID: ${id}`);
 
     await apiRequest(`/students/${id}/`, {
@@ -44,7 +42,6 @@ const handleDeleteStudent = async (id: number) => {
   } catch (err: any) {
     console.error("Delete failed:", err);
     
-    // Extracting the specific error message if backend sent one
     const errorMsg = err.response?.data?.error || err.message || "Unknown error";
     alert(`Failed to delete student: ${errorMsg}`);
   }
@@ -57,10 +54,8 @@ const handleDeleteStudent = async (id: number) => {
       if (filters.classId) query.append("class_id", filters.classId);
       if (filters.status) query.append("status", filters.status);
 
-      // Accessing the paginated response
       const res = await apiRequest<any>(`/students/?${query.toString()}`);
       
-      // Fix: Django Rest Framework returns data in a .results array when paginated
       const rawList = res.data || [];
       console.log(res);
 
@@ -70,10 +65,10 @@ const handleDeleteStudent = async (id: number) => {
         first_name: s.first_name,
         last_name: s.last_name,
         fullName: s.full_name,
+        gender:s.gender,
         date_of_birth: s.date_of_birth,
         profileImage: s.photo_url || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}&background=random`,
         email: s.email || "",
-        // Change class_info to current_class here:
         grade: s.current_class?.name || "Unassigned", 
         gender_display: s.gender,
         classInfo: s.current_class ? s.current_class.name : "Unassigned",
@@ -85,7 +80,7 @@ const handleDeleteStudent = async (id: number) => {
       setStudents(formattedData);
     } catch (err: any) {
       console.error("Failed to load students:", err.message || err);
-      setStudents([]); // Ensure empty state shows on error
+      setStudents([]); 
     } finally {
       setIsLoading(false);
     }
@@ -135,7 +130,6 @@ const handleDeleteStudent = async (id: number) => {
         </div>
       </div>
 
-      {/* Main Content Area */}
       {isLoading ? (
         <div className="bg-white border-x border-b rounded-b-2xl p-20 flex flex-col items-center justify-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-600"></div>

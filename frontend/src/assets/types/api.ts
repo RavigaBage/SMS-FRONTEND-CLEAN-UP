@@ -17,6 +17,7 @@ export interface Student {
   profileImage: string;
   email: string;
   classInfo: any,
+  gender:String;
   gender_display:String;
   grade: string;
   enrollmentDate: string;
