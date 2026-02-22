@@ -11,6 +11,7 @@ import { AttendanceFilterModal } from "@/src/assets/components/management/Attend
 import { Pagination } from "@/src/assets/components/management/Pagination";
 import { toast } from "react-hot-toast";
 import '@/styles/attpage.css';
+import Image from 'next/image'
 
 interface PaginatedResponse {
   count: number;
@@ -76,13 +77,14 @@ export default function StudentAttendancePage() {
         previous: res.previous ?? null,
         results: res.results ?? [],
       };
+      console.log(data.results);
 
       const formattedAttendance = data.results.map((a: any) => ({
         id: a.id,
         studentId: a.student?.id,
         studentName: `${a.student?.first_name} ${a.student?.last_name}`,
         studentImage: a.student?.photo_url || `https://ui-avatars.com/api/?name=${a.student?.first_name}+${a.student?.last_name}&background=0D9488&color=fff`,
-        className: a.class_name || a.student?.class_name || "N/A",
+        className: a.class_obj.class_name ||a.class_name || a.student?.class_name || "N/A",
         attendanceDate: a.attendance_date,
         status: a.status,
         checkInTime: a.check_in_time,

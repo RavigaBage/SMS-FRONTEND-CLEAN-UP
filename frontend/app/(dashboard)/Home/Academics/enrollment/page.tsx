@@ -22,8 +22,6 @@ export interface EnrollmentApiResponse { count: number; next: string | null; pre
 export interface ClassesBase { count: number; next: string | null; previous: string | null; results: ClassData[]; }
 interface PaginatedResponse<T> { count: number; next: string | null; previous: string | null; results: T[]; }
 
-// ─── Status config ────────────────────────────────────────────────────────────
-
 const STATUS_STYLES: Record<string, { badge: string; dot: string }> = {
   active:    { badge: "bg-emerald-50 text-emerald-700 border border-emerald-200", dot: "bg-emerald-500" },
   inactive:  { badge: "bg-slate-100  text-slate-500  border border-slate-200",   dot: "bg-slate-400"   },
@@ -36,7 +34,6 @@ function getStatusStyle(status: string) {
   return STATUS_STYLES[status.toLowerCase()] ?? STATUS_STYLES.inactive;
 }
 
-// ─── Highlight search match ───────────────────────────────────────────────────
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query) return <>{text}</>;

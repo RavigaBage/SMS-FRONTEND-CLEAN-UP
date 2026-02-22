@@ -5,8 +5,6 @@ import "@/styles/payroll.css";
 import { X, Plus, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface StaffOption {
   id: number;
   full_name: string;
@@ -18,19 +16,16 @@ interface PayrollRecord {
   staff_id: number;
   staff_name: string;
   role?: string;
-  base_salary: number;      // ✅ fixed: was basic_salary
+  base_salary: number;     
   allowances: number;
   deductions: number;
   tax: number;
-  net_salary: number;       // ✅ fixed: was net_pay
+  net_salary: number;  
   status: "paid" | "pending" | "failed";
-  payment_period: string;   // ✅ fixed: always YYYY-MM
-  remarks?: string;         // ✅ fixed: was notes
+  payment_period: string;  
+  remarks?: string;      
 }
 
-// ─── YYYY-MM helpers ──────────────────────────────────────────────────────────
-
-/** "2026-02" → "February 2026" for display only */
 function fmtPeriod(ym: string): string {
   if (!ym) return "—";
   const [y, m] = ym.split("-");
@@ -38,7 +33,6 @@ function fmtPeriod(ym: string): string {
   return date.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
 }
 
-/** Build YYYY-MM option list for the last 12 months */
 function buildMonthOptions(): { value: string; label: string }[] {
   const options: { value: string; label: string }[] = [];
   const now = new Date();
@@ -52,14 +46,12 @@ function buildMonthOptions(): { value: string; label: string }[] {
 
 const MONTH_OPTIONS = buildMonthOptions();
 
-// ─── Normalise raw API response ───────────────────────────────────────────────
-
 function normalizeRecord(raw: any): PayrollRecord {
-  const base       = Number(raw.base_salary  ?? raw.basic_salary ?? 0);   // ✅
+  const base       = Number(raw.base_salary  ?? raw.basic_salary ?? 0);  
   const allowances = Number(raw.allowances   ?? 0);
   const deductions = Number(raw.deductions   ?? 0);
   const tax        = Number(raw.tax          ?? 0);
-  const net        = Number(raw.net_salary   ?? raw.net_pay ?? (base + allowances - deductions - tax)); // ✅
+  const net        = Number(raw.net_salary   ?? raw.net_pay ?? (base + allowances - deductions - tax));
 
   return {
     id:             Number(raw.id),
@@ -77,12 +69,8 @@ function normalizeRecord(raw: any): PayrollRecord {
   };
 }
 
-// ─── Currency formatter ───────────────────────────────────────────────────────
-
 const ghs = (n: number) =>
   `GHS ${Number(n).toLocaleString("en-GH", { minimumFractionDigits: 2 })}`;
-
-// ─── Add / Edit Modal ─────────────────────────────────────────────────────────
 
 function AddEditModal({
   open, record, onClose, onSaved,
@@ -100,16 +88,15 @@ function AddEditModal({
   const [staffLoading, setStaffLoading] = useState(false);
 
   const [form, setForm] = useState({
-    staff:          String(record?.staff_id ?? ""),   // ✅ FK int, not free text
-    base_salary:    String(record?.base_salary ?? ""), // ✅ correct field name
+    staff:          String(record?.staff_id ?? ""), 
+    base_salary:    String(record?.base_salary ?? ""), 
     allowances:     String(record?.allowances ?? ""),
     deductions:     String(record?.deductions ?? ""),
     status:         (record?.status ?? "pending") as PayrollRecord["status"],
     payment_period: record?.payment_period ?? "",
-    remarks:        record?.remarks ?? "",             // ✅ correct field name
+    remarks:        record?.remarks ?? "",       
   });
 
-  // Reset form when modal opens / record changes
   useEffect(() => {
     if (!open) return;
     setError(null);
@@ -124,7 +111,6 @@ function AddEditModal({
     });
   }, [record, open]);
 
-  // ✅ Bug 1 fix: fetch real staff list instead of free-text name
   useEffect(() => {
     if (!open) return;
     setStaffLoading(true);
@@ -141,7 +127,6 @@ function AddEditModal({
       .finally(() => setStaffLoading(false));
   }, [open]);
 
-  // Auto-fill salary from staff's salary structure when staff is selected
   const handleStaffChange = async (staffId: string) => {
     setForm((f) => ({ ...f, staff: staffId }));
     if (!staffId) return;
@@ -153,7 +138,7 @@ function AddEditModal({
         ? res.results
         : [];
       if (structures.length > 0) {
-        const s = structures[0]; // most recent (backend orders by -effective_from)
+        const s = structures[0]; 
         setForm((f) => ({
           ...f,
           base_salary: String(s.base_salary ?? ""),
@@ -180,7 +165,6 @@ function AddEditModal({
       return;
     }
 
-    // ✅ Bug 2 fix: exact field names the serializer expects
     const payload = {
       staff:          Number(form.staff),
       base_salary:    Number(form.base_salary  || 0),
@@ -247,7 +231,6 @@ function AddEditModal({
 
         <form onSubmit={handleSubmit} className="modal-form">
 
-          {/* ✅ Staff dropdown — not free text */}
           <label>
             Staff Member *
             <select
@@ -268,7 +251,6 @@ function AddEditModal({
             </select>
           </label>
 
-          {/* ✅ Payment period — YYYY-MM dropdown, not free text */}
           <label>
             Payment Period *
             <select
@@ -284,7 +266,6 @@ function AddEditModal({
             </select>
           </label>
 
-          {/* ✅ base_salary — correct field name */}
           <div className="grid-two">
             <label>
               Base Salary (GHS) *
@@ -323,7 +304,6 @@ function AddEditModal({
             />
           </label>
 
-          {/* Live net pay preview */}
           {Number(form.base_salary) > 0 && (
             <div style={{
               padding: "10px 14px", borderRadius: 8,
@@ -336,7 +316,6 @@ function AddEditModal({
             </div>
           )}
 
-          {/* ✅ Status — only valid backend choices */}
           <label>
             Status
             <select
@@ -345,11 +324,9 @@ function AddEditModal({
             >
               <option value="pending">Pending</option>
               <option value="paid">Paid</option>
-              {/* ✅ Bug 3: "failed" only shown if backend supports it — see migration note */}
             </select>
           </label>
 
-          {/* ✅ remarks — correct field name */}
           <label>
             Remarks
             <textarea
@@ -376,8 +353,6 @@ function AddEditModal({
     </div>
   );
 }
-
-// ─── Confirm Delete ───────────────────────────────────────────────────────────
 
 function ConfirmDelete({ open, onCancel, onConfirm, loading }: {
   open: boolean; onCancel: () => void; onConfirm: () => void; loading?: boolean;
@@ -406,9 +381,6 @@ function ConfirmDelete({ open, onCancel, onConfirm, loading }: {
   );
 }
 
-// ─── Run Payroll Modal ────────────────────────────────────────────────────────
-// ✅ Bug 1 fix: "Run Payroll" now uses the /process_all/ bulk endpoint,
-// no longer requires a single staff_id
 
 function RunPayrollModal({ open, onClose, onDone }: {
   open: boolean; onClose: () => void; onDone: () => void;
@@ -483,7 +455,6 @@ function RunPayrollModal({ open, onClose, onDone }: {
             </>
           )}
 
-          {/* Results summary */}
           {results && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", gap: 12 }}>
@@ -539,7 +510,6 @@ export default function PayrollPage() {
 
   const [runPayrollOpen, setRunPayrollOpen] = useState(false);
 
-  // Filters
   const [statusFilter, setStatusFilter]             = useState<"" | "paid" | "pending">("");
   const [paymentPeriodFilter, setPaymentPeriodFilter] = useState("");
   const [staffIdFilter, setStaffIdFilter]           = useState("");
@@ -547,7 +517,6 @@ export default function PayrollPage() {
 
   const activeFilterCount = [statusFilter, paymentPeriodFilter, staffIdFilter].filter(Boolean).length;
 
-  // ✅ Bug 5 fix: payment_period is always YYYY-MM — matches server filter exactly
   const fetchRecords = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -593,7 +562,6 @@ export default function PayrollPage() {
     }
   };
 
-  // Totals
   const totalBase       = records.reduce((s, r) => s + r.base_salary,  0);
   const totalAllowances = records.reduce((s, r) => s + r.allowances,   0);
   const totalDeductions = records.reduce((s, r) => s + r.deductions,   0);
@@ -608,7 +576,6 @@ export default function PayrollPage() {
         </div>
 
         <div className="header-actions">
-          {/* ✅ Month picker uses YYYY-MM values */}
           <select
             className="month-picker"
             value={paymentPeriodFilter}
@@ -629,7 +596,6 @@ export default function PayrollPage() {
             Refresh
           </button>
 
-          {/* ✅ Bug 1 fix: opens RunPayrollModal instead of calling API directly */}
           <button className="btn btn-teal" onClick={() => setRunPayrollOpen(true)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -651,7 +617,6 @@ export default function PayrollPage() {
         </div>
       )}
 
-      {/* ✅ Bug 6 fix: all stats use GHS */}
       <section className="stats-grid">
         <div className="stat-card">
           <span className="stat-label">Total Base Salaries</span>

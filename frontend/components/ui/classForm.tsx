@@ -90,7 +90,7 @@ export default function classForm({
   useEffect(() => {
     const date = new Date().getFullYear();
     fetchTeachers();
-    setAcademicYearList(handleYearSync(date,10));
+    setAcademicYearList(handleYearSync());
   }, []);
 
 
@@ -115,23 +115,23 @@ export default function classForm({
     }
   };
 
-  const handleYearSync  = (
-      startYear: number,
-      count: number
-      ): any => {
-      return Array.from({ length: count }, (_, i) => {
-          const year = startYear - i;
-          const date_year = new Date().getFullYear();
-          const is_current_status = true ? year == date_year : false;
-          return {
-            end_date:`${year}-${String(year + 1)}`,
-            start_date:year,
-            id:i,
-            is_current:is_current_status,
-            year_name: `${year}-${String(year + 1)}`,
+    const handleYearSync = (): any => {
+      const currentYear = new Date().getFullYear();
+      const startYear   = 2000;
 
-          }
-      });
+      return Array.from(
+        { length: currentYear - startYear + 1 },
+        (_, i) => {
+          const year = currentYear - i;        
+          return {
+            end_date:   `${year}-${year + 1}`,
+            start_date:  year,
+            id:          i,
+            is_current:  year === currentYear,
+            year_name:  `${year}-${year + 1}`,
+          };
+        }
+      );
     };
 
 
@@ -161,9 +161,19 @@ export default function classForm({
 
       if (fetchRequest.status === 400) {
         const errorDetails = await fetchRequest.json();
-        console.error("Validation Error:", errorDetails);
-        setError(true);
-        setMessageMsg("Validation error. Please check your inputs.");
+        const detail = errorDetails?.detail;
+        if (detail) {
+          const message =
+            detail.non_field_errors?.[0] ||           
+            Object.values(detail)  
+              .flat()
+              .find((msg) => typeof msg === "string") ||
+            "Validation error. Please check your inputs.";
+
+          setMessageMsg(message);
+        } else {
+          setMessageMsg("Validation error. Please check your inputs.");
+        }
         setTimeout(() => {
           setResponseMsg(false);
           setMessageMsg("");
@@ -219,8 +229,13 @@ export default function classForm({
   ) => {
     const { name, value } = e.target;
 
+    if(name === "class_teacher"){
+      setFormData('teacher_id',Number(value));
+    }
+
     if (name === "class_teacher" || name === "grade_level" || name === "capacity") {
       setFormData(name, value ? parseInt(value) : "");
+
     } 
     else {
       setFormData(name, value);

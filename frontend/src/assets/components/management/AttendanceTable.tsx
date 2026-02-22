@@ -1,6 +1,6 @@
 import { Edit, Trash2, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { useState } from "react";
-
+import Image from 'next/image';
 export interface AttendanceRecord {
   id: number;
   studentId: number;
@@ -84,8 +84,6 @@ export function AttendanceTable({ records, onUpdate, onDelete }: AttendanceTable
             <th>Class</th>
             <th>Date</th>
             <th>Status</th>
-            <th>Check In</th>
-            <th>Check Out</th>
             <th>Remarks</th>
             <th>Marked By</th>
             <th>Actions</th>
@@ -97,7 +95,9 @@ export function AttendanceTable({ records, onUpdate, onDelete }: AttendanceTable
               {/* Student */}
               <td>
                 <div className="user-cell">
-                  <img
+                  <Image
+                    width={200}
+                    height={200}
                     src={record.studentImage}
                     alt={record.studentName}
                     className="user-avatar"
@@ -141,19 +141,6 @@ export function AttendanceTable({ records, onUpdate, onDelete }: AttendanceTable
                 )}
               </td>
 
-              {/* Check In */}
-              <td>
-                <span className="text-secondary">
-                  {record.checkInTime || "-"}
-                </span>
-              </td>
-
-              {/* Check Out */}
-              <td>
-                <span className="text-secondary">
-                  {record.checkOutTime || "-"}
-                </span>
-              </td>
 
               {/* Remarks */}
               <td>

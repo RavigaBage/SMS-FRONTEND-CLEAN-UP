@@ -20,32 +20,32 @@ export default function StudentsManagementPage() {
     setSearchTerm("");
     setFilters({});
   };
-const handleDeleteStudent = async (id: number) => {
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this student? All enrollment records will be removed."
-  );
-  
-  if (!confirmed) return;
-
-  try {
-    console.log(`Attempting to delete student ID: ${id}`);
-
-    await apiRequest(`/students/${id}/`, {
-      method: "DELETE",
-    });
-    setStudents((prev) => prev.filter((student) => student.id !== id));
+  const handleDeleteStudent = async (id: number) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this student? All enrollment records will be removed."
+    );
     
-    console.log("Delete successful");
-    
-    fetchStudents();
+    if (!confirmed) return;
 
-  } catch (err: any) {
-    console.error("Delete failed:", err);
-    
-    const errorMsg = err.response?.data?.error || err.message || "Unknown error";
-    alert(`Failed to delete student: ${errorMsg}`);
-  }
-};
+    try {
+      console.log(`Attempting to delete student ID: ${id}`);
+
+      await apiRequest(`/students/${id}/`, {
+        method: "DELETE",
+      });
+      setStudents((prev) => prev.filter((student) => student.id !== id));
+      
+      console.log("Delete successful");
+      
+      fetchStudents();
+
+    } catch (err: any) {
+      console.error("Delete failed:", err);
+      
+      const errorMsg = err.response?.data?.error || err.message || "Unknown error";
+      alert(`Failed to delete student: ${errorMsg}`);
+    }
+  };
 
   const fetchStudents = async () => {
     setIsLoading(true);
@@ -57,8 +57,6 @@ const handleDeleteStudent = async (id: number) => {
       const res = await apiRequest<any>(`/students/?${query.toString()}`);
       
       const rawList = res.data || [];
-      console.log(res);
-
       const formattedData: Student[] = rawList.map((s: any) => ({
         id: s.id,
         user: s.id,
@@ -78,6 +76,7 @@ const handleDeleteStudent = async (id: number) => {
       }));
 
       setStudents(formattedData);
+
     } catch (err: any) {
       console.error("Failed to load students:", err.message || err);
       setStudents([]); 
@@ -114,6 +113,7 @@ const handleDeleteStudent = async (id: number) => {
 
         <div className="flex items-center gap-3">
           {(filters.classId || filters.status || searchTerm) && (
+            
             <button 
               onClick={handleReset}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"

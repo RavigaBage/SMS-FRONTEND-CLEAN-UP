@@ -43,7 +43,7 @@ export default function StaffDirectoryPage() {
     status: "",
   });
 
-  const resultsPerPage = 5;
+  const resultsPerPage = 20;
 
   const handleFilterChange = (newFilters: Partial<typeof filters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -76,27 +76,27 @@ export default function StaffDirectoryPage() {
         `/staff/?${queryParams}`,
         { method: "GET" }
       );
+      console.log(response);
 
       // Extract the results array from the normalized response
       const results = (response.results || []) as StaffApiData[];
 
-      // Map backend data to our StaffMember interface
-   const formattedStaff: StaffMember[] = results.map((s) => ({
-      id: String(s.user_id || s.id), 
-      fullName: `${s.first_name} ${s.last_name}`,
-      // Force lowercase 'string' using String() constructor or type assertion
-      role: String(s.staff_type_display || "Staff"), 
-      department: String(s.specialization || "General"),
-      email: String(s.email),
-      phone: String(s.phone || "N/A"),
-      status: (s.status || "Active") as "Active" | "On Leave" | "Inactive",
-      profileImage: s.profile_image || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}`,
-      // Add these to match the new interface
-      specialization: s.specialization ? String(s.specialization) : undefined,
-      managed_classes: s.managed_classes || [],
-      assigned_subjects: s.assigned_subjects || [],
-      created_at:s.created_at || ""
-    }));
+      const formattedStaff: StaffMember[] = results.map((s) => ({
+          id: String(s.user_id || s.id), 
+          fullName: `${s.first_name} ${s.last_name}`,
+          // Force lowercase 'string' using String() constructor or type assertion
+          role: String(s.staff_type_display || "Staff"), 
+          department: String(s.specialization || "General"),
+          email: String(s.email),
+          phone: String(s.phone || "N/A"),
+          status: (s.status || "Active") as "Active" | "On Leave" | "Inactive",
+          profileImage: s.profile_image || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}`,
+          // Add these to match the new interface
+          specialization: s.specialization ? String(s.specialization) : undefined,
+          managed_classes: s.managed_classes || [],
+          assigned_subjects: s.assigned_subjects || [],
+          created_at:s.created_at || ""
+        }));
 
       setStaff(formattedStaff);
       setTotalResults(response.count || 0);
@@ -109,7 +109,6 @@ export default function StaffDirectoryPage() {
     }
   };
 
-  // Trigger fetch on page or search change
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchStaff(currentPage, searchTerm);

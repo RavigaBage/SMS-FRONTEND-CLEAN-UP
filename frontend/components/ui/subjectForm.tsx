@@ -57,17 +57,27 @@ export default function SubjectForm({
 
       if (!response.ok) {
         const err = await response.json();
-        throw err;
+        throw err; // throws the parsed JSON object
       }
 
       setError(false);
       setMessageMsg(`Subject successfully ${isEditing ? "updated" : "created"}`);
       onSuccess?.();
-    } catch {
+
+    } catch (err: any) {
       setError(true);
-      setMessageMsg("Operation failed. Please try again.");
+
+      // Extract the most useful message from the backend error shape
+      const detail = err?.detail;
+      const message = typeof detail === "string"
+        ? detail
+        : detail?.non_field_errors?.[0]
+        ?? Object.values(detail ?? {}).flat().find((m) => typeof m === "string")
+        ?? "Operation failed. Please try again.";
+
+      setMessageMsg(message);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 

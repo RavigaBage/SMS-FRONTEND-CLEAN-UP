@@ -416,23 +416,23 @@ export default function FinancePage() {
   };
 
   // Fetch academic years for dropdown
-  const generateAcademicYears = (
-  startYear: number,
-  count: number
-  ): any => {
-  return Array.from({ length: count }, (_, i) => {
-      const year = startYear - i;
-      const date_year = new Date().getFullYear();
-      const is_current_status = true ? year == date_year : false;
-      return {
-        end_date:`${year}-${String(year + 1)}`,
-        start_date:year,
-        id:i,
-        is_current:is_current_status,
-        year_name: `${year}-${String(year + 1)}`,
+    const generateAcademicYears = (): any => {
+    const currentYear = new Date().getFullYear();
+    const startYear   = 2000;
 
+    return Array.from(
+      { length: currentYear - startYear + 1 },
+      (_, i) => {
+        const year = currentYear - i;        
+        return {
+          end_date:   `${year}-${year + 1}`,
+          start_date:  year,
+          id:          i,
+          is_current:  year === currentYear,
+          year_name:  `${year}-${year + 1}`,
+        };
       }
-  });
+    );
   };
 
   
@@ -452,7 +452,7 @@ export default function FinancePage() {
   useEffect(() => {
     const date_now = new Date().getFullYear();
     fetchFeeStructures();
-    setAcademicYears(generateAcademicYears(date_now,10));
+    setAcademicYears(generateAcademicYears());
     fetchClasses();
   }, []);
 
@@ -619,9 +619,9 @@ export default function FinancePage() {
                         >
                           <option value="">All Terms</option>
                           <option value="all">All Terms (Annual)</option>
-                          <option value='"1"'>Term 1</option>
-                          <option value="2">Term 2</option>
-                          <option value="3">Term 3</option>
+                          <option value='1'>First Term</option>
+                          <option value="2">Second Term</option>
+                          <option value="3">Third Term</option>
                         </select>
                       </div>
 

@@ -73,8 +73,23 @@ export default function GradeEntry() {
           term: term,
         });
 
-        
-        setGrade(data);
+    
+
+        setGrade(data ?? {
+          assessment_score: 0,
+          assessment_total: 0,
+          test_score: 0,
+          test_total: 0,
+          exam_score: 0,
+          exam_total: 0,
+          weighted_assessment: 0,
+          weighted_test: 0,
+          remarks: 0, 
+          weighted_exam: 0,
+          total_score: 0,
+          grade_letter: 'F'
+          
+        } );
         setIsNewGrade(false);
 
         setAssessmentScore(data.assessment_score ?? 0);
