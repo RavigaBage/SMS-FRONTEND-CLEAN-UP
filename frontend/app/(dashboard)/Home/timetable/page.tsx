@@ -52,7 +52,6 @@ const extraCss = `
   animation: tt-slide-up .3s ease;
 }
 
-/* CONTINUATION card (entry spills into next hour row) */
 .card.is-continuation {
   opacity: .5;
   pointer-events: none;
@@ -196,15 +195,6 @@ export default function Home() {
 
   const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
-  /* ── Time-span aware slot lookup ────────────────────────────────────────
-   *
-   * An entry whose start_time="07:30" end_time="09:00" will appear in
-   * both the "07" row (as the main card) and the "08" row (as a faded
-   * continuation card), because it occupies that hour slot.
-   *
-   * Overlap rule: entry overlaps slot [H, H+1) when
-   *   startDecimal < H+1  AND  endDecimal > H
-   * ──────────────────────────────────────────────────────────────────────*/
   function getSlotsForDay(
     data: TimetableEntry[],
     day: string,
@@ -371,8 +361,6 @@ export default function Home() {
                 onClose={() => { setShowDelete(false); setPendingDeleteId(null); }}
                 onConfirm={() => { if (pendingDeleteId !== null) handleDelete(pendingDeleteId); }}
               />
-
-              {/* ── ROWS (07:00 – 17:00 with two break banners) ── */}
               {ROWS.map((row, ri) => {
                 if (row.type === "break") {
                   return <div key={`break-${ri}`} className="break">{row.breakText}</div>;
