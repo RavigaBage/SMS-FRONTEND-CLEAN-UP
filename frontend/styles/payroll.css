@@ -48,7 +48,7 @@ body { font-family: var(--font-main); background-color: var(--bg-light); color: 
 .trend-up { color: var(--primary-teal); }
 
 /* --- Table Card --- */
-.table-card { background: white; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--shadow); overflow: hidden; }
+.table-card { background: white; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--shadow);  }
 .table-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
 
 .payroll-table { width: 100%; border-collapse: collapse; text-align: left; }

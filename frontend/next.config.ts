@@ -36,26 +36,28 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-
+  
   async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
-              "img-src 'self' data: blob:",
-              "connect-src 'self' http://localhost:8000 https://your-api-domain.com",
-            ].join("; "),
-          },
-        ],
-      },
-    ];
+    const apiDomain = process.env.NEXT_PUBLIC_API_URL;
+    const isProd = process.env.NODE_ENV === "production";
+      return [
+        {
+          source: "/(.*)",
+          headers: [
+            {
+              key: "Content-Security-Policy",
+              value: [
+                "default-src 'self'",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                "font-src 'self' https://fonts.gstatic.com",
+                `script-src 'self' ${isProd ? "" : "'unsafe-eval' 'unsafe-inline'"}`,
+                "img-src 'self' data: blob:",
+                `connect-src 'self' ${apiDomain} ${isProd ? "" : "ws: http://localhost:*"}`,
+              ].join("; "),
+            },
+          ],
+        },
+      ];
   },
 
   experimental: {

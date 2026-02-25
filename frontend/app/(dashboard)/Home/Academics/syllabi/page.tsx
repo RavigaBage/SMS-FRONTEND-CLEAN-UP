@@ -561,7 +561,7 @@ function UploadModal({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(JSON.stringify(errorData) || "Failed to create syllabus");
+        throw new Error(JSON.stringify(errorData.error || errorData) || "Failed to create syllabus");
       }
 
       alert("Syllabus created successfully!");
@@ -569,7 +569,11 @@ function UploadModal({
       onClose();
     } catch (error) {
       console.error("Failed to create syllabus:", error);
-      alert(error instanceof Error ? error.message : "Failed to create syllabus. Please try again.");
+      alert(
+          error instanceof Error
+            ? `The syllabus could not be created.\n\n${error.message}`
+            : "The syllabus could not be created right now. Please try again in a moment."
+        );
     } finally {
       setUploading(false);
     }

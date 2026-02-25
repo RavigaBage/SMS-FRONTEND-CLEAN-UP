@@ -1,16 +1,17 @@
 "use client"
-import React, { useEffect, useState, KeyboardEvent, ChangeEvent } from 'react';
-import { Filter, Search, Plus, UserPlus, Users, Calendar, X ,Mail, Phone, ExternalLink, Edit2, Trash2, User} from 'lucide-react'; 
+import React, { useEffect, useState, KeyboardEvent } from 'react';
+import { Filter, Search, Plus, UserPlus, Users, Calendar, X, Mail, Phone, ExternalLink, Edit2, Trash2, User, Link2, ChevronRight, Home, GraduationCap, Heart } from 'lucide-react'; 
 import ParentForm, { MyFormData } from '@/src/assets/components/management/ParentForm';
 import LinkParentModal from '@/src/assets/components/management/LinkParentModal';
 import { apiRequest } from '@/src/lib/apiClient';
-import '@/styles/parent_entry.css';
+
 /* ---------- Types ---------- */
 type ApiResponse<T> = {
   data: T;
   message: string;
   success: boolean;
 };
+
 interface Parent extends MyFormData {
   id: number;
   full_name: string;
@@ -34,16 +35,15 @@ interface LinkModalState {
   studentId: number | null;
 }
 
-// Add these to your interfaces
 interface AcademicYear {
   id: number;
-  year_name: string; // e.g., "2023/2024"
+  year_name: string;
   is_active: boolean;
 }
 
 interface SchoolClass {
   id: number;
-  class_name: string; // e.g., "Grade 10-A"
+  class_name: string;
 }
 
 /* ---------- Component ---------- */
@@ -54,103 +54,139 @@ export default function ParentEntry() {
   const [loading, setLoading] = useState(false);
   const [classId, setClassId] = useState('');
   const [yearId, setYearId] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeView, setActiveView] = useState<'all' | 'linking'>('all');
+  const [selectedParent, setSelectedParent] = useState<Parent | null>(null);
 
   const [openForm, setOpenForm] = useState(false);
   const [editParent, setEditParent] = useState<Parent | null>(null);
-  
-// Inside your component:
-const [classes, setClasses] = useState<SchoolClass[]>([]);
-const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
+  const [linkingInProgress, setLinkingInProgress] = useState<number | null>(null);
+  const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [linkModal, setLinkModal] = useState<LinkModalState>({
     open: false,
     studentId: null,
   });
-  // Design State
   const [showFilters, setShowFilters] = useState(false);
-  const [showStudentSearch, setShowStudentSearch] = useState(false);
-  
 
   /* ---------- Unified Fetcher ---------- */
   const handleApplyFilters = () => {
     fetchParents();
     fetchStudents(classId ? Number(classId) : null);
-    setShowFilters(false); // Close drawer after applying
+    setShowFilters(false);
   };
 
   const handleReset = () => {
     setClassId('');
     setYearId('');
-    fetchParents(); // Fetch all
+    setSearchQuery('');
+    fetchParents();
     fetchStudents(null);
   };
 
   /* ---------- Data loaders ---------- */
+const handleDirectLink = async (studentId: number) => {
+  // If no parent selected, open modal to choose one
+  if (!selectedParent) {
+    setLinkModal({ open: true, studentId });
+    return;
+  }
 
-    const fetchParents = async () => {
-    setLoading(true);
-    try {
-        const params = new URLSearchParams();
-        if (classId) params.append('class_id', classId.toString());
-        if (yearId) params.append('academic_year_id', yearId.toString());
-        
-        const res = await apiRequest<Parent[]>(`/parents/?${params.toString()}`);
-        setParents(res.data as any);
-        
-        const url = `/parents/${params.toString() ? `?${params.toString()}` : ''}`;
-        
-        const response = await apiRequest<Parent[]>(url);
-        setParents(response.data as any|| []);
-    } catch (err) {
-        console.error('fetchParents error', err);
-    } finally {
-        setLoading(false);
-    }
-    };
+  // Show loading state
+  setLinkingInProgress(studentId);
+  
+  // Get CSRF token
+  const csrfToken = document.cookie
+    .split('; ')
+    .find(c => c.startsWith('csrftoken='))?.split('=')[1] || '';
 
-    const fetchStudents = async (classId: number | null = null) => {
-    setLoading(true);
-    try {
-        const url = classId ? `/students/?class_id=${classId}` : '/students/';
+  // Create the link payload
+  const payload = {
+    student: studentId,
+    parent: selectedParent.id,
+    is_primary_contact: true,
+    can_pickup: true,
+  };
 
-        const response = await apiRequest<Student[]>(url, {
-        method: 'GET',
-        });
-
-        setStudents(response.data as any || []);
-
-        fetchParents();
-    } catch (err) {
-        console.error('fetchStudents error', err);
-        alert('Failed to load students.');
-        setStudents([]); // Clear list on error to keep UI consistent
-    } finally {
-        setLoading(false);
-    }
-    };
-
-const fetchClasses = async () => {
   try {
-    const response = await apiRequest<SchoolClass[]>('/classes/', { method: 'GET' });
-    setClasses(response.data as any || []);
+    // Make API request to link them
+    await apiRequest(`/student-parents/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    // Refresh data to show new link
+    await fetchParents();
+    await fetchStudents();
+    
+    alert(`✅ ${selectedParent.full_name} linked to student successfully!`);
   } catch (err) {
-    console.error('fetchClasses error', err);
+    console.error('Direct link error', err);
+    alert('Could not link. This connection may already exist.');
+  } finally {
+    // Clear loading state
+    setLinkingInProgress(null);
   }
 };
+  const fetchParents = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (classId) params.append('class_id', classId.toString());
+      if (yearId) params.append('academic_year_id', yearId.toString());
+      
+      const url = `/parents/${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await apiRequest<Parent[]>(url);
+      setParents(response.data as any|| []);
+    } catch (err) {
+      console.error('fetchParents error', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const fetchAcademicYears = async () => {
-  try {
-    const response = await apiRequest<AcademicYear[]>('/academic-years/', { method: 'GET' });
-    setAcademicYears(response.data as any || []);
-  } catch (err) {
-    console.error('fetchAcademicYears error', err);
-  }
-};
+  const fetchStudents = async (classId: number | null = null) => {
+    setLoading(true);
+    try {
+      const url = classId ? `/students/?class_id=${classId}` : '/students/';
+      const response = await apiRequest<Student[]>(url, { method: 'GET' });
+      setStudents(response.data as any || []);
+      fetchParents();
+    } catch (err) {
+      console.error('fetchStudents error', err);
+      alert('Failed to load students.');
+      setStudents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-// Update your useEffect to load these on mount
-useEffect(() => {
-  fetchClasses();
-  fetchAcademicYears();
-}, []);
+  const fetchClasses = async () => {
+    try {
+      const response = await apiRequest<SchoolClass[]>('/classes/', { method: 'GET' });
+      setClasses(response.data as any || []);
+    } catch (err) {
+      console.error('fetchClasses error', err);
+    }
+  };
+
+  const fetchAcademicYears = async () => {
+    try {
+      const response = await apiRequest<AcademicYear[]>('/academic-years/', { method: 'GET' });
+      setAcademicYears(response.data as any || []);
+    } catch (err) {
+      console.error('fetchAcademicYears error', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchClasses();
+    fetchAcademicYears();
+  }, []);
 
   useEffect(() => {
     fetchParents();
@@ -159,24 +195,22 @@ useEffect(() => {
 
   /* ---------- CRUD handlers ---------- */
 
-const handleCreateParent = async (payload: MyFormData) => {
-  try {
-    const response = await apiRequest<ApiResponse<Parent>>('/parents/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+  const handleCreateParent = async (payload: MyFormData) => {
+    try {
+      const response = await apiRequest<ApiResponse<Parent>>('/parents/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    setParents(prev => [response.data as any, ...prev]);
-    setOpenForm(false);
-    alert('Parent created ✅');
-  } catch (err) {
-    console.error('create parent', err);
-    alert('Could not create parent.');
-  }
-};
+      setParents(prev => [response.data as any, ...prev]);
+      setOpenForm(false);
+      alert('Parent created ✅');
+    } catch (err) {
+      console.error('create parent', err);
+      alert('Could not create parent.');
+    }
+  };
 
   const handleEditParent = async (id: number, payload: MyFormData) => {
     try {
@@ -192,9 +226,7 @@ const handleCreateParent = async (payload: MyFormData) => {
         throw new Error("Invalid parent response");
       }
 
-      setParents(prev =>
-        prev.map(p => (p.id === id ? updated : p))
-      );
+      setParents(prev => prev.map(p => (p.id === id ? updated : p)));
       setEditParent(null);
       setOpenForm(false);
       alert('Parent updated ✅');
@@ -216,245 +248,480 @@ const handleCreateParent = async (payload: MyFormData) => {
     }
   };
 
+  // Filter parents by search
+  const filteredParents = parents.filter(p => 
+    p.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   /* ---------- Render ---------- */
 
-  return (
-    <div className="dashboard-container">
-      {/* PAGE HEADER */}
-<div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-slate-800 rounded-3xl p-8 text-white shadow-xl mb-6">
-  
-  {/* Decorative blur accent */}
-  <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
-  
-  <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-    
-    {/* Left: Title & Caption */}
-    <div className="flex items-start gap-4">
-      <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
-        <Users className="w-8 h-8 text-white" />
-      </div>
-      
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          Parent Management
-        </h1>
-        <p className="text-sm md:text-base text-blue-100 mt-1 max-w-xl">
-          Manage parent records, link guardians to students, and keep family connections beautifully organized.
-        </p>
-      </div>
-    </div>
-
-    {/* Right: Quick Stat */}
-    <div className="bg-white/10 backdrop-blur-sm px-6 py-4 rounded-2xl border border-white/20">
-      <p className="text-xs uppercase tracking-wide text-blue-200">Total Parents</p>
-      <p className="text-2xl font-bold">{parents.length}</p>
-    </div>
-
-  </div>
-</div>
-
-      <main className="content">
-
-        {/* TOP BAR: Search & Main Actions */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                  <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all"
-                      placeholder="Search parents..."
-                      onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                        if (e.key === 'Enter') fetchParents();
-                      }}
-                    />
-                  </div>
+return (
+    <div className="min-h-screen bg-stone-50">
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
         
-                  <div className="flex items-center gap-2">
-                    <button 
-                      onClick={() => setShowFilters(!showFilters)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${showFilters ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+        * {
+          font-family: 'DM Sans', sans-serif;
+        }
+        
+        .font-display {
+          font-family: 'Crimson Pro', serif;
+        }
+
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes pulse-glow {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(217, 119, 6, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(217, 119, 6, 0.5);
+          }
+        }
+
+        .animate-slide-in-right {
+          animation: slideInRight 0.4s ease-out;
+        }
+
+        .animate-slide-in-up {
+          animation: slideInUp 0.4s ease-out;
+        }
+
+        .pulse-glow {
+          animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .link-line {
+          position: absolute;
+          height: 2px;
+          background: linear-gradient(90deg, #d97706, #f59e0b);
+          transform-origin: left center;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .gradient-border {
+          position: relative;
+        }
+
+        .gradient-border::before {
+          content: '';
+          position: absolute;
+          inset: -1px;
+          border-radius: inherit;
+          padding: 1px;
+          background: linear-gradient(135deg, #d97706, #f59e0b);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+        }
+      `}</style>
+
+      {/* HERO HEADER */}
+      <header className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-stone-100 border-b border-amber-200/50">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-6 py-12">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="font-display text-5xl font-bold text-stone-900 mb-3">
+                Family Connections
+              </h1>
+              <p className="text-lg text-stone-600 max-w-2xl leading-relaxed">
+                Build and nurture the relationships between families and students. 
+                Every connection matters in creating a supportive educational community.
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-6 mt-2">
+              <div className="text-right">
+                <div className="text-sm text-stone-500 uppercase tracking-wider font-medium mb-1">Active Parents</div>
+                <div className="font-display text-4xl font-bold text-amber-600">{parents.length}</div>
+              </div>
+              <div className="h-16 w-px bg-stone-300"></div>
+              <div className="text-right">
+                <div className="text-sm text-stone-500 uppercase tracking-wider font-medium mb-1">Students</div>
+                <div className="font-display text-4xl font-bold text-stone-700">{students.length}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* View Toggle */}
+          <div className="mt-8 flex items-center gap-3">
+            <button
+              onClick={() => setActiveView('all')}
+              className={`px-6 py-3 rounded-xl font-medium transition-all ${
+                activeView === 'all'
+                  ? 'bg-stone-900 text-white shadow-lg'
+                  : 'bg-white text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              All Parents
+            </button>
+            <button
+              onClick={() => setActiveView('linking')}
+              className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
+                activeView === 'linking'
+                  ? 'bg-amber-600 text-white shadow-lg pulse-glow'
+                  : 'bg-white text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <Link2 className="w-4 h-4" />
+              Link Families
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {activeView === 'all' ? (
+          // ALL PARENTS VIEW
+          <div className="space-y-6 animate-slide-in-up">
+            {/* SEARCH & ACTIONS */}
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-5 h-5" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 bg-white border-2 border-stone-200 rounded-xl focus:border-amber-500 focus:outline-none transition-all text-stone-900 placeholder:text-stone-400"
+                  placeholder="Search by name or email..."
+                />
+              </div>
+              
+              <button 
+                onClick={() => setShowFilters(!showFilters)}
+                className={`px-6 py-4 rounded-xl font-medium transition-all flex items-center gap-2 ${
+                  showFilters 
+                    ? 'bg-stone-900 text-white' 
+                    : 'bg-white border-2 border-stone-200 text-stone-700 hover:border-stone-300'
+                }`}
+              >
+                <Filter className="w-4 h-4" />
+                Filters
+              </button>
+              
+              <button 
+                onClick={() => setOpenForm(true)}
+                className="px-6 py-4 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700 transition-all flex items-center gap-2 shadow-lg shadow-amber-600/30"
+              >
+                <Plus className="w-5 h-5" />
+                Add Parent
+              </button>
+            </div>
+
+            {/* FILTER PANEL */}
+            {showFilters && (
+              <div className="bg-white border-2 border-stone-200 rounded-2xl p-6 animate-slide-in-up">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-stone-700 mb-2">Academic Year</label>
+                    <select 
+                      value={yearId}
+                      onChange={(e) => setYearId(e.target.value)}
+                      className="w-full p-3 bg-stone-50 border-2 border-stone-200 rounded-lg focus:border-amber-500 focus:outline-none"
                     >
-                      <Filter className="w-4 h-4" />
-                      Filters
+                      <option value="">All Years</option>
+                      {academicYears.map(y => <option key={y.id} value={y.id}>{y.year_name}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-stone-700 mb-2">Class</label>
+                    <select 
+                      value={classId}
+                      onChange={(e) => setClassId(e.target.value)}
+                      className="w-full p-3 bg-stone-50 border-2 border-stone-200 rounded-lg focus:border-amber-500 focus:outline-none"
+                    >
+                      <option value="">All Classes</option>
+                      {classes.map(c => <option key={c.id} value={c.id}>{c.class_name}</option>)}
+                    </select>
+                  </div>
+
+                  <div className="flex items-end gap-2">
+                    <button 
+                      onClick={handleApplyFilters}
+                      className="flex-1 bg-stone-900 text-white py-3 rounded-lg font-semibold hover:bg-stone-800 transition-all"
+                    >
+                      Apply
                     </button>
                     <button 
-                      onClick={() => setOpenForm(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all"
+                      onClick={handleReset}
+                      className="px-4 py-3 bg-stone-100 text-stone-600 rounded-lg hover:bg-stone-200 transition-all"
                     >
-                      <Plus className="w-4 h-4" />
-                      Add Parent
+                      Reset
                     </button>
                   </div>
                 </div>
-        
-                {/* EXPANDABLE FILTER PANEL */}
-                {showFilters && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-white rounded-2xl border border-blue-100 shadow-xl animate-in slide-in-from-top duration-300">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
-                        <Calendar className="w-3 h-3" /> Academic Year
-                      </label>
-                      <select 
-                        value={yearId}
-                        onChange={(e) => setYearId(e.target.value)}
-                        className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-blue-500"
-                      >
-                        <option value="">All Years</option>
-                        {academicYears.map(y => <option key={y.id} value={y.id}>{y.year_name}</option>)}
-                      </select>
+              </div>
+            )}
+
+            {/* PARENTS GRID */}
+            {loading ? (
+              <div className="flex justify-center items-center py-20">
+                <div className="w-8 h-8 border-3 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : filteredParents.length === 0 ? (
+              <div className="bg-white border-2 border-dashed border-stone-300 rounded-2xl p-16 text-center">
+                <Users className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+                <p className="text-stone-500 text-lg">No parents found matching your criteria.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredParents.map((parent, idx) => (
+                  <div 
+                    key={parent.id}
+                    className="group bg-white border-2 border-stone-200 rounded-2xl p-6 hover:border-amber-500 hover:shadow-xl transition-all duration-300 animate-slide-in-up"
+                    style={{ animationDelay: `${idx * 50}ms` }}
+                  >
+                    {/* Avatar & Name */}
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-display text-xl font-bold shadow-lg">
+                        {parent.full_name.charAt(0)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-display text-xl font-bold text-stone-900 mb-1 truncate">
+                          {parent.full_name}
+                        </h3>
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                          parent.relationship === 'father' 
+                            ? 'bg-blue-100 text-blue-700' 
+                            : parent.relationship === 'mother' 
+                            ? 'bg-pink-100 text-pink-700' 
+                            : 'bg-stone-100 text-stone-700'
+                        }`}>
+                          {parent.relationship_display}
+                        </span>
+                      </div>
                     </div>
-        
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
-                        <Users className="w-3 h-3" /> Class
-                      </label>
-                      <select 
-                        value={classId}
-                        onChange={(e) => setClassId(e.target.value)}
-                        className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-blue-500"
-                      >
-                        <option value="">All Classes</option>
-                        {classes.map(c => <option key={c.id} value={c.id}>{c.class_name}</option>)}
-                      </select>
+
+                    {/* Contact Info */}
+                    <div className="space-y-2 mb-4 pb-4 border-b border-stone-100">
+                      <div className="flex items-center gap-2 text-sm text-stone-600">
+                        <Phone className="w-4 h-4 text-stone-400" />
+                        <span>{parent.phone_number}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-stone-600">
+                        <Mail className="w-4 h-4 text-stone-400" />
+                        <span className="truncate">{parent.email}</span>
+                      </div>
                     </div>
-        
-                    <div className="flex items-end gap-2">
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      <a 
+                        href={`/Home/profiles/parents/profile/${parent.id}`}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition-all text-sm font-medium"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Profile
+                      </a>
                       <button 
-                        onClick={handleApplyFilters}
-                        className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+                        onClick={() => { setEditParent(parent); setOpenForm(true); }}
+                        className="p-2 text-stone-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
                       >
-                        Apply Filters
+                        <Edit2 className="w-4 h-4" />
                       </button>
                       <button 
-                        onClick={handleReset}
-                        className="px-4 py-2.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200"
+                        onClick={() => handleDeleteParent(parent.id)}
+                        className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                       >
-                        Reset
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-                )}
-
-<section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-  <table className="w-full text-left border-collapse">
-    <thead>
-      <tr className="bg-slate-50/50 border-b border-slate-200">
-        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Parent Details</th>
-        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Contact</th>
-        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Connection</th>
-        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Students</th>
-        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-      </tr>
-    </thead>
-    <tbody className="divide-y divide-slate-100">
-      {loading ? (
-        <tr>
-          <td colSpan={5} className="px-6 py-10 text-center text-slate-400">
-            <div className="flex justify-center items-center gap-2">
-              <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              Loading records...
-            </div>
-          </td>
-        </tr>
-      ) : parents.length === 0 ? (
-        <tr>
-          <td colSpan={5} className="px-6 py-10 text-center text-slate-400">
-            No parents found matching your criteria.
-          </td>
-        </tr>
-      ) : (
-        parents.map((p, index) => (
-          <tr key={p.id ?? `p-${index}`} className="hover:bg-slate-50/80 transition-colors group">
-            {/* NAME & AVATAR */}
-            <td className="px-6 py-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
-                  {p.full_name.charAt(0)}
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          // LINKING VIEW
+          <div className="animate-slide-in-up">
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 mb-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-amber-600 text-white rounded-xl">
+                  <Heart className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="font-bold text-slate-800 leading-none mb-1">{p.full_name}</p>
-                  <p className="text-xs text-slate-500 italic uppercase tracking-tighter">ID: #{p.id}</p>
+                  <h2 className="font-display text-2xl font-bold text-stone-900 mb-2">
+                    Create Family Connections
+                  </h2>
+                  <p className="text-stone-600 leading-relaxed mb-3">
+                    <strong>Quick Linking:</strong> Select a parent, then click the link button next to any student to instantly connect them.
+                  </p>
+                  <p className="text-sm text-stone-500 leading-relaxed">
+                    💡 Tip: Click the link button without selecting a parent to see all available parents to choose from.
+                  </p>
                 </div>
               </div>
-            </td>
+            </div>
 
-            {/* CONTACT INFO */}
-            <td className="px-6 py-4">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Phone className="w-3 h-3 text-slate-400" />
-                  {p.phone_number}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* PARENTS COLUMN */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-display text-2xl font-bold text-stone-900 flex items-center gap-2">
+                    <Home className="w-6 h-6 text-amber-600" />
+                    Parents
+                  </h3>
+                  <span className="text-sm text-stone-500">{parents.length} total</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Mail className="w-3 h-3 text-slate-400" />
-                  <span className="truncate max-w-[150px]">{p.email}</span>
+
+                <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                  {parents.map(parent => (
+                    <button
+                      key={parent.id}
+                      onClick={() => setSelectedParent(selectedParent?.id === parent.id ? null : parent)}
+                      className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                        selectedParent?.id === parent.id
+                          ? 'border-amber-500 bg-amber-50 shadow-lg gradient-border'
+                          : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-display text-lg font-bold ${
+                          selectedParent?.id === parent.id
+                            ? 'bg-gradient-to-br from-amber-500 to-orange-600'
+                            : 'bg-gradient-to-br from-stone-400 to-stone-500'
+                        }`}>
+                          {parent.full_name.charAt(0)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-stone-900 truncate">{parent.full_name}</div>
+                          <div className="text-sm text-stone-500">{parent.relationship_display}</div>
+                        </div>
+                        {selectedParent?.id === parent.id && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded-full">
+                              ACTIVE
+                            </span>
+                            <ChevronRight className="w-5 h-5 text-amber-600" />
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
-            </td>
 
-            {/* RELATIONSHIP BADGE */}
-            <td className="px-6 py-4">
-              <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide
-                ${p.relationship === 'father' ? 'bg-blue-50 text-blue-600' : 
-                  p.relationship === 'mother' ? 'bg-pink-50 text-pink-600' : 
-                  'bg-slate-100 text-slate-600'}`}>
-                {p.relationship_display}
-              </span>
-            </td>
+              {/* STUDENTS COLUMN */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-display text-2xl font-bold text-stone-900 flex items-center gap-2">
+                    <GraduationCap className="w-6 h-6 text-amber-600" />
+                    Students
+                  </h3>
+                  <span className="text-sm text-stone-500">{students.length} total</span>
+                </div>
 
-            {/* LINKED STUDENTS */}
-            <td className="px-6 py-4">
-              <a 
-                href={`/Home/profiles/parents/profile/${p.id}`}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-all"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                View Children
-              </a>
-            </td>
-
-            {/* ACTION BUTTONS */}
-            <td className="px-6 py-4 text-right">
-              <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={() => { setEditParent(p); setOpenForm(true); }}
-                  className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                  title="Edit Parent"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button 
-                  onClick={() => handleDeleteParent(p.id)}
-                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                  title="Delete Parent"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))
-      )}
-    </tbody>
-  </table>
-</section>
-        {/* Student Search & List content goes here */}
-                    <div className="space-y-4 overflow-y-auto max-h-[80vh]">
-                       {students.map(s => (
-                         <div key={s.id} className="p-4 border border-slate-100 rounded-xl hover:bg-slate-50 flex justify-between items-center">
-                            <div>
-                              <p className="font-bold text-slate-800">{s.full_name}</p>
-                              <p className="text-xs text-slate-500">{s.admission_number} • {s.class_info?.class_name}</p>
+                <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                  {students.map(student => {
+                    const isLinked = student.parents?.some(p => p.id === selectedParent?.id);
+                    const isLinking = linkingInProgress === student.id;
+                    
+                    return (
+                      <div
+                        key={student.id}
+                        className={`p-4 rounded-xl border-2 transition-all ${
+                          isLinked
+                            ? 'border-green-500 bg-green-50'
+                            : isLinking
+                            ? 'border-amber-500 bg-amber-50 animate-pulse'
+                            : 'border-stone-200 bg-white hover:border-amber-300 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-display text-lg font-bold ${
+                            isLinked
+                              ? 'bg-gradient-to-br from-green-500 to-emerald-600'
+                              : 'bg-gradient-to-br from-blue-400 to-indigo-500'
+                          }`}>
+                            {student.full_name.charAt(0)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-stone-900 truncate">{student.full_name}</div>
+                            <div className="text-sm text-stone-500">
+                              {student.admission_number} • {student.class_info?.class_name}
                             </div>
-                            <button 
-                              onClick={() => setLinkModal({ open: true, studentId: s.id })}
-                              className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
-                            >
-                              <UserPlus className="w-4 h-4" />
-                            </button>
-                         </div>
-                       ))}
-                    </div>
+                            {isLinked && selectedParent && (
+                              <div className="flex items-center gap-1 mt-1">
+                                <Check className="w-3 h-3 text-green-600" />
+                                <span className="text-xs text-green-600 font-medium">
+                                  Linked to {selectedParent.full_name}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => handleDirectLink(student.id)}
+                            disabled={isLinking || (isLinked && selectedParent !== null)}
+                            className={`p-2.5 rounded-lg transition-all font-medium text-sm flex items-center gap-2 ${
+                              isLinked && selectedParent
+                                ? 'bg-green-600 text-white cursor-default'
+                                : isLinking
+                                ? 'bg-amber-400 text-white cursor-wait'
+                                : selectedParent
+                                ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-lg'
+                                : 'bg-stone-200 text-stone-600 hover:bg-stone-300'
+                            }`}
+                            title={
+                              isLinked && selectedParent
+                                ? 'Already linked'
+                                : selectedParent
+                                ? `Link to ${selectedParent.full_name}`
+                                : 'Select a parent first or click to choose'
+                            }
+                          >
+                            {isLinking ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              </>
+                            ) : isLinked && selectedParent ? (
+                              <Check className="w-5 h-5" />
+                            ) : selectedParent ? (
+                              <>
+                                <Link2 className="w-4 h-4" />
+                                Link
+                              </>
+                            ) : (
+                              <UserPlus className="w-5 h-5" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* MODALS */}
         {openForm && (
@@ -476,11 +743,11 @@ const handleCreateParent = async (payload: MyFormData) => {
             studentId={linkModal.studentId}
             parentsList={parents}
             onClose={() => setLinkModal({ open: false, studentId: null })}
-            onLinked={() => {
-              alert('Parent linked successfully');
+            onLinked={async () => {
+              await fetchParents();
+              await fetchStudents();
               setLinkModal({ open: false, studentId: null });
-              fetchParents();
-              fetchStudents();
+              alert('✅ Parent linked successfully!');
             }}
           />
         )}
@@ -488,3 +755,9 @@ const handleCreateParent = async (payload: MyFormData) => {
     </div>
   );
 }
+
+const Check = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+  </svg>
+);

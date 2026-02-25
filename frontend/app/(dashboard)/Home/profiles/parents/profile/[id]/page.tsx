@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { apiRequest } from '@/src/lib/apiClient';
+import Link from 'next/link'
 import { 
   Phone, Mail, MapPin, User, ShieldCheck, 
   ChevronRight, MessageSquare, Edit3, GraduationCap 
@@ -13,7 +14,9 @@ type IconProps = {
 interface Ward {
   id: number;
   full_name: string;
+  age:String;
   admission_number: string;
+  admission_date: string;
   class_info: {
     name: string;
     grade_level: string;
@@ -166,7 +169,7 @@ const WardCard = ({ ward }: { ward: Ward }) => (
       </div>
       <div className="text-right">
         <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase rounded-lg">
-          {ward.class_info?.name || 'Unassigned'}
+          { `${ward.age} years`|| 'enrolled'}
         </span>
       </div>
     </div>
@@ -176,7 +179,7 @@ const WardCard = ({ ward }: { ward: Ward }) => (
         <GraduationCap className="w-5 h-5 text-slate-400" />
         <div>
           <p className="text-[10px] font-black text-slate-400 uppercase leading-none">Academic Year</p>
-          <p className="text-sm font-bold text-slate-700">{ward.class_info?.academic_year || 'N/A'}</p>
+          <p className="text-sm font-bold text-slate-700">{ward.admission_date || 'N/A'}</p>
         </div>
       </div>
       <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${ward.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>
@@ -185,9 +188,12 @@ const WardCard = ({ ward }: { ward: Ward }) => (
     </div>
 
     <div className="grid grid-cols-3 gap-2">
-      <button className="py-2.5 rounded-xl border border-slate-200 text-[11px] font-black uppercase text-slate-600 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all">Profile</button>
-      <button className="py-2.5 rounded-xl border border-slate-200 text-[11px] font-black uppercase text-slate-600 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all">Results</button>
-      <button className="py-2.5 rounded-xl border border-slate-200 text-[11px] font-black uppercase text-slate-600 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all">Fees</button>
+      <Link
+        href={`/Home/profiles/students/students/${ward.id}`}
+        className="py-2.5 px-4 rounded-xl border border-slate-200 text-[11px] font-black uppercase text-slate-600 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all inline-block text-center"
+      >
+        Profile
+      </Link>
     </div>
   </div>
 );

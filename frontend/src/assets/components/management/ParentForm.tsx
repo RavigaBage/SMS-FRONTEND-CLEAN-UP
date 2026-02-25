@@ -120,7 +120,7 @@ export default function ParentForm({
           <div>
             <label className="form-label">First Name*</label>
             <input 
-              className="form-input"
+              className="form-input mt-1 block w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
               name="first_name"
               value={form.first_name}
               onChange={handleChange}
@@ -131,7 +131,7 @@ export default function ParentForm({
           <div>
             <label className="form-label">Last Name*</label>
             <input 
-              className="form-input"
+              className="form-input mt-1 block w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
               name="last_name"
               value={form.last_name}
               onChange={handleChange}
@@ -151,7 +151,7 @@ export default function ParentForm({
           <div>
             <label className="form-label">Phone Number*</label>
             <input 
-              className="form-input"
+              className="form-input mt-1 block w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
               name="phone_number"
               value={form.phone_number}
               onChange={handleChange}
@@ -163,7 +163,7 @@ export default function ParentForm({
             <label className="form-label">Email</label>
             <input 
               type="email"
-              className="form-input"
+              className="form-input mt-1 block w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
               name="email"
               value={form.email}
               onChange={handleChange}
@@ -175,7 +175,7 @@ export default function ParentForm({
           <label className="form-label">Residential Address</label>
           <textarea
             rows={2}
-            className="form-input"
+            className="form-input mt-1 block w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
             name="address"
             value={form.address}
             onChange={handleChange}
@@ -190,15 +190,15 @@ export default function ParentForm({
         </h3>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <input className="form-input" name="occupation" value={form.occupation} onChange={handleChange} placeholder="Occupation" />
-          <input className="form-input" name="workplace" value={form.workplace} onChange={handleChange} placeholder="Workplace" />
+          <input className="form-input mt-1 block w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400" name="occupation" value={form.occupation} onChange={handleChange} placeholder="Occupation" />
+          <input className="form-input mt-1 block w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400" name="workplace" value={form.workplace} onChange={handleChange} placeholder="Workplace" />
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mt-6">
-          <input className="form-input" name="national_id" value={form.national_id} onChange={handleChange} placeholder="National ID / Passport" />
+          <input className="form-input mt-1 block w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400" name="national_id" value={form.national_id} onChange={handleChange} placeholder="National ID / Passport" />
 
           <select
-            className="form-input"
+            className="form-input mt-1 block w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
             name="relationship"
             value={form.relationship}
             onChange={handleChange}

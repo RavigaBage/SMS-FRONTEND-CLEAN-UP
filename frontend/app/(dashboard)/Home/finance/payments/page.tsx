@@ -5,10 +5,9 @@ import {
   Plus, Search, Download, Eye, RefreshCcw,
   CheckCircle2, Clock, AlertCircle, X, Check,
   Banknote, Landmark, CreditCard, Loader2,
+  Edit3, Trash2
 } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Payment {
   id: number;
@@ -27,57 +26,64 @@ interface Invoice {
   invoice_number: string;
   student: { full_name: string };
   balance: string;
-  status: string;
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function unwrap<T>(raw: unknown): T | null {
   if (!raw) return null;
   const r = raw as any;
-  if (r?.data   !== undefined) return r.data    as T;
+  if (r?.data !== undefined) return r.data as T;
   if (r?.results !== undefined) return r.results as T;
   return raw as T;
 }
 
-// ─── Record Payment Modal ─────────────────────────────────────────────────────
-
 function RecordPaymentModal({
-  isOpen, onClose, onSuccess,
+  isOpen, onClose, onSuccess, initialPayment,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialPayment?: Payment | null;
 }) {
-  const [loading,  setLoading]  = useState(false);
+  const isEdit = Boolean(initialPayment);
+  const [loading, setLoading] = useState(false);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [error,    setError]    = useState<string | null>(null);
-  const [success,  setSuccess]  = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
-    invoice_id:      "",   // ← matches backend field name
-    amount_paid:     "",   // ← matches backend field name
-    payment_method:  "cash",
+    invoice_id: "",
+    amount_paid: "",
+    payment_method: "cash",
     transaction_reference: "",
   });
 
-  // Fetch open invoices when modal opens
   useEffect(() => {
     if (!isOpen) return;
     let cancelled = false;
 
     setError(null);
     setSuccess(false);
-    setInvoices([]);
-    setFormData({ invoice_id: "", amount_paid: "", payment_method: "cash", transaction_reference: "" });
 
+    // If editing, prefill known fields from initialPayment
+    if (isEdit && initialPayment) {
+      setFormData({
+        invoice_id: "", // we don't have invoice id in initialPayment; keep blank and show readonly header
+        amount_paid: String(initialPayment.amount),
+        payment_method: initialPayment.method || "cash",
+        transaction_reference: initialPayment.reference || "",
+      });
+      // still fetch invoices in case user wants to change invoice when editing (optional)
+    } else {
+      setFormData({ invoice_id: "", amount_paid: "", payment_method: "cash", transaction_reference: "" });
+    }
+
+    setInvoices([]);
     (async () => {
       try {
+        // Only load unpaid invoices for creation flow; for edit it's okay to fetch too
         const raw = await apiRequest<any>("/invoices/?status=unpaid");
         const payload = unwrap<Invoice[] | Invoice>(raw);
-        const arr = Array.isArray(payload)
-          ? (payload as Invoice[])
-          : payload ? [payload as Invoice] : [];
+        const arr = Array.isArray(payload) ? (payload as Invoice[]) : payload ? [payload as Invoice] : [];
         if (!cancelled) setInvoices(arr);
       } catch {
         if (!cancelled) setError("Could not load invoices. Please try again.");
@@ -85,15 +91,14 @@ function RecordPaymentModal({
     })();
 
     return () => { cancelled = true; };
-  }, [isOpen]);
+  }, [isOpen, isEdit, initialPayment]);
 
-  // Auto-fill amount from selected invoice balance
   const handleInvoiceChange = (id: string) => {
     const inv = invoices.find((i) => String(i.id) === id);
     setFormData((prev) => ({
       ...prev,
-      invoice_id:  id,
-      amount_paid: inv ? String(parseFloat(inv.balance)) : "",
+      invoice_id: id,
+      amount_paid: inv ? String(parseFloat(inv.balance)) : prev.amount_paid,
     }));
   };
 
@@ -101,7 +106,7 @@ function RecordPaymentModal({
     e.preventDefault();
     setError(null);
 
-    if (!formData.invoice_id) { setError("Please select an invoice."); return; }
+    if (!isEdit && !formData.invoice_id) { setError("Please select an invoice."); return; }
     if (!formData.amount_paid || Number(formData.amount_paid) <= 0) {
       setError("Please enter a valid amount greater than zero.");
       return;
@@ -109,26 +114,32 @@ function RecordPaymentModal({
 
     setLoading(true);
     try {
-      // ✅ Field names now exactly match what the backend serializer expects
-      const payload = {
-        invoice_id:            Number(formData.invoice_id),
-        amount_paid:           Number(formData.amount_paid),
-        payment_method:        formData.payment_method,
+      const payload: any = {
+        amount_paid: Number(formData.amount_paid),
+        payment_method: formData.payment_method,
         transaction_reference: formData.transaction_reference || "",
       };
 
-      await apiRequest<any>("/payments/", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+      if (!isEdit) {
+        payload.invoice_id = Number(formData.invoice_id);
+        await apiRequest<any>("/payments/", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // PATCH existing payment
+        await apiRequest<any>(`/payments/${initialPayment!.id}/`, {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        });
+      }
 
       setSuccess(true);
       setTimeout(() => {
         onSuccess();
         onClose();
-      }, 1000);
+      }, 700);
     } catch (err: any) {
-      // Surface DRF field-level errors clearly
       const detail = err?.message || err?.detail;
       if (detail && typeof detail === "object") {
         const msgs = Object.entries(detail)
@@ -136,7 +147,7 @@ function RecordPaymentModal({
           .join(" · ");
         setError(msgs);
       } else {
-        setError(String(detail || "Failed to record payment. Please try again."));
+        setError(String(detail || (isEdit ? "Failed to update payment. Please try again." : "Failed to record payment. Please try again.")));
       }
     } finally {
       setLoading(false);
@@ -145,8 +156,7 @@ function RecordPaymentModal({
 
   if (!isOpen) return null;
 
-  const selectedInvoice = invoices.find((i) => String(i.id) === formData.invoice_id);
-
+  // If editing and invoice info exists in initialPayment, show it as readonly header
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -159,8 +169,15 @@ function RecordPaymentModal({
         {/* Header */}
         <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-slate-100">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Record Payment</h2>
-            <p className="text-sm text-slate-500 mt-0.5">Log a new fee transaction against an invoice</p>
+            <h2 className="text-lg font-bold text-slate-900">{isEdit ? "Edit Payment" : "Record Payment"}</h2>
+            <p className="text-sm text-slate-500 mt-0.5">
+              {isEdit ? "Update payment details" : "Log a new fee transaction against an invoice"}
+            </p>
+            {isEdit && initialPayment && (
+              <div className="mt-2 text-xs text-slate-500">
+                <strong className="text-slate-800">{initialPayment.student_name}</strong> · <span className="font-mono text-xs">{initialPayment.invoice_number}</span>
+              </div>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -185,37 +202,31 @@ function RecordPaymentModal({
           {success && (
             <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700">
               <CheckCircle2 size={16} className="shrink-0" />
-              <span>Payment recorded successfully!</span>
+              <span>Payment saved successfully!</span>
             </div>
           )}
 
-          {/* Invoice selector */}
-          <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              Invoice *
-            </label>
-            <select
-              required
-              value={formData.invoice_id}
-              onChange={(e) => handleInvoiceChange(e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"
-            >
-              <option value="">— Select an unpaid invoice —</option>
-              {invoices.map((inv) => (
-                <option key={inv.id} value={inv.id}>
-                  {inv.invoice_number} · {inv.student?.full_name} · GHS {parseFloat(inv.balance).toFixed(2)} due
-                </option>
-              ))}
-            </select>
-
-            {/* Selected invoice summary */}
-            {selectedInvoice && (
-              <div className="mt-2 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-between text-xs">
-                <span className="text-blue-700 font-semibold">{selectedInvoice.student?.full_name}</span>
-                <span className="text-blue-500">Balance: <strong>GHS {parseFloat(selectedInvoice.balance).toFixed(2)}</strong></span>
-              </div>
-            )}
-          </div>
+          {/* Invoice selector (only for create) */}
+          {!isEdit && (
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                Invoice *
+              </label>
+              <select
+                required
+                value={formData.invoice_id}
+                onChange={(e) => handleInvoiceChange(e.target.value)}
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"
+              >
+                <option value="">— Select an unpaid invoice —</option>
+                {invoices.map((inv) => (
+                  <option key={inv.id} value={inv.id}>
+                    {inv.invoice_number} · {inv.student?.full_name} · GHS {parseFloat(inv.balance).toFixed(2)} due
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Amount */}
           <div>
@@ -295,9 +306,9 @@ function RecordPaymentModal({
               disabled={loading || success}
               className="flex-1 py-2.5 bg-slate-900 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-slate-800 transition disabled:opacity-60"
             >
-              {loading  ? <><Loader2 className="animate-spin" size={15} /> Processing…</> : null}
-              {success  ? <><CheckCircle2 size={15} /> Done!</>                           : null}
-              {!loading && !success ? <><Check size={15} /> Confirm Payment</>            : null}
+              {loading ? <><Loader2 className="animate-spin" size={15} /> Processing…</> : null}
+              {success ? <><CheckCircle2 size={15} /> Done!</> : null}
+              {!loading && !success ? <><Check size={15} /> {isEdit ? "Save Changes" : "Confirm Payment"}</> : null}
             </button>
           </div>
         </form>
@@ -340,10 +351,12 @@ function StatCard({ icon, label, value, color }: {
 // ─── Payments Page ────────────────────────────────────────────────────────────
 
 export default function PaymentsPage() {
-  const [payments,     setPayments]     = useState<Payment[]>([]);
-  const [isModalOpen,  setIsModalOpen]  = useState(false);
-  const [searchTerm,   setSearchTerm]   = useState("");
-  const [loading,      setLoading]      = useState(true);
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalPayment, setModalPayment] = useState<Payment | null>(null); // null = create, object = edit
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchPayments = async () => {
     setLoading(true);
@@ -382,6 +395,31 @@ export default function PaymentsPage() {
 
   const totalRevenue = payments.reduce((s, p) => s + p.amount, 0);
 
+  const openCreateModal = () => {
+    setModalPayment(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (p: Payment) => {
+    setModalPayment(p);
+    setIsModalOpen(true);
+  };
+
+  const deletePayment = async (id: number) => {
+    const ok = window.confirm("Delete this payment? This action cannot be undone.");
+    if (!ok) return;
+    setDeletingId(id);
+    try {
+      await apiRequest<any>(`/payments/${id}/`, { method: "DELETE" });
+      await fetchPayments();
+    } catch (err) {
+      console.error("Failed to delete payment", err);
+      alert("Failed to delete payment. Please try again.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
 
@@ -400,7 +438,7 @@ export default function PaymentsPage() {
             <RefreshCcw size={16} />
           </button>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={openCreateModal}
             className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow hover:bg-slate-800 transition"
           >
             <Plus size={16} /> Record Payment
@@ -412,7 +450,7 @@ export default function PaymentsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <StatCard icon={<Clock size={22} />}        label="Revenue (shown)"   value={`GHS ${totalRevenue.toLocaleString("en-GH", { minimumFractionDigits: 2 })}`} color="blue"    />
         <StatCard icon={<CheckCircle2 size={22} />} label="Transactions"       value={String(payments.length)} color="emerald" />
-        <StatCard icon={<AlertCircle size={22} />}  label="Pending Invoices"   value="—"                       color="rose"    />
+        <StatCard icon={<AlertCircle size={22} />}  label="Pending Invoices"   value="—"                      color="rose"    />
       </div>
 
       {/* Table card */}
@@ -497,6 +535,23 @@ export default function PaymentsPage() {
                       <button className="p-1.5 hover:bg-blue-50 text-blue-600 rounded-lg transition" title="View">
                         <Eye size={15} />
                       </button>
+
+                      <button
+                        onClick={() => openEditModal(p)}
+                        className="p-1.5 hover:bg-slate-100 text-slate-600 rounded-lg transition"
+                        title="Edit"
+                      >
+                        <Edit3 size={15} />
+                      </button>
+
+                      <button
+                        onClick={() => deletePayment(p.id)}
+                        disabled={deletingId === p.id}
+                        className="p-1.5 hover:bg-rose-50 text-rose-600 rounded-lg transition"
+                        title="Delete"
+                      >
+                        {deletingId === p.id ? <Loader2 className="animate-spin" size={15} /> : <Trash2 size={15} />}
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -516,8 +571,9 @@ export default function PaymentsPage() {
 
       <RecordPaymentModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={fetchPayments}
+        onClose={() => { setIsModalOpen(false); setModalPayment(null); }}
+        onSuccess={() => { fetchPayments(); }}
+        initialPayment={modalPayment}
       />
     </div>
   );
