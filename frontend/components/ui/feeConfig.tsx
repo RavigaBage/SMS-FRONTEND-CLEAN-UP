@@ -29,10 +29,7 @@ export default function FeeRow({
       </div>
 
       <label className="switch">
-        <RowCheckbox
-          checked={isChecked}
-          setChange={setCheckedChange}
-        />
+        <RowCheckbox checked={isChecked} setChange={setCheckedChange} />
         <span></span>
       </label>
     </div>

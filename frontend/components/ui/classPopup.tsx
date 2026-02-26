@@ -7,9 +7,9 @@ type PopupProps = {
   togglePopup: () => void;
   formData: Record<string, any>;
   fieldNames: string | string[];
-  setFormData:  (field: string, value: any) => void;
-  isDeleting:Boolean;
-  isUpdating:Boolean;
+  setFormData: (field: string, value: any) => void;
+  isDeleting: Boolean;
+  isUpdating: Boolean;
   onSuccess?: (payload?: any) => void;
 };
 
@@ -21,7 +21,7 @@ export default function Popup({
   setFormData,
   isDeleting,
   isUpdating,
-  onSuccess
+  onSuccess,
 }: PopupProps) {
   return (
     <div
@@ -30,15 +30,13 @@ export default function Popup({
     >
       <div
         className={`popup-container ${active ? "active" : ""}`}
-        onClick={(e: React.MouseEvent<HTMLDivElement>) =>
-          e.stopPropagation()
-        }
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
       >
         <ClassForm
           formData={formData}
           fieldName={fieldNames}
           setFormData={setFormData}
-          isDeleting={isDeleting} 
+          isDeleting={isDeleting}
           isUpdating={isUpdating}
           onSuccess={onSuccess}
         />

@@ -1,4 +1,3 @@
-
 .timetableApp .dropdown {
   position: relative;
   min-width: 150px;
@@ -23,7 +22,7 @@
 }
 
 .timetableApp .dropdown-button::after {
-  content: '▼';
+  content: "▼";
   font-size: 12px;
   transition: transform 0.3s ease;
 }
@@ -41,10 +40,12 @@
   background: white;
   border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.3s ease;
   opacity: 0;
   z-index: 10;
 }
@@ -137,7 +138,8 @@
   gap: 10px;
 }
 
-.timetableApp .chip , .timetableApp select{
+.timetableApp .chip,
+.timetableApp select {
   padding: 12px;
   border-radius: 999px;
   background: #e5e7eb;
@@ -145,9 +147,9 @@
   min-width: 150px;
   text-align: center;
 }
-.timetableApp select{
-  border-radius:10px;
-  padding:10px;
+.timetableApp select {
+  border-radius: 10px;
+  padding: 10px;
   min-width: 150px;
   font-size: 20px;
 }
@@ -166,8 +168,8 @@
 /* Timetable */
 .timetableApp .timetable {
   background: #fff;
-  border-radius: 12px; 
-  border:1px solid #cacaca;
+  border-radius: 12px;
+  border: 1px solid #cacaca;
   overflow: hidden;
 }
 
@@ -178,8 +180,8 @@
   background: #b1bcd433;
   overflow: hidden;
 }
-.timetableApp .grid-header span{
-  border-right:1px solid #cacaca;
+.timetableApp .grid-header span {
+  border-right: 1px solid #cacaca;
   text-align: center;
   padding-block: 20px;
   padding-inline: 10px;
@@ -188,7 +190,7 @@
 .timetableApp .grid {
   display: grid;
   grid-template-columns: 80px repeat(5, 1fr);
-  grid-auto-rows: auto
+  grid-auto-rows: auto;
 }
 
 .timetableApp .time {
@@ -197,18 +199,19 @@
   text-align: center;
   font-weight: bolder;
 }
-.timetableApp .grid .grid_feild, .timetableApp .time{
-  padding:10px;
-  border-bottom:1px solid #ccc;
-  border-top:1px solid #ccc;
-  border-left:1px solid #e9e7e7;
-  border-right:1px solid #e9e7e7;
+.timetableApp .grid .grid_feild,
+.timetableApp .time {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #e9e7e7;
+  border-right: 1px solid #e9e7e7;
 }
-.timetableApp .grid .grid_feild{
+.timetableApp .grid .grid_feild {
   padding: 0px;
   position: relative;
 }
-.timetableApp .grid .grid_feild .slot_options{
+.timetableApp .grid .grid_feild .slot_options {
   width: fit-content;
   height: fit-content;
   padding-block: 10px;
@@ -225,30 +228,30 @@
   transition: opacity 0.2s ease;
 }
 .timetableApp .grid .grid_feild .card:hover .slot_options,
-.timetableApp .grid .grid_feild .card:focus-within .slot_options{
+.timetableApp .grid .grid_feild .card:focus-within .slot_options {
   opacity: 1;
   pointer-events: auto;
 }
-.timetableApp .grid .grid_feild.active .slot_options.clt{
+.timetableApp .grid .grid_feild.active .slot_options.clt {
   display: none;
 }
-.timetableApp .grid .grid_feild .slot_options .item_{
+.timetableApp .grid .grid_feild .slot_options .item_ {
   display: grid;
   place-items: center;
   width: 30px;
   height: 30px;
-  margin:5px;
-  border:1px solid #ccc;
+  margin: 5px;
+  border: 1px solid #ccc;
   border-radius: 4px;
 }
-.timetableApp .grid .grid_feild .slot_options .item_:hover{
+.timetableApp .grid .grid_feild .slot_options .item_:hover {
   background-color: #6b7280;
 }
-.timetableApp .grid .grid_feild .slot_options .item_ svg.delete:hover{
-  fill:crimson ;
+.timetableApp .grid .grid_feild .slot_options .item_ svg.delete:hover {
+  fill: crimson;
 }
-.timetableApp .grid .grid_feild .slot_options .item_ svg.update:hover{
-  fill:greenyellow;
+.timetableApp .grid .grid_feild .slot_options .item_ svg.update:hover {
+  fill: greenyellow;
 }
 /* Cards */
 .timetableApp .grid .grid_feild .card {
@@ -257,27 +260,53 @@
   font-size: 13px;
   width: 90%;
   height: 90%;
-  margin:10px auto;
-  min-width:180px;
+  margin: 10px auto;
+  min-width: 180px;
   min-height: 150px;
-  
 }
-.timetableApp .grid .grid_feild .card.empty{
-  border:5px dashed #ccc;
+.timetableApp .grid .grid_feild .card.empty {
+  border: 5px dashed #ccc;
 }
 
 /* Color tokens */
-.timetableApp div[data-color="1"] { background: #e0f2fe;border-left:5px solid #0195f7; }
-.timetableApp div[data-color="2"] { background: #ecfdf5;border-left:5px solid #41f09e; }
-.timetableApp div[data-color="3"] { background: #fee2e2;border-left:5px solid #fd4e4e; }
-.timetableApp div[data-color="4"] { background: #fef3c7;border-left:5px solid #ffdc51; }
-.timetableApp div[data-color="6"] { background: #ede9fe;border-left:5px solid #7b5dff; }
-.timetableApp div[data-color="7"] { background: #fce7f3;border-left:5px solid #fd4bb0; }
-.timetableApp div[data-color="8"] { background: #ffedd5;border-left:5px solid #fdae46; }
-.timetableApp div[data-color="9"] { background: #cffafe;border-left:5px solid #30e4f5; }
-.timetableApp div[data-color="0"] { background: #06e6fa;border-left:5px solid #046068; }
+.timetableApp div[data-color="1"] {
+  background: #e0f2fe;
+  border-left: 5px solid #0195f7;
+}
+.timetableApp div[data-color="2"] {
+  background: #ecfdf5;
+  border-left: 5px solid #41f09e;
+}
+.timetableApp div[data-color="3"] {
+  background: #fee2e2;
+  border-left: 5px solid #fd4e4e;
+}
+.timetableApp div[data-color="4"] {
+  background: #fef3c7;
+  border-left: 5px solid #ffdc51;
+}
+.timetableApp div[data-color="6"] {
+  background: #ede9fe;
+  border-left: 5px solid #7b5dff;
+}
+.timetableApp div[data-color="7"] {
+  background: #fce7f3;
+  border-left: 5px solid #fd4bb0;
+}
+.timetableApp div[data-color="8"] {
+  background: #ffedd5;
+  border-left: 5px solid #fdae46;
+}
+.timetableApp div[data-color="9"] {
+  background: #cffafe;
+  border-left: 5px solid #30e4f5;
+}
+.timetableApp div[data-color="0"] {
+  background: #06e6fa;
+  border-left: 5px solid #046068;
+}
 
-.timetableApp div{
+.timetableApp div {
   cursor: pointer;
 }
 .timetableApp .conflict {
@@ -338,16 +367,16 @@
   font-size: 12px;
   color: #6b7280;
 }
-.timetableApp .slot_title h1{
+.timetableApp .slot_title h1 {
   font-size: 18px;
 }
-.timetableApp .slot_location{
+.timetableApp .slot_location {
   border-radius: 999px;
-  padding:5px;
+  padding: 5px;
   text-align: center;
   width: fit-content;
 }
-.timetableApp .slot_assigned p{
+.timetableApp .slot_assigned p {
   font-weight: 600;
 }
 
@@ -357,7 +386,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -381,7 +410,9 @@
   text-align: center;
   transform: scale(0);
   opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 .timetableApp .popup-container.active {
   transform: scale(1);
@@ -402,7 +433,6 @@
 .timetableApp .close-btn:hover {
   background: #c0392b;
 }
-
 
 .timetableApp .form-header {
   display: flex;
@@ -437,7 +467,6 @@
   color: #6b7280;
   margin-top: 4px;
 }
-
 
 .timetableApp button {
   position: relative;
@@ -480,11 +509,13 @@
 }
 
 @keyframes slide {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
-
-
 
 /* ─────────────────────────────────────────────────────────────────────────────
    TIMETABLE — design improvements & skeleton loader
@@ -503,7 +534,9 @@
   background: var(--bg, #f8fafc);
 }
 
-.tt-col-time { /* empty corner */ }
+.tt-col-time {
+  /* empty corner */
+}
 
 .tt-col-day {
   font-size: 11px;
@@ -563,7 +596,6 @@
   border-radius: 4px;
 }
 
-
 /* ── Filled card ─────────────────────────────────────────────────────────── */
 .tt-card {
   position: relative;
@@ -571,20 +603,22 @@
   overflow: hidden;
   height: 100%;
   min-height: 84px;
-  transition: box-shadow 0.18s, transform 0.18s;
+  transition:
+    box-shadow 0.18s,
+    transform 0.18s;
 }
 
 .tt-card--filled {
   background: var(--card-bg, #eef2ff);
   display: flex;
   align-items: stretch;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   cursor: default;
 }
 
 .tt-card--filled:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.10);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
 /* left accent bar */
@@ -657,7 +691,9 @@
   border-radius: 6px;
   border: none;
   cursor: pointer;
-  transition: background 0.12s, transform 0.12s;
+  transition:
+    background 0.12s,
+    transform 0.12s;
 }
 
 .tt-action-btn:active {
@@ -665,23 +701,22 @@
 }
 
 .tt-action-btn--edit {
-  background: rgba(99,102,241,.12);
+  background: rgba(99, 102, 241, 0.12);
   color: #6366f1;
 }
 
 .tt-action-btn--edit:hover {
-  background: rgba(99,102,241,.22);
+  background: rgba(99, 102, 241, 0.22);
 }
 
 .tt-action-btn--delete {
-  background: rgba(244, 63, 94, .1);
+  background: rgba(244, 63, 94, 0.1);
   color: #f43f5e;
 }
 
 .tt-action-btn--delete:hover {
-  background: rgba(244, 63, 94, .2);
+  background: rgba(244, 63, 94, 0.2);
 }
-
 
 /* ── Empty / + card ──────────────────────────────────────────────────────── */
 .tt-card--empty {
@@ -696,7 +731,11 @@
   border-radius: 10px;
   cursor: pointer;
   color: #94a3b8;
-  transition: border-color 0.18s, background 0.18s, color 0.18s, transform 0.18s;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    color 0.18s,
+    transform 0.18s;
   padding: 10px 6px;
 }
 
@@ -735,11 +774,14 @@
   text-transform: uppercase;
 }
 
-
 /* ── Skeleton loader ─────────────────────────────────────────────────────── */
 @keyframes tt-shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position:  400px 0; }
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
 }
 
 .tt-card--skeleton {
@@ -761,11 +803,23 @@
   animation: tt-shimmer 1.4s ease-in-out infinite;
 }
 
-.sk-line--title  { height: 13px; width: 75%; }
-.sk-line--sub    { height: 10px; width: 90%; }
-.sk-line--short  { height: 10px; width: 55%; }
-.sk-line--time   { height: 10px; width: 36px; margin-left: auto; }
-
+.sk-line--title {
+  height: 13px;
+  width: 75%;
+}
+.sk-line--sub {
+  height: 10px;
+  width: 90%;
+}
+.sk-line--short {
+  height: 10px;
+  width: 55%;
+}
+.sk-line--time {
+  height: 10px;
+  width: 36px;
+  margin-left: auto;
+}
 
 /* ── Empty state (before first load) ────────────────────────────────────── */
 .tt-empty-state {
@@ -795,7 +849,6 @@
   color: #475569;
 }
 
-
 /* ── "Load table" chip loading state ────────────────────────────────────── */
 .chip--loading {
   opacity: 0.75;
@@ -817,5 +870,7 @@
 }
 
 @keyframes chip-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

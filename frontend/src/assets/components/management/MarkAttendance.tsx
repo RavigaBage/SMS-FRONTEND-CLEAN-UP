@@ -11,7 +11,11 @@ interface MarkAttendanceModalProps {
   onClose: () => void;
 }
 
-export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAttendanceModalProps) {
+export function MarkAttendanceModal({
+  isOpen,
+  selectedDate,
+  onClose,
+}: MarkAttendanceModalProps) {
   const [loading, setLoading] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
@@ -28,7 +32,7 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
   useEffect(() => {
     if (isOpen) {
       fetchClasses();
-      setFormData(prev => ({ ...prev, attendance_date: selectedDate }));
+      setFormData((prev) => ({ ...prev, attendance_date: selectedDate }));
     }
   }, [isOpen, selectedDate]);
 
@@ -41,61 +45,66 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
   const fetchClasses = async () => {
     try {
       const res = await apiRequest<any>("/classes/", { method: "GET" });
-      setClasses(res.results as any || res);
+      setClasses((res.results as any) || res);
     } catch (err) {
       console.error("Error fetching classes:", err);
       toast.error("Failed to load classes");
     }
   };
 
-const fetchStudents = async (classId: string) => {
-  try {
-    const res = await apiRequest<any>(`/classes/${classId}/students/`, { method: "GET" });
-    // This endpoint returns a plain array, not a paginated response
-    const list = Array.isArray(res.data) ? res.data
-               : res.results || res.data || [];
-    setStudents(list);
-  } catch (err) {
-    console.error("Error fetching students:", err);
-    toast.error("Failed to load students");
-  }
-};
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  setErrors({});
-
-  try {
-    const res = await apiRequest("/attendance/", {
-      method: "POST",
-      body: JSON.stringify({
-        student_id:         formData.student_id,   // serializer expects 'student' not 'student_id'
-        // class_obj:       selectedClass,          // serializer expects 'class_obj' not 'class_id'
-        attendance_date: formData.attendance_date,
-        status:          formData.status,
-        remarks:         formData.remarks,
-        class_id:  Number(selectedClass),
-        ...(formData.check_in_time && { check_in_time: formData.check_in_time }),
-      }),
-    });
-
-    // apiRequest returns ApiResponse, not throws — check error field
-    if (res.error) {
-      toast.error(res.error);
-      setErrors({ general: res.error });
-      return;
+  const fetchStudents = async (classId: string) => {
+    try {
+      const res = await apiRequest<any>(`/classes/${classId}/students/`, {
+        method: "GET",
+      });
+      // This endpoint returns a plain array, not a paginated response
+      const list = Array.isArray(res.data)
+        ? res.data
+        : res.results || res.data || [];
+      setStudents(list);
+    } catch (err) {
+      console.error("Error fetching students:", err);
+      toast.error("Failed to load students");
     }
+  };
 
-    toast.success("Attendance marked successfully!");
-    onClose();
-    resetForm();
-  } catch (err: any) {
-    toast.error("Failed to mark attendance. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrors({});
+
+    try {
+      const res = await apiRequest("/attendance/", {
+        method: "POST",
+        body: JSON.stringify({
+          student_id: formData.student_id, // serializer expects 'student' not 'student_id'
+          // class_obj:       selectedClass,          // serializer expects 'class_obj' not 'class_id'
+          attendance_date: formData.attendance_date,
+          status: formData.status,
+          remarks: formData.remarks,
+          class_id: Number(selectedClass),
+          ...(formData.check_in_time && {
+            check_in_time: formData.check_in_time,
+          }),
+        }),
+      });
+
+      // apiRequest returns ApiResponse, not throws — check error field
+      if (res.error) {
+        toast.error(res.error);
+        setErrors({ general: res.error });
+        return;
+      }
+
+      toast.success("Attendance marked successfully!");
+      onClose();
+      resetForm();
+    } catch (err: any) {
+      toast.error("Failed to mark attendance. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -113,7 +122,10 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container modal-md" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container modal-md"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div>
             <h2 className="modal-title">
@@ -121,7 +133,8 @@ const handleSubmit = async (e: React.FormEvent) => {
               Mark Attendance
             </h2>
             <p className="modal-subtitle">
-              Record student attendance for {new Date(selectedDate).toLocaleDateString()}
+              Record student attendance for{" "}
+              {new Date(selectedDate).toLocaleDateString()}
             </p>
           </div>
           <button className="modal-close" onClick={onClose}>
@@ -131,9 +144,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         <form onSubmit={handleSubmit} className="modal-form">
           {errors.general && (
-            <div className="error-alert">
-              {errors.general}
-            </div>
+            <div className="error-alert">{errors.general}</div>
           )}
 
           <div className="form-section">
@@ -142,7 +153,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 Class <span className="required">*</span>
               </label>
               <select
-                className={`form-select ${errors.class_id ? 'error' : ''}`}
+                className={`form-select ${errors.class_id ? "error" : ""}`}
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
                 required
@@ -154,7 +165,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                   </option>
                 ))}
               </select>
-              {errors.class_id && <span className="error-text">{errors.class_id}</span>}
+              {errors.class_id && (
+                <span className="error-text">{errors.class_id}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -162,20 +175,25 @@ const handleSubmit = async (e: React.FormEvent) => {
                 Student <span className="required">*</span>
               </label>
               <select
-                className={`form-select ${errors.student_id ? 'error' : ''}`}
+                className={`form-select ${errors.student_id ? "error" : ""}`}
                 value={formData.student_id}
-                onChange={(e) => setFormData({ ...formData, student_id: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, student_id: e.target.value })
+                }
                 required
                 disabled={!selectedClass}
               >
                 <option value="">-- Select Student --</option>
                 {students.map((student) => (
                   <option key={student.id} value={student.id}>
-                    {student.first_name} {student.last_name} - {student.admission_number || student.id}
+                    {student.first_name} {student.last_name} -{" "}
+                    {student.admission_number || student.id}
                   </option>
                 ))}
               </select>
-              {errors.student_id && <span className="error-text">{errors.student_id}</span>}
+              {errors.student_id && (
+                <span className="error-text">{errors.student_id}</span>
+              )}
             </div>
 
             <div className="form-row">
@@ -186,7 +204,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <select
                   className="form-select"
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, status: e.target.value })
+                  }
                   required
                 >
                   <option value="present">Present</option>
@@ -202,7 +222,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                   type="time"
                   className="form-input"
                   value={formData.check_in_time}
-                  onChange={(e) => setFormData({ ...formData, check_in_time: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, check_in_time: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -214,7 +236,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 rows={3}
                 placeholder="Additional notes..."
                 value={formData.remarks}
-                onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, remarks: e.target.value })
+                }
               />
             </div>
           </div>
@@ -228,11 +252,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="primary-button"
-              disabled={loading}
-            >
+            <button type="submit" className="primary-button" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="animate-spin" size={18} />

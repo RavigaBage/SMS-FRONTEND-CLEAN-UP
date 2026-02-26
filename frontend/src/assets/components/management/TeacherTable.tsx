@@ -1,6 +1,6 @@
 import { Edit, Trash2, Eye, BookOpen, UserX, MoreVertical } from "lucide-react";
 import { useState } from "react";
-import Image from 'next/image';
+import Image from "next/image";
 
 export interface Teacher {
   id: number;
@@ -66,22 +66,21 @@ export function TeacherTable({
               {/* Teacher Info */}
               <td>
                 <div className="user-cell">
-                   <Image
+                  <Image
                     src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        teacher.fullName || "User"
+                      teacher.fullName || "User",
                     )}&background=random`}
                     alt="User avatar"
                     width={40}
                     height={40}
                     className="rounded-full"
-                    />
+                  />
                   <div className="user-info">
                     <p className="user-name">{teacher.fullName}</p>
                     <p className="user-meta">{teacher.email}</p>
                   </div>
                 </div>
               </td>
-
 
               {/* Specialization */}
               <td>
@@ -96,7 +95,8 @@ export function TeacherTable({
                   {teacher.subjects.length > 0 ? (
                     <>
                       <span className="badge badge-blue">
-                        {teacher.subjects.length} subject{teacher.subjects.length !== 1 ? "s" : ""}
+                        {teacher.subjects.length} subject
+                        {teacher.subjects.length !== 1 ? "s" : ""}
                       </span>
                       <button
                         className="text-button"
@@ -121,7 +121,8 @@ export function TeacherTable({
               {/* Experience */}
               <td>
                 <span className="text-secondary">
-                  {teacher.yearsOfExperience} year{teacher.yearsOfExperience !== 1 ? "s" : ""}
+                  {teacher.yearsOfExperience} year
+                  {teacher.yearsOfExperience !== 1 ? "s" : ""}
                 </span>
               </td>
 

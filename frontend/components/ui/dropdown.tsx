@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 type DropdownOption = {
   class_id: number | string;
   class_name: string;
-  id:number;
+  id: number;
 };
 
 type DropdownProps = {
@@ -70,8 +70,9 @@ export default function Dropdown({
         )}
 
         {isOpen &&
-          options.map((cls,index) => (
-            <div key={index} 
+          options.map((cls, index) => (
+            <div
+              key={index}
               onClick={() => handleSelect(cls)}
               className="dropdown-item"
               data-value={`${cls.id}`}

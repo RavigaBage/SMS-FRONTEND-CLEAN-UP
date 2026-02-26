@@ -5,10 +5,10 @@ import TeachingForm from "./PopupForm";
 type PopupProps = {
   active: boolean;
   togglePopup: () => void;
-  setUpdating?:boolean;
+  setUpdating?: boolean;
   formData: Record<string, any>;
   fieldNames: string | string[];
-  setFormData:  (field: string, value: any) => void;
+  setFormData: (field: string, value: any) => void;
   onSuccess?: () => void;
   onOutsideClose?: () => void;
 };
@@ -33,9 +33,7 @@ export default function Popup({
     >
       <div
         className={`popup-container ${active ? "active" : ""}`}
-        onClick={(e: React.MouseEvent<HTMLDivElement>) =>
-          e.stopPropagation()
-        }
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
       >
         <TeachingForm
           formData={formData}
@@ -44,7 +42,6 @@ export default function Popup({
           setFormData={setFormData}
           onSuccess={onSuccess}
         />
-
       </div>
     </div>
   );

@@ -1,6 +1,13 @@
-import { Edit, Trash2, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
 import { useState } from "react";
-import Image from 'next/image';
+import Image from "next/image";
 export interface AttendanceRecord {
   id: number;
   studentId: number;
@@ -21,7 +28,11 @@ interface AttendanceTableProps {
   onDelete: (id: number) => void;
 }
 
-export function AttendanceTable({ records, onUpdate, onDelete }: AttendanceTableProps) {
+export function AttendanceTable({
+  records,
+  onUpdate,
+  onDelete,
+}: AttendanceTableProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editStatus, setEditStatus] = useState("");
   const [editRemarks, setEditRemarks] = useState("");
@@ -47,13 +58,13 @@ export function AttendanceTable({ records, onUpdate, onDelete }: AttendanceTable
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'present':
+      case "present":
         return <CheckCircle size={16} />;
-      case 'absent':
+      case "absent":
         return <XCircle size={16} />;
-      case 'late':
+      case "late":
         return <Clock size={16} />;
-      case 'excused':
+      case "excused":
         return <AlertCircle size={16} />;
       default:
         return null;
@@ -62,16 +73,16 @@ export function AttendanceTable({ records, onUpdate, onDelete }: AttendanceTable
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'present':
-        return 'status-present';
-      case 'absent':
-        return 'status-absent';
-      case 'late':
-        return 'status-late';
-      case 'excused':
-        return 'status-excused';
+      case "present":
+        return "status-present";
+      case "absent":
+        return "status-absent";
+      case "late":
+        return "status-late";
+      case "excused":
+        return "status-excused";
       default:
-        return '';
+        return "";
     }
   };
 
@@ -134,13 +145,15 @@ export function AttendanceTable({ records, onUpdate, onDelete }: AttendanceTable
                     <option value="excused">Excused</option>
                   </select>
                 ) : (
-                  <span className={`status-badge ${getStatusClass(record.status)}`}>
+                  <span
+                    className={`status-badge ${getStatusClass(record.status)}`}
+                  >
                     {getStatusIcon(record.status)}
-                    {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                    {record.status.charAt(0).toUpperCase() +
+                      record.status.slice(1)}
                   </span>
                 )}
               </td>
-
 
               {/* Remarks */}
               <td>

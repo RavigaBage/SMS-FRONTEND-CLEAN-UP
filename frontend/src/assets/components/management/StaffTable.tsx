@@ -1,24 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, Phone, Trash2, ExternalLink, X, Check, Loader2 } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  Trash2,
+  ExternalLink,
+  X,
+  Check,
+  Loader2,
+} from "lucide-react";
 import { useState } from "react";
 import { apiRequest } from "@/src/lib/apiClient";
-import Image from 'next/image';
+import Image from "next/image";
 export interface StaffMember {
   id: string;
   fullName: string;
-  role: string; 
+  role: string;
   department: string;
   email: string;
   phone: string;
   status: "Active" | "On Leave" | "Inactive";
   profileImage: string;
-  created_at:String;
+  created_at: String;
 }
 
 export function StaffTable({ staff }: { staff: StaffMember[] }) {
-
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const handleDelete = async (id: string) => {
@@ -34,12 +41,12 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
       setDeletingId(null);
     }
   };
-  const  ConvertIsoTime = (time:string)=>{
+  const ConvertIsoTime = (time: string) => {
     console.log(time);
     const currentDate = new Date(time);
     console.log(currentDate);
     return currentDate.toLocaleString();
-  }
+  };
 
   return (
     <div className="bg-white overflow-hidden">
@@ -55,21 +62,28 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
         </thead>
         <tbody className="divide-y text-sm">
           {staff.map((member) => (
-            <tr key={member.id} className="hover:bg-slate-50/50 transition-colors group">
+            <tr
+              key={member.id}
+              className="hover:bg-slate-50/50 transition-colors group"
+            >
               <td className="px-6 py-4">
                 <div className="flex items-center gap-3">
-                   <Image
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        member.fullName || "User"
-                      )}&background=random`}
-                      alt="User avatar"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                                    <div>
-                    <p className="font-bold text-slate-700">{member.fullName}</p>
-                    <p className="text-[11px] text-cyan-600 font-mono">{ConvertIsoTime(member.created_at as any)}</p>
+                  <Image
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      member.fullName || "User",
+                    )}&background=random`}
+                    alt="User avatar"
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                  <div>
+                    <p className="font-bold text-slate-700">
+                      {member.fullName}
+                    </p>
+                    <p className="text-[11px] text-cyan-600 font-mono">
+                      {ConvertIsoTime(member.created_at as any)}
+                    </p>
                   </div>
                 </div>
               </td>
@@ -79,8 +93,12 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
               </td>
               <td className="px-6 py-4">
                 <div className="flex flex-col gap-1 text-slate-500">
-                  <span className="flex items-center gap-2 text-xs"><Mail size={12}/> {member.email}</span>
-                  <span className="flex items-center gap-2 text-xs"><Phone size={12}/> {member.phone}</span>
+                  <span className="flex items-center gap-2 text-xs">
+                    <Mail size={12} /> {member.email}
+                  </span>
+                  <span className="flex items-center gap-2 text-xs">
+                    <Phone size={12} /> {member.phone}
+                  </span>
                 </div>
               </td>
               <td className="px-6 py-4">
@@ -91,15 +109,21 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
                   {deletingId === member.id ? (
                     // VERIFICATION STATE
                     <div className="flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
-                      <span className="text-[10px] font-black text-rose-500 uppercase mr-2">Confirm?</span>
-                      <button 
+                      <span className="text-[10px] font-black text-rose-500 uppercase mr-2">
+                        Confirm?
+                      </span>
+                      <button
                         onClick={() => handleDelete(member.id)}
                         disabled={isProcessing}
                         className="p-1.5 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
                       >
-                        {isProcessing ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                        {isProcessing ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Check size={14} />
+                        )}
                       </button>
-                      <button 
+                      <button
                         onClick={() => setDeletingId(null)}
                         className="p-1.5 bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 transition-colors"
                       >
@@ -109,13 +133,13 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
                   ) : (
                     // DEFAULT STATE
                     <>
-                      <Link 
+                      <Link
                         href={`/Home/profiles/teachers&staff/profile/${member.id}`}
                         className="p-2 text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-all"
                       >
                         <ExternalLink size={18} />
                       </Link>
-                      <button 
+                      <button
                         onClick={() => setDeletingId(member.id)}
                         className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all group-hover:opacity-100"
                       >
@@ -140,7 +164,9 @@ function StaffStatusBadge({ status }: { status: string }) {
     Inactive: "bg-slate-50 text-slate-600 border border-slate-100",
   };
   return (
-    <span className={`px-3 py-1 rounded-full text-[10px] font-bold w-fit ${styles[status]}`}>
+    <span
+      className={`px-3 py-1 rounded-full text-[10px] font-bold w-fit ${styles[status]}`}
+    >
       {status}
     </span>
   );

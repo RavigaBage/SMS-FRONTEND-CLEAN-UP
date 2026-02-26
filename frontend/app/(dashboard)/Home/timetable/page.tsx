@@ -9,16 +9,21 @@ import "@/styles/timetable.css";
 import { fetchWithAuth } from "@/src/lib/apiClient";
 import { Pencil, Trash2 } from "lucide-react";
 
-type TermOption     = { class_id: number; class_name: string; id: number; };
-type Teacher        = { id: number; first_name: string; last_name: string; };
-type Subject        = { id: number; subject_name: string; subject_code: string; };
-type Class          = { id: number; class_name: string; };
+type TermOption = { class_id: number; class_name: string; id: number };
+type Teacher = { id: number; first_name: string; last_name: string };
+type Subject = { id: number; subject_name: string; subject_code: string };
+type Class = { id: number; class_name: string };
 type TimetableEntry = {
-  id: number; class_obj?: Class | null; subject?: Subject | null;
-  teacher?: Teacher | null; day_of_week?: string | null;
-  start_time?: string | null; end_time?: string | null; room_number?: string | null;
+  id: number;
+  class_obj?: Class | null;
+  subject?: Subject | null;
+  teacher?: Teacher | null;
+  day_of_week?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  room_number?: string | null;
 };
-type Option = { class_id: number; class_name: string; id: number; };
+type Option = { class_id: number; class_name: string; id: number };
 
 /* ── Extra CSS (loader + continuation cards) ────────────────────────────── */
 const extraCss = `
@@ -66,46 +71,66 @@ const extraCss = `
 `;
 
 /* ── Row definitions: hour string or break marker ─────────────────────── */
-const ROWS: { type: "time" | "break"; hour?: string; label?: string; breakText?: string }[] = [
-  { type: "time",  hour: "07", label: "07:00" },
-  { type: "time",  hour: "08", label: "08:00" },
-  { type: "time",  hour: "09", label: "09:00" },
+const ROWS: {
+  type: "time" | "break";
+  hour?: string;
+  label?: string;
+  breakText?: string;
+}[] = [
+  { type: "time", hour: "07", label: "07:00" },
+  { type: "time", hour: "08", label: "08:00" },
+  { type: "time", hour: "09", label: "09:00" },
   { type: "break", breakText: "☕  RECESS BREAK" },
-  { type: "time",  hour: "10", label: "10:00" },
-  { type: "time",  hour: "11", label: "11:00" },
-  { type: "time",  hour: "12", label: "12:00" },
-  { type: "time",  hour: "13", label: "13:00" },
-  { type: "break", breakText: "🍽  LUNCH BREAK"  },
-  { type: "time",  hour: "14", label: "14:00" },
-  { type: "time",  hour: "15", label: "15:00" },
-  { type: "time",  hour: "16", label: "16:00" },
-  { type: "time",  hour: "17", label: "17:00" },
+  { type: "time", hour: "10", label: "10:00" },
+  { type: "time", hour: "11", label: "11:00" },
+  { type: "time", hour: "12", label: "12:00" },
+  { type: "time", hour: "13", label: "13:00" },
+  { type: "break", breakText: "🍽  LUNCH BREAK" },
+  { type: "time", hour: "14", label: "14:00" },
+  { type: "time", hour: "15", label: "15:00" },
+  { type: "time", hour: "16", label: "16:00" },
+  { type: "time", hour: "17", label: "17:00" },
 ];
 
 export default function Home() {
-  const [classList,        setClassList]        = useState<Option[]>([]);
-  const [TermList,         setTermList]          = useState<TermOption[]>([]);
-  const [active,           setActive]            = useState(false);
-  const [showDelete,       setShowDelete]        = useState(false);
-  const [pendingDeleteId,  setPendingDeleteId]   = useState<number | null>(null);
-  const [Updating,         setUpdate]            = useState<any>(false);
-  const [timetableData,    setTimetableData]     = useState<TimetableEntry[]>([]);
-  const [loading,          setLoading]           = useState(false);  // ← loader state
+  const [classList, setClassList] = useState<Option[]>([]);
+  const [TermList, setTermList] = useState<TermOption[]>([]);
+  const [active, setActive] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
+  const [Updating, setUpdate] = useState<any>(false);
+  const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
+  const [loading, setLoading] = useState(false); // ← loader state
   const boxRef = useRef<HTMLDivElement | null>(null);
 
   const InitialData = {
-    schoolClass: "", term: "", weekdays: "", timeSlots: "", roomNumber: "",
-    teachingAssignment: "", status: "", teachers: "", day_of_week: "",
-    subjects: "", year: "", academic_year: "", class_id: "",
+    schoolClass: "",
+    term: "",
+    weekdays: "",
+    timeSlots: "",
+    roomNumber: "",
+    teachingAssignment: "",
+    status: "",
+    teachers: "",
+    day_of_week: "",
+    subjects: "",
+    year: "",
+    academic_year: "",
+    class_id: "",
   };
   const [formData, setFormData] = useState<Record<string, any>>(InitialData);
 
   const updateFormField = (field: string, value: any) => {
-    const fieldMap: Record<string, string> = { year: "academic_year", schoolClass: "class_id" };
-    const mappedField   = fieldMap[field] ?? field;
-    const resolvedValue = typeof value === "object" && value !== null && "id" in value
-      ? (value as { id: number | string }).id : value ?? "";
-    setFormData(prev => ({
+    const fieldMap: Record<string, string> = {
+      year: "academic_year",
+      schoolClass: "class_id",
+    };
+    const mappedField = fieldMap[field] ?? field;
+    const resolvedValue =
+      typeof value === "object" && value !== null && "id" in value
+        ? (value as { id: number | string }).id
+        : (value ?? "");
+    setFormData((prev) => ({
       ...prev,
       [mappedField]: resolvedValue,
       ...(mappedField === "subject" ? { subject_id: resolvedValue } : {}),
@@ -116,62 +141,88 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const classRes  = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/classes/`, { method: "GET", headers: { "Content-Type": "application/json" } });
+        const classRes = await fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+          { method: "GET", headers: { "Content-Type": "application/json" } },
+        );
         const classData = await classRes.json();
         if (classRes.ok) {
           const list = classData.results || classData;
           if (Array.isArray(list)) setClassList(list);
         }
         setTermList([
-          { id: 1, class_id: 1, class_name: "First Term"  },
+          { id: 1, class_id: 1, class_name: "First Term" },
           { id: 2, class_id: 2, class_name: "Second Term" },
-          { id: 3, class_id: 3, class_name: "Third Term"  },
+          { id: 3, class_id: 3, class_name: "Third Term" },
         ]);
-      } catch (err) { console.error("Error fetching data:", err); }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
     })();
   }, []);
 
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/timetable/${id}/`, { method: "DELETE", headers: { "Content-Type": "application/json" } });
+      const res = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/timetable/${id}/`,
+        { method: "DELETE", headers: { "Content-Type": "application/json" } },
+      );
       if (res.ok) {
-        setTimetableData(prev => prev.filter(i => i.id !== id));
-        setShowDelete(false); setPendingDeleteId(null);
+        setTimetableData((prev) => prev.filter((i) => i.id !== id));
+        setShowDelete(false);
+        setPendingDeleteId(null);
       } else {
         const data = await res.json();
         alert(`Failed to delete: ${data.detail || "Unknown error"}`);
       }
-    } catch (err) { console.error("Delete failed", err); alert("Error deleting the entry."); }
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("Error deleting the entry.");
+    }
   };
 
-  const MiddlewareDel = (id: number) => { setPendingDeleteId(id); setShowDelete(true); };
-  const closePopup    = () => { setActive(false); setUpdate(false); };
+  const MiddlewareDel = (id: number) => {
+    setPendingDeleteId(id);
+    setShowDelete(true);
+  };
+  const closePopup = () => {
+    setActive(false);
+    setUpdate(false);
+  };
 
   const openCreatePopup = (dayOfWeek: string) => {
     if (!formData.class_id || !formData.term || !formData.academic_year) {
-      alert("Please select class, term, and year before adding a new timetable entry.");
+      alert(
+        "Please select class, term, and year before adding a new timetable entry.",
+      );
       return;
     }
     setUpdate(false);
-    setFormData(prev => ({ ...InitialData, class_id: prev.class_id, term: prev.term, academic_year: prev.academic_year, day_of_week: dayOfWeek }));
+    setFormData((prev) => ({
+      ...InitialData,
+      class_id: prev.class_id,
+      term: prev.term,
+      academic_year: prev.academic_year,
+      day_of_week: dayOfWeek,
+    }));
     setActive(true);
   };
 
   const openEditPopup = (entry: TimetableEntry) => {
     setUpdate(entry.id);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...InitialData,
-      class_id:      entry.class_obj?.id ?? prev.class_id ?? "",
-      term:          (entry as any)?.term ?? prev.term ?? "",
+      class_id: entry.class_obj?.id ?? prev.class_id ?? "",
+      term: (entry as any)?.term ?? prev.term ?? "",
       academic_year: (entry as any)?.academic_year ?? prev.academic_year ?? "",
-      day_of_week:   entry.day_of_week ?? "",
-      start_time:    entry.start_time  ?? "",
-      end_time:      entry.end_time    ?? "",
-      room_number:   entry.room_number ?? "",
-      subject:       entry.subject?.id ?? "",
-      subject_id:    entry.subject?.id ?? "",
-      teacher:       entry.teacher?.id ?? "",
-      teacher_id:    entry.teacher?.id ?? "",
+      day_of_week: entry.day_of_week ?? "",
+      start_time: entry.start_time ?? "",
+      end_time: entry.end_time ?? "",
+      room_number: entry.room_number ?? "",
+      subject: entry.subject?.id ?? "",
+      subject_id: entry.subject?.id ?? "",
+      teacher: entry.teacher?.id ?? "",
+      teacher_id: entry.teacher?.id ?? "",
     }));
     setActive(true);
   };
@@ -180,17 +231,30 @@ export default function Home() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (formData.class_id)     params.append("class_id",     String(formData.class_id));
-      if (formData.term)          params.append("term",          String(formData.term));
-      if (formData.academic_year) params.append("academic_year", String(formData.academic_year));
-      const url      = `${process.env.NEXT_PUBLIC_API_URL}/timetable/${params.toString() ? `?${params}` : ""}`;
+      if (formData.class_id)
+        params.append("class_id", String(formData.class_id));
+      if (formData.term) params.append("term", String(formData.term));
+      if (formData.academic_year)
+        params.append("academic_year", String(formData.academic_year));
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/timetable/${params.toString() ? `?${params}` : ""}`;
       const response = await fetchWithAuth(url);
-      if (!response.ok) { console.error("Failed to fetch timetable"); return; }
-      const data     = await response.json();
-      const safeData = Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [];
+      if (!response.ok) {
+        console.error("Failed to fetch timetable");
+        return;
+      }
+      const data = await response.json();
+      const safeData = Array.isArray(data?.results)
+        ? data.results
+        : Array.isArray(data)
+          ? data
+          : [];
       setTimetableData(safeData);
-    } catch (err) { console.error("Error fetching timetable:", err); setTimetableData([]); }
-    finally { setLoading(false); }
+    } catch (err) {
+      console.error("Error fetching timetable:", err);
+      setTimetableData([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
@@ -205,16 +269,17 @@ export default function Home() {
     const slotH = parseInt(hour, 10);
 
     return data
-      .filter(e => e?.day_of_week === day && e?.start_time)
-      .flatMap(e => {
+      .filter((e) => e?.day_of_week === day && e?.start_time)
+      .flatMap((e) => {
         const [startH, startM] = e.start_time!.split(":").map(Number);
 
         // If no end_time, assume 1-hour duration
-        let endH = startH + 1, endM = startM;
+        let endH = startH + 1,
+          endM = startM;
         if (e.end_time) [endH, endM] = e.end_time.split(":").map(Number);
 
         const startDec = startH + startM / 60;
-        const endDec   = endH   + endM   / 60;
+        const endDec = endH + endM / 60;
 
         // Does this entry touch the [slotH, slotH+1) window?
         if (startDec < slotH + 1 && endDec > slotH) {
@@ -238,7 +303,11 @@ export default function Home() {
           <div
             className="card empty"
             onClick={() => {
-              if (!formData.class_id || !formData.term || !formData.academic_year) {
+              if (
+                !formData.class_id ||
+                !formData.term ||
+                !formData.academic_year
+              ) {
                 alert("Please select class, term, and year first.");
                 return;
               }
@@ -246,8 +315,20 @@ export default function Home() {
             }}
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="1.4" strokeDasharray="3 2"/>
-              <path d="M9 5.5v7M5.5 9h7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              <circle
+                cx="9"
+                cy="9"
+                r="8"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeDasharray="3 2"
+              />
+              <path
+                d="M9 5.5v7M5.5 9h7"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
             </svg>
           </div>
         </div>
@@ -258,12 +339,21 @@ export default function Home() {
 
     return (
       <div className="grid_feild">
-        <div className={`card${isContinuation ? " is-continuation" : ""}`} data-color={colorIndex}>
+        <div
+          className={`card${isContinuation ? " is-continuation" : ""}`}
+          data-color={colorIndex}
+        >
           {isContinuation ? (
             /* Faded continuation row — subject name + arrow only */
             <div className="tt-cont-label">
               <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-                <path d="M5 1v10M2 8l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path
+                  d="M5 1v10M2 8l3 3 3-3"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               {entry.subject?.subject_name ?? "Continued"}
             </div>
@@ -279,12 +369,22 @@ export default function Home() {
                     : "No Teacher"}
                 </p>
               </div>
-              <div className="slot_location">{entry.room_number ?? "No Room"}</div>
+              <div className="slot_location">
+                {entry.room_number ?? "No Room"}
+              </div>
               <div className="slot_options">
-                <div className="item_" title="Delete" onClick={() => entry.id && MiddlewareDel(entry.id)}>
+                <div
+                  className="item_"
+                  title="Delete"
+                  onClick={() => entry.id && MiddlewareDel(entry.id)}
+                >
                   <Trash2 size={14} />
                 </div>
-                <div className="item_" title="Edit" onClick={() => entry.id && openEditPopup(entry)}>
+                <div
+                  className="item_"
+                  title="Edit"
+                  onClick={() => entry.id && openEditPopup(entry)}
+                >
                   <Pencil size={14} />
                 </div>
               </div>
@@ -311,18 +411,54 @@ export default function Home() {
         </header>
 
         <section className="filters">
-          <Dropdown options={classList}  placeholder="Select class" fieldName="schoolClass" setFormData={updateFormField} />
-          <Dropdown options={TermList}   placeholder="Select term"  fieldName="term"        setFormData={updateFormField} />
-          <DropdownYear                  placeholder="Select year"  fieldName="year"        setFormData={updateFormField} />
+          <Dropdown
+            options={classList}
+            placeholder="Select class"
+            fieldName="schoolClass"
+            setFormData={updateFormField}
+          />
+          <Dropdown
+            options={TermList}
+            placeholder="Select term"
+            fieldName="term"
+            setFormData={updateFormField}
+          />
+          <DropdownYear
+            placeholder="Select year"
+            fieldName="year"
+            setFormData={updateFormField}
+          />
           <div className="chips">
             <span
               className="chip active"
               onClick={!loading ? fetchTimetable : undefined}
-              style={{ opacity: loading ? .6 : 1, cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 7 }}
+              style={{
+                opacity: loading ? 0.6 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+              }}
             >
               {loading && (
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ animation: "tt-spin .7s linear infinite", flexShrink: 0 }}>
-                  <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.8" strokeDasharray="20 14"/>
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 13 13"
+                  fill="none"
+                  style={{
+                    animation: "tt-spin .7s linear infinite",
+                    flexShrink: 0,
+                  }}
+                >
+                  <circle
+                    cx="6.5"
+                    cy="6.5"
+                    r="5.5"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeDasharray="20 14"
+                  />
                 </svg>
               )}
               {loading ? "Loading…" : "Load table"}
@@ -334,13 +470,15 @@ export default function Home() {
           <section className="timetable">
             <div className="grid-header">
               <span></span>
-              <span>Monday</span><span>Tuesday</span><span>Wednesday</span>
-              <span>Thursday</span><span>Friday</span>
+              <span>Monday</span>
+              <span>Tuesday</span>
+              <span>Wednesday</span>
+              <span>Thursday</span>
+              <span>Friday</span>
             </div>
 
             {/* position:relative so the loader overlay is scoped to the grid */}
             <div className="grid" ref={boxRef} style={{ position: "relative" }}>
-
               {/* ── LOADER OVERLAY ── */}
               {loading && (
                 <div className="tt-loader-overlay">
@@ -351,32 +489,49 @@ export default function Home() {
               )}
 
               <Popup
-                active={active} togglePopup={closePopup} setUpdating={Updating}
-                formData={formData} fieldNames={["weekdays","timeSlots","teachers","subjects"]}
+                active={active}
+                togglePopup={closePopup}
+                setUpdating={Updating}
+                formData={formData}
+                fieldNames={["weekdays", "timeSlots", "teachers", "subjects"]}
                 setFormData={updateFormField}
-                onSuccess={() => { setActive(false); fetchTimetable(); }}
+                onSuccess={() => {
+                  setActive(false);
+                  fetchTimetable();
+                }}
               />
               <DeletePopup
                 isOpen={showDelete}
-                onClose={() => { setShowDelete(false); setPendingDeleteId(null); }}
-                onConfirm={() => { if (pendingDeleteId !== null) handleDelete(pendingDeleteId); }}
+                onClose={() => {
+                  setShowDelete(false);
+                  setPendingDeleteId(null);
+                }}
+                onConfirm={() => {
+                  if (pendingDeleteId !== null) handleDelete(pendingDeleteId);
+                }}
               />
               {ROWS.map((row, ri) => {
                 if (row.type === "break") {
-                  return <div key={`break-${ri}`} className="break">{row.breakText}</div>;
+                  return (
+                    <div key={`break-${ri}`} className="break">
+                      {row.breakText}
+                    </div>
+                  );
                 }
                 return (
                   <div key={row.hour} style={{ display: "contents" }}>
                     <div className="time">{row.label}</div>
                     {weekdays.map((day, index) => (
                       <div key={`${row.hour}-${day}`}>
-                        {TimetableDiv(getSlotsForDay(timetableData, day, row.hour!), index)}
+                        {TimetableDiv(
+                          getSlotsForDay(timetableData, day, row.hour!),
+                          index,
+                        )}
                       </div>
                     ))}
                   </div>
                 );
               })}
-
             </div>
           </section>
         </div>

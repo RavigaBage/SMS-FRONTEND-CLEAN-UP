@@ -11,14 +11,14 @@ type DropdownYearProps = {
 };
 
 export default function DropdownYear({
-  placeholder = 'select year',
+  placeholder = "select year",
   fieldName,
   setFormData,
 }: DropdownYearProps) {
   // generate years dynamically
   const options = [];
   for (let i = currentYear; i >= currentYear - 5; i--) {
-    options.push(`${i}/${i+1}`);
+    options.push(`${i}/${i + 1}`);
   }
 
   const [isOpen, setIsOpen] = useState<boolean>(false);

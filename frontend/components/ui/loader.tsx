@@ -26,12 +26,8 @@ export default function LoaderPopup({
         </div>
 
         <div className="delete-actions">
-          {status === "success" && (
-            <p className="success">{message}</p>
-          )}
-          {status === "error" && (
-            <p className="error">{message}</p>
-          )}
+          {status === "success" && <p className="success">{message}</p>}
+          {status === "error" && <p className="error">{message}</p>}
         </div>
       </div>
     </div>

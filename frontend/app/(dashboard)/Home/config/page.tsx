@@ -43,9 +43,7 @@ function Field({
         {label}
       </label>
       {children}
-      {hint && (
-        <p className="text-xs text-slate-400">{hint}</p>
-      )}
+      {hint && <p className="text-xs text-slate-400">{hint}</p>}
     </div>
   );
 }
@@ -117,10 +115,14 @@ function SectionCard({
 }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-      <div className="px-6 py-5 border-b border-slate-100
-                      bg-slate-50/50 flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#1f3889]/10
-                        flex items-center justify-center text-[#1f3889] flex-shrink-0">
+      <div
+        className="px-6 py-5 border-b border-slate-100
+                      bg-slate-50/50 flex items-start gap-4"
+      >
+        <div
+          className="w-10 h-10 rounded-xl bg-[#1f3889]/10
+                        flex items-center justify-center text-[#1f3889] flex-shrink-0"
+        >
           {icon}
         </div>
         <div>
@@ -158,7 +160,7 @@ export default function EmailConfigPage() {
     setSaving(true);
     setSaved(false);
     try {
-     apiRequest(`/api/settings/email/`, {
+      apiRequest(`/api/settings/email/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config),
@@ -177,11 +179,11 @@ export default function EmailConfigPage() {
     setTestStatus("sending");
     setTestMessage("");
     try {
-    const res = apiRequest(`/api/settings/email/test/`, {
+      const res = apiRequest(`/api/settings/email/test/`, {
         method: "POST",
         body: JSON.stringify({ to: testEmail }),
       });
-      const response =  await res;
+      const response = await res;
       const data = response.data;
       console.log(response);
       if (data) {
@@ -189,7 +191,7 @@ export default function EmailConfigPage() {
         setTestMessage(`Test email sent to ${testEmail}`);
       } else {
         setTestStatus("error");
-        setTestMessage(response.error|| "Failed to send test email.");
+        setTestMessage(response.error || "Failed to send test email.");
       }
     } catch {
       setTestStatus("error");
@@ -206,8 +208,18 @@ export default function EmailConfigPage() {
         <div className="w-full mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button className="text-slate-400 hover:text-slate-600 transition">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <div>
@@ -228,16 +240,41 @@ export default function EmailConfigPage() {
           >
             {saving ? (
               <>
-                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                <svg
+                  className="w-4 h-4 animate-spin"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8z"
+                  />
                 </svg>
                 Saving…
               </>
             ) : saved ? (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 Saved
               </>
@@ -249,15 +286,23 @@ export default function EmailConfigPage() {
       </div>
 
       <div className="w-full mx-auto px-6 py-8 space-y-6">
-
         {/* ── Backend toggle ── */}
         <SectionCard
           title="Email Backend"
           description="Choose how emails are sent. Use Console in development to preview emails in your terminal."
           icon={
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M5 12h14M12 5l7 7-7 7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 12h14M12 5l7 7-7 7"
+              />
             </svg>
           }
         >
@@ -267,26 +312,33 @@ export default function EmailConfigPage() {
                 key={b}
                 onClick={() => set("backend", b)}
                 className={`px-4 py-3.5 rounded-xl border-2 text-sm font-semibold transition text-left
-                  ${config.backend === b
-                    ? "border-[#1f3889] bg-[#1f3889]/5 text-[#1f3889]"
-                    : "border-slate-200 text-slate-600 hover:border-slate-300"
+                  ${
+                    config.backend === b
+                      ? "border-[#1f3889] bg-[#1f3889]/5 text-[#1f3889]"
+                      : "border-slate-200 text-slate-600 hover:border-slate-300"
                   }`}
               >
-                <div className="font-bold capitalize">{b === "console" ? "Console" : "SMTP"}</div>
+                <div className="font-bold capitalize">
+                  {b === "console" ? "Console" : "SMTP"}
+                </div>
                 <div className="text-xs font-normal mt-0.5 opacity-70">
-                  {b === "console" ? "Dev only — prints to terminal" : "Production — sends real emails"}
+                  {b === "console"
+                    ? "Dev only — prints to terminal"
+                    : "Production — sends real emails"}
                 </div>
               </button>
             ))}
           </div>
 
           {config.backend === "console" && (
-            <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-50
-                            border border-amber-200">
+            <div
+              className="flex items-start gap-3 p-4 rounded-xl bg-amber-50
+                            border border-amber-200"
+            >
               <span className="text-amber-500 text-lg">⚠️</span>
               <p className="text-sm text-amber-700">
-                Console backend does not send real emails. Emails will appear in your
-                Django server terminal. Switch to SMTP for production.
+                Console backend does not send real emails. Emails will appear in
+                your Django server terminal. Switch to SMTP for production.
               </p>
             </div>
           )}
@@ -297,13 +349,25 @@ export default function EmailConfigPage() {
           title="School Information"
           description="Used in email templates and the sender name shown to parents."
           icon={
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3"
+              />
             </svg>
           }
         >
-          <Field label="School Name" hint="Appears in email subject lines and templates.">
+          <Field
+            label="School Name"
+            hint="Appears in email subject lines and templates."
+          >
             <TextInput
               value={config.school_name}
               onChange={(v) => set("school_name", v)}
@@ -327,9 +391,18 @@ export default function EmailConfigPage() {
           title="SMTP Settings"
           description="Required when using the SMTP backend. Use Gmail App Passwords — never your real Gmail password."
           icon={
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
             </svg>
           }
         >
@@ -378,16 +451,38 @@ export default function EmailConfigPage() {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
               >
                 {showPassword ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                    />
                   </svg>
                 ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
                   </svg>
                 )}
               </button>
@@ -397,7 +492,8 @@ export default function EmailConfigPage() {
             <div>
               <p className="text-sm font-semibold text-slate-700">Use TLS</p>
               <p className="text-xs text-slate-400">
-                Required for Gmail (port 587). Disable only for custom SMTP servers.
+                Required for Gmail (port 587). Disable only for custom SMTP
+                servers.
               </p>
             </div>
             <Toggle
@@ -413,9 +509,18 @@ export default function EmailConfigPage() {
           title="Send Test Email"
           description="Verify your configuration is working by sending a test email."
           icon={
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+              />
             </svg>
           }
         >
@@ -441,20 +546,27 @@ export default function EmailConfigPage() {
             </button>
           </div>
           {testStatus !== "idle" && (
-            <div className={`flex items-center gap-2 p-3 rounded-lg text-sm font-medium
-              ${testStatus === "success"
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                : testStatus === "error"
-                ? "bg-red-50 text-red-700 border border-red-200"
-                : "bg-slate-50 text-slate-600 border border-slate-200"
+            <div
+              className={`flex items-center gap-2 p-3 rounded-lg text-sm font-medium
+              ${
+                testStatus === "success"
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : testStatus === "error"
+                    ? "bg-red-50 text-red-700 border border-red-200"
+                    : "bg-slate-50 text-slate-600 border border-slate-200"
               }`}
             >
-              <span>{testStatus === "success" ? "✅" : testStatus === "error" ? "❌" : "⏳"}</span>
+              <span>
+                {testStatus === "success"
+                  ? "✅"
+                  : testStatus === "error"
+                    ? "❌"
+                    : "⏳"}
+              </span>
               {testMessage}
             </div>
           )}
         </SectionCard>
-
       </div>
     </div>
   );

@@ -18,8 +18,8 @@ interface Invoice {
   invoice_number: string;
   items: InvoiceItem[];
   total_amount: string; // Changed from 'total'
-  amount_paid: string;  // Added
-  balance: string;      // Added
+  amount_paid: string; // Added
+  balance: string; // Added
   status?: string;
   status_display?: string; // Added
   due_date?: string;
@@ -30,7 +30,7 @@ interface Invoice {
     class_info?: { class_name?: string } | null;
     address?: string;
     // Note: 'parent' is not in your JSON response, but leaving it optional
-    parent?: { full_name?: string } | string; 
+    parent?: { full_name?: string } | string;
   } | null;
 }
 
@@ -70,8 +70,15 @@ export default function InvoiceViewPage({ params }: PageProps) {
             Invoice #{invoice?.invoice_number || invoiceId}
           </h1>
           <div className="flex gap-2">
-            <button onClick={goBack} className="px-4 py-2 border rounded">Back</button>
-            <button onClick={handlePrint} className="px-4 py-2 bg-slate-900 text-white rounded">Print</button>
+            <button onClick={goBack} className="px-4 py-2 border rounded">
+              Back
+            </button>
+            <button
+              onClick={handlePrint}
+              className="px-4 py-2 bg-slate-900 text-white rounded"
+            >
+              Print
+            </button>
           </div>
         </div>
 
@@ -83,22 +90,38 @@ export default function InvoiceViewPage({ params }: PageProps) {
           <p>Invoice not found.</p>
         ) : (
           <div className="bg-white p-6 rounded-lg shadow">
-            
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="font-semibold text-lg">Student Details:</h2>
-                <p><strong>Name:</strong> {invoice.student?.full_name || "—"}</p>
-                <p><strong>Admission No:</strong> {invoice.student?.admission_number || "—"}</p>
-                <p><strong>Class:</strong> {invoice.student?.class_info?.class_name || "—"}</p>
+                <p>
+                  <strong>Name:</strong> {invoice.student?.full_name || "—"}
+                </p>
+                <p>
+                  <strong>Admission No:</strong>{" "}
+                  {invoice.student?.admission_number || "—"}
+                </p>
+                <p>
+                  <strong>Class:</strong>{" "}
+                  {invoice.student?.class_info?.class_name || "—"}
+                </p>
                 {/* Kept parent just in case your API sometimes returns it, otherwise it shows '—' */}
-                <p><strong>Parent:</strong> {typeof invoice.student?.parent === "string" ? invoice.student.parent : invoice.student?.parent?.full_name || "—"}</p>
+                <p>
+                  <strong>Parent:</strong>{" "}
+                  {typeof invoice.student?.parent === "string"
+                    ? invoice.student.parent
+                    : invoice.student?.parent?.full_name || "—"}
+                </p>
               </div>
-              
+
               <div className="text-right">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${invoice.status === 'unpaid' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${invoice.status === "unpaid" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"}`}
+                >
                   {invoice.status_display || invoice.status}
                 </span>
-                <p className="mt-2 text-sm text-gray-600">Due Date: {invoice.due_date}</p>
+                <p className="mt-2 text-sm text-gray-600">
+                  Due Date: {invoice.due_date}
+                </p>
               </div>
             </div>
 
@@ -119,12 +142,17 @@ export default function InvoiceViewPage({ params }: PageProps) {
                       <td className="border px-3 py-2">{item.qty}</td>
                       <td className="border px-3 py-2">{item.amount}</td>
                       {/* Note: Ensure item.unit_price and qty are numbers if multiplying */}
-                      <td className="border px-3 py-2">{Number(item.amount)}</td>
+                      <td className="border px-3 py-2">
+                        {Number(item.amount)}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="border px-3 py-4 text-center text-gray-500">
+                    <td
+                      colSpan={4}
+                      className="border px-3 py-4 text-center text-gray-500"
+                    >
                       No items found on this invoice.
                     </td>
                   </tr>
@@ -135,15 +163,15 @@ export default function InvoiceViewPage({ params }: PageProps) {
             {/* 2. Updated to use the correct amounts from the API */}
             <div className="mt-6 text-right space-y-2 border-t pt-4 w-64 ml-auto">
               <div className="flex justify-between text-gray-600">
-                <span>Total Amount:</span> 
+                <span>Total Amount:</span>
                 <span>₵ {invoice.total_amount}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>Amount Paid:</span> 
+                <span>Amount Paid:</span>
                 <span>₵ {invoice.amount_paid}</span>
               </div>
               <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                <span>Balance:</span> 
+                <span>Balance:</span>
                 <span>₵ {invoice.balance}</span>
               </div>
             </div>

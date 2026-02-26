@@ -1,6 +1,6 @@
-"use client"; 
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const SkeletonRow = ({ columns }: { columns: number }) => {
   const [mounted, setMounted] = useState(false);
@@ -16,9 +16,9 @@ const SkeletonRow = ({ columns }: { columns: number }) => {
           <div
             className="skeleton-box"
             style={{
-              width: mounted 
-                ? `${Math.floor(Math.random() * (80 - 40 + 1) + 40)}%` 
-                : "70%" 
+              width: mounted
+                ? `${Math.floor(Math.random() * (80 - 40 + 1) + 40)}%`
+                : "70%",
             }}
           />
         </td>
@@ -35,7 +35,7 @@ export default function SkeletonTable({ rows = 5, columns = 4 }) {
           <tr>
             {Array.from({ length: columns }).map((_, i) => (
               <th key={i}>
-                <div className="skeleton-box" style={{ width: '50px' }} />
+                <div className="skeleton-box" style={{ width: "50px" }} />
               </th>
             ))}
           </tr>

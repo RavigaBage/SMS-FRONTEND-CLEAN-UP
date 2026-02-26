@@ -4,7 +4,7 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  role: 'admin' | 'teacher' | 'student' | 'parent';
+  role: "admin" | "teacher" | "student" | "parent";
 }
 
 export interface Student {
@@ -16,12 +16,12 @@ export interface Student {
   date_of_birth: string | null;
   profileImage: string;
   email: string;
-  classInfo: any,
-  gender:String;
-  gender_display:String;
+  classInfo: any;
+  gender: String;
+  gender_display: String;
   grade: string;
   enrollmentDate: string;
-  status: 'active' | 'graduated' | 'inactive';
+  status: "active" | "graduated" | "inactive";
   parent?: {
     id: number;
     phone_number: string;
@@ -29,13 +29,12 @@ export interface Student {
   };
 }
 
-
 export interface StudentListItem {
   id: number;
   fullName: string;
   email: string;
   grade: string;
   enrollmentDate: string;
-  status: 'active' | 'graduated' | 'inactive';
+  status: "active" | "graduated" | "inactive";
   profileImage: string;
 }

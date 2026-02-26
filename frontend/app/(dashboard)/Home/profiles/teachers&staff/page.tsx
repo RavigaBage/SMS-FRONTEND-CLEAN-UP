@@ -3,31 +3,32 @@
 import { useState, useEffect } from "react";
 import { UserPlus, Search, Download } from "lucide-react";
 import { apiRequest, ApiResponse } from "@/src/lib/apiClient";
-import { StaffTable, StaffMember } from "@/src/assets/components/management/StaffTable";
+import {
+  StaffTable,
+  StaffMember,
+} from "@/src/assets/components/management/StaffTable";
 import { AddStaffModal } from "@/src/assets/components/management/AddStaff";
 import { Pagination } from "@/src/assets/components/management/Pagination";
 import { StaffFilters } from "@/src/assets/components/management/StaffFilters";
-import '@/styles/staff-dr.css';
+import "@/styles/staff-dr.css";
 
 interface StaffApiData {
   user_id?: number;
   id: number;
   first_name: string;
   last_name: string;
-  staff_type_display?:String;
+  staff_type_display?: String;
   role?: string;
   department?: string;
-  specialization?:String;
+  specialization?: String;
   email: string;
   phone?: string;
   status?: string;
   profile_image?: string;
-  managed_classes:[];
-  assigned_subjects:[];
-  created_at:String;
-
+  managed_classes: [];
+  assigned_subjects: [];
+  created_at: String;
 }
-
 
 export default function StaffDirectoryPage() {
   // State Management
@@ -55,7 +56,7 @@ export default function StaffDirectoryPage() {
     setFilters({
       role: "",
       dept: "",
-      status: ""
+      status: "",
     });
     setCurrentPage(1);
   };
@@ -72,31 +73,33 @@ export default function StaffDirectoryPage() {
         ...(filters.status && { status: filters.status }),
       });
 
-      const response: ApiResponse<StaffApiData | StaffApiData[]> = await apiRequest<StaffApiData>(
-        `/staff/?${queryParams}`,
-        { method: "GET" }
-      );
+      const response: ApiResponse<StaffApiData | StaffApiData[]> =
+        await apiRequest<StaffApiData>(`/staff/?${queryParams}`, {
+          method: "GET",
+        });
       console.log(response);
 
       // Extract the results array from the normalized response
       const results = (response.results || []) as StaffApiData[];
 
       const formattedStaff: StaffMember[] = results.map((s) => ({
-          id: String(s.user_id || s.id), 
-          fullName: `${s.first_name} ${s.last_name}`,
-          // Force lowercase 'string' using String() constructor or type assertion
-          role: String(s.staff_type_display || "Staff"), 
-          department: String(s.specialization || "General"),
-          email: String(s.email),
-          phone: String(s.phone || "N/A"),
-          status: (s.status || "Active") as "Active" | "On Leave" | "Inactive",
-          profileImage: s.profile_image || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}`,
-          // Add these to match the new interface
-          specialization: s.specialization ? String(s.specialization) : undefined,
-          managed_classes: s.managed_classes || [],
-          assigned_subjects: s.assigned_subjects || [],
-          created_at:s.created_at || ""
-        }));
+        id: String(s.user_id || s.id),
+        fullName: `${s.first_name} ${s.last_name}`,
+        // Force lowercase 'string' using String() constructor or type assertion
+        role: String(s.staff_type_display || "Staff"),
+        department: String(s.specialization || "General"),
+        email: String(s.email),
+        phone: String(s.phone || "N/A"),
+        status: (s.status || "Active") as "Active" | "On Leave" | "Inactive",
+        profileImage:
+          s.profile_image ||
+          `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}`,
+        // Add these to match the new interface
+        specialization: s.specialization ? String(s.specialization) : undefined,
+        managed_classes: s.managed_classes || [],
+        assigned_subjects: s.assigned_subjects || [],
+        created_at: s.created_at || "",
+      }));
 
       setStaff(formattedStaff);
       setTotalResults(response.count || 0);
@@ -120,7 +123,6 @@ export default function StaffDirectoryPage() {
   const totalPages = Math.ceil(totalResults / resultsPerPage);
 
   return (
-    
     <div className="staff-page">
       {/* Header */}
       <div className="staff-header">
@@ -181,6 +183,5 @@ export default function StaffDirectoryPage() {
         }}
       />
     </div>
-
   );
 }

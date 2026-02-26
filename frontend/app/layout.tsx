@@ -1,18 +1,18 @@
-import type { Metadata, Viewport } from 'next'
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: 'swap',
+  display: "swap",
   preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-  display: 'swap',
+  display: "swap",
   preload: true,
 });
 
@@ -21,7 +21,8 @@ export const metadata: Metadata = {
     default: "School Management System",
     template: "%s | School Management System",
   },
-  description: "Comprehensive school management system for managing students, staff, classes, grades, attendance, and more.",
+  description:
+    "Comprehensive school management system for managing students, staff, classes, grades, attendance, and more.",
   keywords: [
     "school management",
     "student management",
@@ -37,36 +38,40 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  ),
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     title: "School Management System",
-    description: "Comprehensive school management system for managing students, staff, classes, grades, attendance, and more.",
+    description:
+      "Comprehensive school management system for managing students, staff, classes, grades, attendance, and more.",
     siteName: "School Management System",
   },
   twitter: {
     card: "summary_large_image",
     title: "School Management System",
-    description: "Comprehensive school management system for managing students, staff, classes, grades, attendance, and more.",
+    description:
+      "Comprehensive school management system for managing students, staff, classes, grades, attendance, and more.",
   },
   robots: {
-    index: process.env.NODE_ENV === 'production',
-    follow: process.env.NODE_ENV === 'production',
+    index: process.env.NODE_ENV === "production",
+    follow: process.env.NODE_ENV === "production",
     googleBot: {
-      index: process.env.NODE_ENV === 'production',
-      follow: process.env.NODE_ENV === 'production',
+      index: process.env.NODE_ENV === "production",
+      follow: process.env.NODE_ENV === "production",
     },
   },
 };
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: '#ffffff',
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -78,8 +83,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
         <meta httpEquiv="X-Frame-Options" content="DENY" />
         <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />

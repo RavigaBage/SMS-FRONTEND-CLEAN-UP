@@ -1,4 +1,8 @@
-import type { Invoice, InvoiceFilters, InvoiceListResponse } from "@/src/assets/types/invoice";
+import type {
+  Invoice,
+  InvoiceFilters,
+  InvoiceListResponse,
+} from "@/src/assets/types/invoice";
 
 // ─── Core API Response Shape ──────────────────────────────────────────────────
 
@@ -18,7 +22,7 @@ export interface ApiResponse<T> {
 
 export async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   const baseUrl =
     process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000/api";
@@ -38,7 +42,7 @@ export async function apiRequest<T>(
   } catch (error) {
     console.error("Network Error:", error);
     throw new Error(
-      "SERVER_OFFLINE: Unable to connect to the server. Please check your connection or backend status."
+      "SERVER_OFFLINE: Unable to connect to the server. Please check your connection or backend status.",
     );
   }
 
@@ -49,21 +53,20 @@ export async function apiRequest<T>(
 
       const isTokenError =
         errorData.code === "token_not_valid" ||
-        String(errorData.detail ?? "").toLowerCase().includes("token");
+        String(errorData.detail ?? "")
+          .toLowerCase()
+          .includes("token");
 
       if (isTokenError) {
         const refreshToken = localStorage.getItem("refreshToken");
 
         if (refreshToken) {
           try {
-            const refreshRes = await fetch(
-              `${baseUrl}/auth/refresh/`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ refresh: refreshToken }),
-              }
-            );
+            const refreshRes = await fetch(`${baseUrl}/auth/refresh/`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refresh: refreshToken }),
+            });
 
             if (refreshRes.ok) {
               const refreshData = await refreshRes.json();
@@ -157,11 +160,13 @@ export async function apiRequest<T>(
 function buildQueryString(filters: InvoiceFilters): string {
   const params = new URLSearchParams();
 
-  if (filters.search)                              params.set("search",        filters.search);
-  if (filters.status && filters.status !== "all") params.set("status",        filters.status);
-  if (filters.term   && filters.term   !== "all") params.set("term",          filters.term);
-  if (filters.academic_year)                       params.set("academic_year", filters.academic_year);
-  if (filters.page   && filters.page   > 1)        params.set("page",          String(filters.page));
+  if (filters.search) params.set("search", filters.search);
+  if (filters.status && filters.status !== "all")
+    params.set("status", filters.status);
+  if (filters.term && filters.term !== "all") params.set("term", filters.term);
+  if (filters.academic_year) params.set("academic_year", filters.academic_year);
+  if (filters.page && filters.page > 1)
+    params.set("page", String(filters.page));
 
   const qs = params.toString();
   return qs ? `?${qs}` : "";
@@ -182,9 +187,9 @@ export const invoiceApi = {
     if (res.error) throw new Error(res.error);
 
     return {
-      results:  res.results  ?? (Array.isArray(res.data) ? res.data : []),
-      count:    res.count    ?? (Array.isArray(res.data) ? res.data.length : 0),
-      next:     res.next     ?? null,
+      results: res.results ?? (Array.isArray(res.data) ? res.data : []),
+      count: res.count ?? (Array.isArray(res.data) ? res.data.length : 0),
+      next: res.next ?? null,
       previous: res.previous ?? null,
     };
   },

@@ -1,4 +1,4 @@
-import '@/styles/enrollment.css';
+import "@/styles/enrollment.css";
 
 export default function StaffManagement() {
   const enrollmentData = [
@@ -8,7 +8,7 @@ export default function StaffManagement() {
       role: "Grade 6A",
       date: "12 Sept 2024",
       status: "active",
-      statusLabel: "Active"
+      statusLabel: "Active",
     },
     {
       id: 2,
@@ -16,7 +16,7 @@ export default function StaffManagement() {
       role: "JHS 2B",
       date: "14 Sept 2024",
       status: "pending",
-      statusLabel: "Pending"
+      statusLabel: "Pending",
     },
     {
       id: 3,
@@ -24,24 +24,27 @@ export default function StaffManagement() {
       role: "SHS 1 Science",
       date: "04 Jan 2024",
       status: "withdrawn",
-      statusLabel: "Withdrawn"
-    }
+      statusLabel: "Withdrawn",
+    },
   ];
 
   // Helper to determine status class
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'active': return 'statusActive';
-      case 'pending': return 'statusPending';
-      case 'withdrawn': return 'statusWithdrawn';
-      default: return '';
+      case "active":
+        return "statusActive";
+      case "pending":
+        return "statusPending";
+      case "withdrawn":
+        return "statusWithdrawn";
+      default:
+        return "";
     }
   };
 
   return (
     <div className="dashboardWrapper">
       <div className="dashboard">
-        
         {/* Header */}
         <header className="header">
           <div>
@@ -54,7 +57,11 @@ export default function StaffManagement() {
         {/* Controls */}
         <section className="controls">
           <div className="searchBox">
-            <input type="text" placeholder="Search student name..." aria-label="Search student name" />
+            <input
+              type="text"
+              placeholder="Search student name..."
+              aria-label="Search student name"
+            />
           </div>
 
           <div className="filters">
@@ -89,7 +96,9 @@ export default function StaffManagement() {
             <tbody>
               {enrollmentData.map((row) => (
                 <tr key={row.id}>
-                  <td style={{ fontWeight: 600, color: '#0f172a' }}>{row.name}</td>
+                  <td style={{ fontWeight: 600, color: "#0f172a" }}>
+                    {row.name}
+                  </td>
                   <td>{row.role}</td>
                   <td>{row.date}</td>
                   <td>
@@ -102,7 +111,7 @@ export default function StaffManagement() {
                       <button className="actionBtn btnView">View</button>
                       <button className="actionBtn btnEdit">Edit</button>
                       <button className="actionBtn btnRemove">
-                        {row.status === 'withdrawn' ? 'Remove' : 'Withdraw'}
+                        {row.status === "withdrawn" ? "Remove" : "Withdraw"}
                       </button>
                     </div>
                   </td>

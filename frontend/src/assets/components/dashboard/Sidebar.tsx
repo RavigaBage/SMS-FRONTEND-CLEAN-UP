@@ -1,9 +1,14 @@
-
 "use client";
 
-import { 
-  LayoutDashboard, Users, GraduationCap, 
-  School, Calendar, Settings, LogOut, Landmark 
+import {
+  LayoutDashboard,
+  Users,
+  GraduationCap,
+  School,
+  Calendar,
+  Settings,
+  LogOut,
+  Landmark,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,7 +17,11 @@ export function Sidebar() {
   const pathname = usePathname();
 
   const menuItems = [
-    { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
+    {
+      icon: <LayoutDashboard size={20} />,
+      label: "Dashboard",
+      href: "/dashboard",
+    },
     { icon: <GraduationCap size={20} />, label: "Students", href: "/students" },
     { icon: <Users size={20} />, label: "Staff", href: "/teachers&staff" },
     { icon: <School size={20} />, label: "Classes", href: "/classes" },
@@ -29,24 +38,29 @@ export function Sidebar() {
           <School size={24} />
         </div>
         <div>
-          <span className="font-bold text-xl tracking-tight text-slate-800 block leading-none">EduManager</span>
-          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase mt-1 block">Management System</span>
+          <span className="font-bold text-xl tracking-tight text-slate-800 block leading-none">
+            EduManager
+          </span>
+          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase mt-1 block">
+            Management System
+          </span>
         </div>
       </div>
 
       {/* Navigation Links */}
       <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
-          const isActive = item.label === "Students" 
-            ? pathname.startsWith("/students") 
-            : pathname === item.href;
+          const isActive =
+            item.label === "Students"
+              ? pathname.startsWith("/students")
+              : pathname === item.href;
           return (
             <Link
               key={item.label}
               href={item.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                isActive 
-                  ? "bg-cyan-50 text-cyan-600 shadow-sm shadow-cyan-100" 
+                isActive
+                  ? "bg-cyan-50 text-cyan-600 shadow-sm shadow-cyan-100"
                   : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
               }`}
             >

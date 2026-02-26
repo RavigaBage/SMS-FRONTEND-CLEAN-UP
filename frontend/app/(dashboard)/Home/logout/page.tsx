@@ -1,10 +1,9 @@
-import '@/styles/logout.css'
+import "@/styles/logout.css";
 
 export default function LogoutConfirmation() {
   return (
     <div className="logout-page">
       <div className="logout-card">
-
         <div className="brand-logo">
           <svg
             width="24"
@@ -35,8 +34,8 @@ export default function LogoutConfirmation() {
         <h2 className="logout-title">Ready to leave?</h2>
 
         <p className="logout-message">
-          Are you sure you want to log out, <strong>Admin Sarah</strong>? Make sure
-          you've saved all pending grade entries.
+          Are you sure you want to log out, <strong>Admin Sarah</strong>? Make
+          sure you've saved all pending grade entries.
         </p>
 
         <div className="session-summary">
@@ -60,7 +59,6 @@ export default function LogoutConfirmation() {
           <button className="btn btn-logout">Confirm Logout</button>
           <button className="btn btn-cancel">Stay Logged In</button>
         </div>
-
       </div>
     </div>
   );

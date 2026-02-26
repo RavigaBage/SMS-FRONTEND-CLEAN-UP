@@ -21,8 +21,6 @@ interface StudentType {
   status: "active" | "inactive" | "graduated" | string;
 }
 
-
-
 // API functions
 
 // Type Definitions
@@ -46,8 +44,6 @@ interface StudentType {
   date_of_birth: string;
   status: "active" | "inactive" | "graduated" | string;
 }
-
-
 
 interface UserType {
   id: string;
@@ -91,33 +87,36 @@ export interface ResultType {
   subject_rank?: string;
   academic_year?: string;
   term?: string;
-  remarks?:string;
+  remarks?: string;
 }
-  const buildPayload = (
-    studentId: number, classId: number, subjectId: number,
-    academicYear: string, term: string, data: Partial<ResultType>
-  ) => ({
-    student_id:           studentId,
-    class_id:             classId,
-    subject_id:           subjectId,
-    academic_year:        academicYear,
-    term:                 term,
-    assessment_score:     data.assessment_score     ?? 0,
-    assessment_total:     data.assessment_total     ?? 0,
-    test_score:           data.test_score           ?? 0,
-    test_total:           data.test_total           ?? 0,
-    exam_score:           data.exam_score           ?? 0,
-    exam_total:           data.exam_total           ?? 0,
-    weighted_assessment:  data.weighted_assessment  ?? 0,
-    weighted_test:        data.weighted_test        ?? 0,
-    weighted_exam:        data.weighted_exam        ?? 0,
-    total_score:          data.total_score          ?? 0,
-    grade_letter:         data.grade_letter         ?? 'F',
-    remarks:              data.remarks              ?? '' ,  // ← add this
-  });
+const buildPayload = (
+  studentId: number,
+  classId: number,
+  subjectId: number,
+  academicYear: string,
+  term: string,
+  data: Partial<ResultType>,
+) => ({
+  student_id: studentId,
+  class_id: classId,
+  subject_id: subjectId,
+  academic_year: academicYear,
+  term: term,
+  assessment_score: data.assessment_score ?? 0,
+  assessment_total: data.assessment_total ?? 0,
+  test_score: data.test_score ?? 0,
+  test_total: data.test_total ?? 0,
+  exam_score: data.exam_score ?? 0,
+  exam_total: data.exam_total ?? 0,
+  weighted_assessment: data.weighted_assessment ?? 0,
+  weighted_test: data.weighted_test ?? 0,
+  weighted_exam: data.weighted_exam ?? 0,
+  total_score: data.total_score ?? 0,
+  grade_letter: data.grade_letter ?? "F",
+  remarks: data.remarks ?? "", // ← add this
+});
 // API Methods
 export const gradeApi = {
-
   getGradeByParams: async ({
     studentId,
     classId,
@@ -132,7 +131,7 @@ export const gradeApi = {
     term: string;
   }): Promise<ResultType> => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/grades/by-params/?student=${studentId}&class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`
+      `${process.env.NEXT_PUBLIC_API_URL}/grades/by-params/?student=${studentId}&class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
     );
     if (!res.ok) {
       const error = await res.json();
@@ -140,7 +139,6 @@ export const gradeApi = {
     }
     return (await res.json()).grade;
   },
-
 
   createGrade: async ({
     studentId,
@@ -157,8 +155,6 @@ export const gradeApi = {
     term: string;
     data: Partial<ResultType>;
   }): Promise<ResultType> => {
-
-
     const res = await fetchWithAuth(
       `${process.env.NEXT_PUBLIC_API_URL}/grades/`,
       {
@@ -166,14 +162,18 @@ export const gradeApi = {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(buildPayload(studentId, classId, subjectId, academicYear, term, data)),
-      }
+        body: JSON.stringify(
+          buildPayload(studentId, classId, subjectId, academicYear, term, data),
+        ),
+      },
     );
-    
+
     if (!res.ok) {
       const error = await res.json();
       console.error("Create grade error:", error);
-      throw new Error(error.detail || JSON.stringify(error) || "Failed to create grade");
+      throw new Error(
+        error.detail || JSON.stringify(error) || "Failed to create grade",
+      );
     }
     return await res.json();
   },
@@ -212,7 +212,7 @@ export const gradeApi = {
       weighted_test: data.weighted_test || 0,
       weighted_exam: data.weighted_exam || 0,
       total_score: data.total_score || 0,
-      grade_letter: data.grade_letter || 'F',
+      grade_letter: data.grade_letter || "F",
     };
     const res = await fetchWithAuth(
       `${process.env.NEXT_PUBLIC_API_URL}/grades/by-params/?student=${studentId}&class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
@@ -221,17 +221,20 @@ export const gradeApi = {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(buildPayload(studentId, classId, subjectId, academicYear, term, data)),
-      }
+        body: JSON.stringify(
+          buildPayload(studentId, classId, subjectId, academicYear, term, data),
+        ),
+      },
     );
     if (!res.ok) {
       const error = await res.json();
       console.error("Update grade error:", error);
-      throw new Error(error.detail || JSON.stringify(error) || "Failed to update grade");
+      throw new Error(
+        error.detail || JSON.stringify(error) || "Failed to update grade",
+      );
     }
     return await res.json();
   },
-
 
   saveGrade: async ({
     studentId,

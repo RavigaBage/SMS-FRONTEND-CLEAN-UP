@@ -8,15 +8,15 @@
   --text-dark: #0f172a;
   --text-muted: #64748b;
   --border: #e5e7eb;
-  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   --radius: 14px;
 }
 
-.dashboardWrapper .TRANSCRIPTDATA{
+.dashboardWrapper .TRANSCRIPTDATA {
   min-height: 100vh;
   background: var(--bg);
   padding: 40px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .TRANSCRIPTDATA .dashboard {
@@ -97,7 +97,7 @@
   background: #f1f5f9;
 }
 
-.TRANSCRIPTDATA .transcriptTable th, 
+.TRANSCRIPTDATA .transcriptTable th,
 .TRANSCRIPTDATA .transcriptTable td {
   padding: 16px;
   text-align: left;
@@ -166,13 +166,13 @@
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
   transition: all 0.25s ease;
 }
 
 .TRANSCRIPTDATA .primaryBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 30px rgba(37,99,235,0.35);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
 }
 
 .TRANSCRIPTDATA .secondaryBtn {
@@ -197,10 +197,11 @@
 
 /* Print Specific Utility */
 @media print {
-  .TRANSCRIPTDATA .actions, .TRANSCRIPTDATA .header p {
+  .TRANSCRIPTDATA .actions,
+  .TRANSCRIPTDATA .header p {
     display: none;
   }
-  .dashboardWrapper .TRANSCRIPTDATA{
+  .dashboardWrapper .TRANSCRIPTDATA {
     padding: 0;
     background: white;
   }
@@ -242,11 +243,25 @@
 
 .TRANSCRIPTDATA .rankValue.gold {
   color: #d4af37; /* Gold color */
-  text-shadow: 0 0 1px rgba(0,0,0,0.1);
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
-.TRANSCRIPTDATA .statusTag.above { color: #059669; background: #ecfdf5; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
-.TRANSCRIPTDATA .statusTag.below { color: #dc2626; background: #fef2f2; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.TRANSCRIPTDATA .statusTag.above {
+  color: #059669;
+  background: #ecfdf5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.TRANSCRIPTDATA .statusTag.below {
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
 
 .TRANSCRIPTDATA .rankPill {
   background: #f1f5f9;

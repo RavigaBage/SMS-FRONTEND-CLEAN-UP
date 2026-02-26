@@ -12,6 +12,7 @@ Instead of making multiple API calls from the frontend (students, staff, payment
 This reduces network round-trips, improves perceived performance, and simplifies state management.
 
 **Main benefits**
+
 - One request instead of 4–6
 - Efficient database queries with `select_related` & aggregation
 - Clean separation of concerns
@@ -19,7 +20,7 @@ This reduces network round-trips, improves perceived performance, and simplifies
 
 ## Architecture – Data Flow
 
-```mermaid
+````mermaid
 sequenceDiagram
     participant User
     participant Browser as Next.js (HomePage)
@@ -42,8 +43,8 @@ sequenceDiagram
 
 Module for managing student-class enrollments in the school administration system.
 
-**Frontend**: Next.js (App Router / Client Component)  
-**Backend API**: Django REST Framework  
+**Frontend**: Next.js (App Router / Client Component)
+**Backend API**: Django REST Framework
 **Main Endpoint**: `/enrollments/`
 
 ## Overview
@@ -131,15 +132,15 @@ interface EnrollmentData {
 
 Page for managing academic subjects (create, view, edit, delete).
 
-**Frontend**: Next.js Client Component  
+**Frontend**: Next.js Client Component
 **Backend API**: `/subjects/`
 
 ## Overview
 
-- Displays list of subjects with name and code  
-- Add new subjects via popup  
-- Edit / Delete existing subjects  
-- Simple table with action menu per row  
+- Displays list of subjects with name and code
+- Add new subjects via popup
+- Edit / Delete existing subjects
+- Simple table with action menu per row
 - Loading skeleton during fetch
 
 ## Data Structure
@@ -165,19 +166,19 @@ interface SubjectApiResponse {
 
 Page for viewing, creating, editing and deleting academic classes.
 
-**Frontend**: Next.js Client Component  
+**Frontend**: Next.js Client Component
 **Main API Endpoints**:
-- `/classes`  
-- `/academic-years`  
+- `/classes`
+- `/academic-years`
 - `/classes/{id}/` (DELETE)
 
 ## Overview
 
-- List all classes with key information  
-- Filter by academic year  
-- Add new class via popup  
-- Edit class details  
-- Delete classes (with confirmation)  
+- List all classes with key information
+- Filter by academic year
+- Add new class via popup
+- Edit class details
+- Delete classes (with confirmation)
 - Action menu per row (Edit / Assign Teacher / Delete)
 
 ## Data Structures
@@ -221,14 +222,14 @@ interface YearsModel {
 
 Main dashboard for viewing student lists and accessing academic transcripts.
 
-**Frontend**: Next.js Client Component  
+**Frontend**: Next.js Client Component
 **Main API Endpoint**: `/enrollments/?class=...&academic_year=...`
 
 ## Purpose
 
-- Display students enrolled in a selected class and academic year  
-- Show summary statistics (total, active, on-leave)  
-- Provide quick access to individual student transcripts  
+- Display students enrolled in a selected class and academic year
+- Show summary statistics (total, active, on-leave)
+- Provide quick access to individual student transcripts
 - Filter by class and academic year
 
 ## Data Structures
@@ -257,22 +258,22 @@ export type StudentResponse = {
     class_name: string;
     status: "active" | "on_leave";
   }[];
- 
+
 };
 
 # Students Management
 
 Page for viewing, searching, adding, and managing student records.
 
-**Frontend**: Next.js Client Component  
+**Frontend**: Next.js Client Component
 **Main API Endpoint**: `GET /students/`
 
 ## Overview
 
-- Displays list of all students  
-- Client-side search by name or ID  
-- Add new student via modal  
-- Table view with formatted student data  
+- Displays list of all students
+- Client-side search by name or ID
+- Add new student via modal
+- Table view with formatted student data
 - Placeholder buttons for Filters & Export
 
 ## Data Structure
@@ -288,3 +289,4 @@ interface Student {
   status: string;
   profileImage: string;
 }
+````

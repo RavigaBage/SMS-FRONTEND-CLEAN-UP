@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import {
   Search,
   Download,
@@ -13,9 +19,9 @@ import {
   Edit,
   Plus,
 } from "lucide-react";
-import '@/styles/staffAttendance.css'
+import "@/styles/staffAttendance.css";
 import { apiRequest } from "@/src/lib/apiClient";
-import {StaffMember } from "@/src/assets/components/management/StaffTable";
+import { StaffMember } from "@/src/assets/components/management/StaffTable";
 
 /* ---------------- TYPES ---------------- */
 
@@ -78,7 +84,7 @@ export interface AttendanceSummary {
 interface FetchOptions {
   search?: string;
   date?: string;
-  role?:String;
+  role?: String;
   department?: string;
   status?: string;
   page?: number;
@@ -95,19 +101,17 @@ interface StaffApiData {
   id: number;
   first_name: string;
   last_name: string;
-  staff_type_display?:String;
+  staff_type_display?: String;
   role?: string;
   department?: string;
-  specialization?:String;
+  specialization?: String;
   email: string;
   phone?: string;
   status?: string;
   profile_image?: string;
-  managed_classes:[];
-  assigned_subjects:[];
-
+  managed_classes: [];
+  assigned_subjects: [];
 }
-
 
 /* ---------------- HELPERS ---------------- */
 
@@ -134,7 +138,8 @@ const normalizeAttendance = (raw: StaffAttendanceRaw): StaffAttendance => ({
 function unwrapArray<T>(payload: ApiResponse<T> | T[] | null | undefined): T[] {
   if (!payload) return [];
   if (Array.isArray(payload)) return payload;
-  if ((payload as ApiResponse<T>).results) return (payload as ApiResponse<T>).results as T[];
+  if ((payload as ApiResponse<T>).results)
+    return (payload as ApiResponse<T>).results as T[];
   return [];
 }
 
@@ -153,7 +158,10 @@ const buildQuery = (opts?: FetchOptions) => {
   return params.toString();
 };
 
-const createApiError = (err: unknown, defaultMessage = "An error occurred"): ApiError => {
+const createApiError = (
+  err: unknown,
+  defaultMessage = "An error occurred",
+): ApiError => {
   if (err instanceof Error) {
     return {
       message: err.message || defaultMessage,
@@ -178,7 +186,11 @@ const createApiError = (err: unknown, defaultMessage = "An error occurred"): Api
 
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 };
 
 const formatTime = (timeString: string | null): string => {
@@ -198,29 +210,32 @@ const getTodayDate = (): string => {
 /* ---------------- COMPONENT ---------------- */
 
 export default function StaffAttendancePage() {
-  const [attendanceRecords, setAttendanceRecords] = useState<StaffAttendance[]>([]);
+  const [attendanceRecords, setAttendanceRecords] = useState<StaffAttendance[]>(
+    [],
+  );
   const [summary, setSummary] = useState<AttendanceSummary>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>(getTodayDate());
-  const [departmentFilter, setDepartmentFilter] = useState<string>("All Departments");
+  const [departmentFilter, setDepartmentFilter] =
+    useState<string>("All Departments");
   const [statusFilter, setStatusFilter] = useState<string>("All Statuses");
   const [page, setPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
-  
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
-const [isSubmitting, setIsSubmitting] = useState(false);
-const [editingRecord, setEditingRecord] = useState<StaffAttendance | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<StaffAttendance | null>(
+    null,
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
 
- const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [staff, setStaff] = useState<StaffMember[]>([]);
   const [filters, setFilters] = useState({
     role: "",
     dept: "",
@@ -233,35 +248,37 @@ const [editingRecord, setEditingRecord] = useState<StaffAttendance | null>(null)
       const queryParams = new URLSearchParams({
         page: page.toString(),
         search: search,
-        ...(filters.role && { role: filters.dept}),
+        ...(filters.role && { role: filters.dept }),
         ...(filters.dept && { department: filters.dept }),
         ...(filters.status && { status: filters.status }),
       });
 
-      const response: ApiResponse<StaffApiData | StaffApiData[]> = await apiRequest<StaffApiData>(
-        `/staff/?${queryParams}`,
-        { method: "GET" }
-      );
+      const response: ApiResponse<StaffApiData | StaffApiData[]> =
+        await apiRequest<StaffApiData>(`/staff/?${queryParams}`, {
+          method: "GET",
+        });
 
       // Extract the results array from the normalized response
       const results = (response.results || []) as StaffApiData[];
 
       // Map backend data to our StaffMember interface
-   const formattedStaff: StaffMember[] = results.map((s) => ({
-      id: String(s.user_id || s.id), 
-      fullName: `${s.first_name} ${s.last_name}`,
-      role: String(s.staff_type_display || "Staff"), 
-      department: String(s.specialization || "General"),
-      email: String(s.email),
-      phone: String(s.phone || "N/A"),
-      created_at:s.created_at || '',
-      status: (s.status || "Active") as "Active" | "On Leave" | "Inactive",
-      profileImage: s.profile_image || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}`,
-      // Add these to match the new interface
-      specialization: s.specialization ? String(s.specialization) : undefined,
-      managed_classes: s.managed_classes || [],
-      assigned_subjects: s.assigned_subjects || [],
-    }));
+      const formattedStaff: StaffMember[] = results.map((s) => ({
+        id: String(s.user_id || s.id),
+        fullName: `${s.first_name} ${s.last_name}`,
+        role: String(s.staff_type_display || "Staff"),
+        department: String(s.specialization || "General"),
+        email: String(s.email),
+        phone: String(s.phone || "N/A"),
+        created_at: s.created_at || "",
+        status: (s.status || "Active") as "Active" | "On Leave" | "Inactive",
+        profileImage:
+          s.profile_image ||
+          `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}`,
+        // Add these to match the new interface
+        specialization: s.specialization ? String(s.specialization) : undefined,
+        managed_classes: s.managed_classes || [],
+        assigned_subjects: s.assigned_subjects || [],
+      }));
 
       setStaff(formattedStaff);
       setTotalResults(response.count || 0);
@@ -283,283 +300,309 @@ const [editingRecord, setEditingRecord] = useState<StaffAttendance | null>(null)
     return () => clearTimeout(delayDebounceFn);
   }, [currentPage, searchTerm, filters]);
 
-const openAddModal = () => {
-  setEditingRecord(null);
-  setFormData({
+  const openAddModal = () => {
+    setEditingRecord(null);
+    setFormData({
+      staffId: "",
+      status: "present",
+      attendanceDate: getTodayDate(),
+      checkIn: "08:00",
+      checkOut: "16:00",
+      remarks: "",
+    });
+    setIsModalOpen(true);
+  };
+
+  const OpenEditModal = (record: StaffAttendance) => {
+    setEditingRecord(record);
+    setFormData({
+      staffId: record.staffId.toString(),
+      status: record.status,
+      attendanceDate: record.attendanceDate,
+      checkIn: toTimeInput(record.checkIn),
+      checkOut: toTimeInput(record.checkOut),
+      remarks: record.remarks,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this attendance record?"))
+      return;
+
+    try {
+      await apiRequest(`/staff-attendance/${id}/`, { method: "DELETE" });
+      setAttendanceRecords((prev) => prev.filter((r) => r.id !== id));
+      // Refresh summary
+      fetchAttendanceData({ date: selectedDate });
+    } catch (err) {
+      setError("Failed to delete record");
+    }
+  };
+  // Form State
+  const [formData, setFormData] = useState({
     staffId: "",
     status: "present",
     attendanceDate: getTodayDate(),
     checkIn: "08:00",
     checkOut: "16:00",
-    remarks: ""
+    remarks: "",
   });
-  setIsModalOpen(true);
-};
-
-const OpenEditModal = (record: StaffAttendance) => {
-  setEditingRecord(record);
-  setFormData({
-    staffId: record.staffId.toString(),
-    status: record.status,
-    attendanceDate: record.attendanceDate,
-    checkIn: toTimeInput(record.checkIn),
-  checkOut: toTimeInput(record.checkOut),
-    remarks: record.remarks
-  });
-  setIsModalOpen(true);
-};
-
-const handleDelete = async (id: number) => {
-  if (!confirm("Are you sure you want to delete this attendance record?")) return;
-  
-  try {
-    await apiRequest(`/staff-attendance/${id}/`, { method: "DELETE" });
-    setAttendanceRecords(prev => prev.filter(r => r.id !== id));
-    // Refresh summary
-    fetchAttendanceData({ date: selectedDate });
-  } catch (err) {
-    setError("Failed to delete record");
-  }
-};
-// Form State
-const [formData, setFormData] = useState({
-  staffId: "",
-  status: "present",
-  attendanceDate: getTodayDate(),
-  checkIn: "08:00",
-  checkOut: "16:00",
-  remarks: ""
-});
 
   /* ---------------- EFFECTS ---------------- */
 
- // ── Replace your three separate useEffects with these two ──────────────────
+  // ── Replace your three separate useEffects with these two ──────────────────
 
-// 1. Staff fetch — debounced
-useEffect(() => {
-  const t = setTimeout(() => fetchStaff(currentPage, searchTerm), 300);
-  return () => clearTimeout(t);
-}, [currentPage, searchTerm, filters]);
+  // 1. Staff fetch — debounced
+  useEffect(() => {
+    const t = setTimeout(() => fetchStaff(currentPage, searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [currentPage, searchTerm, filters]);
 
-// 2. Attendance fetch — single consolidated effect
-useEffect(() => {
-  // Skip if a fetch is already in flight
-  if (abortControllerRef.current) {
-    abortControllerRef.current.abort();
-  }
-  
-  setPage(1); // reset page when filters change
-  setError(null); // clear previous error before new fetch
+  // 2. Attendance fetch — single consolidated effect
+  useEffect(() => {
+    // Skip if a fetch is already in flight
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
 
-  const t = setTimeout(() => {
+    setPage(1); // reset page when filters change
+    setError(null); // clear previous error before new fetch
+
+    const t = setTimeout(() => {
+      fetchAttendanceData({
+        search: searchTerm.trim(),
+        date: selectedDate,
+        department: departmentFilter,
+        role: departmentFilter,
+        status: statusFilter,
+        page: 1,
+      });
+    }, 400); // debounce attendance fetch too
+
+    return () => clearTimeout(t);
+  }, [searchTerm, selectedDate, departmentFilter, statusFilter]);
+
+  // 3. Separate effect only for page changes (not filter changes)
+  useEffect(() => {
+    if (page === 1) return; // avoid double-fetch on filter reset
     fetchAttendanceData({
       search: searchTerm.trim(),
       date: selectedDate,
       department: departmentFilter,
       role: departmentFilter,
       status: statusFilter,
-      page: 1,
+      page,
     });
-  }, 400); // debounce attendance fetch too
-
-  return () => clearTimeout(t);
-}, [searchTerm, selectedDate, departmentFilter, statusFilter]);
-
-// 3. Separate effect only for page changes (not filter changes)
-useEffect(() => {
-  if (page === 1) return; // avoid double-fetch on filter reset
-  fetchAttendanceData({
-    search: searchTerm.trim(),
-    date: selectedDate,
-    department: departmentFilter,
-    role: departmentFilter,
-    status: statusFilter,
-    page,
-  });
-}, [page]);
+  }, [page]);
 
   /* ---------------- API ---------------- */
 
-const fetchAttendanceData = useCallback(async (opts?: FetchOptions) => {
-  // Cancel any in-flight request
-  if (abortControllerRef.current) {
-    abortControllerRef.current.abort();
-  }
-  abortControllerRef.current = new AbortController();
-  const signal = abortControllerRef.current.signal;
+  const fetchAttendanceData = useCallback(async (opts?: FetchOptions) => {
+    // Cancel any in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
 
-  setLoading(true);
-  // Don't clear error here — cleared before fetch starts in the effect
+    setLoading(true);
+    // Don't clear error here — cleared before fetch starts in the effect
 
-  try {
-    const query = buildQuery(opts ?? {});
-    const [listResult, summaryResult] = await Promise.allSettled([
-      apiRequest<ApiResponse<StaffAttendanceRaw>>(`/staff-attendance/?${query}`, { method: "GET", signal }),
-      apiRequest<AttendanceSummary>(`/staff-attendance/?date=${opts?.date || getTodayDate()}`, { method: "GET", signal }),
-    ]);
+    try {
+      const query = buildQuery(opts ?? {});
+      const [listResult, summaryResult] = await Promise.allSettled([
+        apiRequest<ApiResponse<StaffAttendanceRaw>>(
+          `/staff-attendance/?${query}`,
+          { method: "GET", signal },
+        ),
+        apiRequest<AttendanceSummary>(
+          `/staff-attendance/?date=${opts?.date || getTodayDate()}`,
+          { method: "GET", signal },
+        ),
+      ]);
 
-    if (listResult.status === "fulfilled") {
-      const rawList = unwrapArray(listResult.value as any);
-      const normalized = rawList.map(normalizeAttendance as any);
-      setAttendanceRecords(normalized as any);
-      setSummary(calculateSummary(normalized as any));
-      setTotalCount(listResult.value?.count ?? rawList.length);
-    } else if (listResult.reason?.name !== "AbortError") {
-      // ✅ Set error ONCE — don't re-throw
-      setError("Failed to fetch attendance records. Please try again.");
+      if (listResult.status === "fulfilled") {
+        const rawList = unwrapArray(listResult.value as any);
+        const normalized = rawList.map(normalizeAttendance as any);
+        setAttendanceRecords(normalized as any);
+        setSummary(calculateSummary(normalized as any));
+        setTotalCount(listResult.value?.count ?? rawList.length);
+      } else if (listResult.reason?.name !== "AbortError") {
+        // ✅ Set error ONCE — don't re-throw
+        setError("Failed to fetch attendance records. Please try again.");
+        setAttendanceRecords([]);
+        setTotalCount(0);
+      }
+
+      // Summary failure is non-critical — log but don't show error to user
+      if (
+        summaryResult.status === "rejected" &&
+        summaryResult.reason?.name !== "AbortError"
+      ) {
+        console.warn("Summary fetch failed:", summaryResult.reason);
+      }
+    } catch (err) {
+      if ((err as Error)?.name === "AbortError") return;
+      // ✅ Only reaches here for truly unexpected errors
+      setError("Something went wrong. Please refresh the page.");
       setAttendanceRecords([]);
+      setSummary({});
       setTotalCount(0);
+    } finally {
+      setLoading(false);
+      abortControllerRef.current = null;
     }
-
-    // Summary failure is non-critical — log but don't show error to user
-    if (summaryResult.status === "rejected" && summaryResult.reason?.name !== "AbortError") {
-      console.warn("Summary fetch failed:", summaryResult.reason);
-    }
-
-  } catch (err) {
-    if ((err as Error)?.name === "AbortError") return;
-    // ✅ Only reaches here for truly unexpected errors
-    setError("Something went wrong. Please refresh the page.");
-    setAttendanceRecords([]);
-    setSummary({});
-    setTotalCount(0);
-  } finally {
-    setLoading(false);
-    abortControllerRef.current = null;
-  }
-}, []);
+  }, []);
 
   const calculateSummary = (records: StaffAttendance[]): AttendanceSummary => {
-  const total_staff = records.length;
-  let present_today = 0;
-  let late_arrivals = 0;
-  let on_leave = 0;
-  let absent = 0;
+    const total_staff = records.length;
+    let present_today = 0;
+    let late_arrivals = 0;
+    let on_leave = 0;
+    let absent = 0;
 
-  records.forEach(record => {
-    switch (record.status) {
-      case "present":
-        present_today++;
-        break;
-      case "late":
-        present_today++;
-        late_arrivals++;
-        break;
-      case "on_leave":
-        on_leave++;
-        break;
-      case "absent":
-        absent++;
-        break;
-      case "half_day":
-        present_today++;
-        break;
-    }
-  });
+    records.forEach((record) => {
+      switch (record.status) {
+        case "present":
+          present_today++;
+          break;
+        case "late":
+          present_today++;
+          late_arrivals++;
+          break;
+        case "on_leave":
+          on_leave++;
+          break;
+        case "absent":
+          absent++;
+          break;
+        case "half_day":
+          present_today++;
+          break;
+      }
+    });
 
-  const attendance_rate = total_staff ? (present_today / total_staff) * 100 : 0;
+    const attendance_rate = total_staff
+      ? (present_today / total_staff) * 100
+      : 0;
 
-  return {
-    total_staff,
-    present_today,
-    late_arrivals,
-    on_leave,
-    absent,
-    attendance_rate,
+    return {
+      total_staff,
+      present_today,
+      late_arrivals,
+      on_leave,
+      absent,
+      attendance_rate,
+    };
   };
-};
-
 
   /* ---------------- HANDLERS ---------------- */
 
   const handleExport = async () => {
     try {
-      const qs = buildQuery({ search: debouncedSearch, date: selectedDate,role: departmentFilter, department: departmentFilter, status: statusFilter });
-      window.open(`${process.env.NEXT_PUBLIC_API_URL || ""}/staff/?${qs}`, "_blank");
+      const qs = buildQuery({
+        search: debouncedSearch,
+        date: selectedDate,
+        role: departmentFilter,
+        department: departmentFilter,
+        status: statusFilter,
+      });
+      window.open(
+        `${process.env.NEXT_PUBLIC_API_URL || ""}/staff/?${qs}`,
+        "_blank",
+      );
     } catch (err) {
       console.error("Export failed:", err);
       alert("Failed to export data. Please try again.");
     }
   };
 
-  const totalPages = useMemo(() => Math.ceil((totalCount || 0) / 20), [totalCount]);
+  const totalPages = useMemo(
+    () => Math.ceil((totalCount || 0) / 20),
+    [totalCount],
+  );
 
   // Inside StaffAttendancePage component
 
+  /* ---------------- CRUD HANDLERS ---------------- */
 
-/* ---------------- CRUD HANDLERS ---------------- */
-
-const toTimeInput = (isoString: string | null): string => {
-  if (!isoString) return "";
-  const date = new Date(isoString);
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
-};
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-  
-  const payload = {
-    staff: parseInt(formData.staffId),
-    status: formData.status,
-    attendance_date: formData.attendanceDate,
-    check_in: formData.checkIn
-    ? `${formData.attendanceDate}T${formData.checkIn}:00Z`
-    : null,
-  check_out: formData.checkOut
-    ? `${formData.attendanceDate}T${formData.checkOut}:00Z`
-    : null,
-    remarks: formData.remarks
+  const toTimeInput = (isoString: string | null): string => {
+    if (!isoString) return "";
+    const date = new Date(isoString);
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
   };
 
-  try {
-    if (editingRecord) {
-      await apiRequest(`/staff-attendance/${editingRecord.id}/`, {
-        method: "PUT",
-        body: JSON.stringify(payload)
-      });
-    } else {
-      await apiRequest(`/staff-attendance/`, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const payload = {
+      staff: parseInt(formData.staffId),
+      status: formData.status,
+      attendance_date: formData.attendanceDate,
+      check_in: formData.checkIn
+        ? `${formData.attendanceDate}T${formData.checkIn}:00Z`
+        : null,
+      check_out: formData.checkOut
+        ? `${formData.attendanceDate}T${formData.checkOut}:00Z`
+        : null,
+      remarks: formData.remarks,
+    };
+
+    try {
+      if (editingRecord) {
+        await apiRequest(`/staff-attendance/${editingRecord.id}/`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await apiRequest(`/staff-attendance/`, {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      }
+      setIsModalOpen(false);
+      fetchAttendanceData({ date: selectedDate });
+
+      const updatedRecords = editingRecord
+        ? attendanceRecords.map((r) =>
+            r.id === editingRecord.id ? { ...r, ...payload } : r,
+          )
+        : [...attendanceRecords, payload];
+
+      setAttendanceRecords(updatedRecords as any);
+      setSummary(calculateSummary(updatedRecords as any));
+
+      console.log(summary);
+    } catch (err) {
+      setError("Failed to save attendance record.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsModalOpen(false);
-    fetchAttendanceData({ date: selectedDate }); 
-
-    const updatedRecords = editingRecord
-  ? attendanceRecords.map(r => (r.id === editingRecord.id ? { ...r, ...payload } : r))
-  : [...attendanceRecords, payload];
-
-setAttendanceRecords(updatedRecords as any);
-setSummary(calculateSummary(updatedRecords as any));
-
-console.log(summary);
-
-  } catch (err) {
-    setError("Failed to save attendance record.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   return (
     <div className="container staffAttendance">
       {/* Error Banner */}
       {error && (
-      <div className="error-banner"> {/* style this in your CSS */}
-        <span>{error}</span>
-        <button onClick={() => setError(null)}>×</button>
-      </div>
-    )}
+        <div className="error-banner">
+          {" "}
+          {/* style this in your CSS */}
+          <span>{error}</span>
+          <button onClick={() => setError(null)}>×</button>
+        </div>
+      )}
 
       {/* Header */}
       <header className="page-header">
         <div className="header-left">
           <h1>Staff Attendance</h1>
-          <p>Monitoring daily presence and punctuality for Academic Year 2025-26</p>
+          <p>
+            Monitoring daily presence and punctuality for Academic Year 2025-26
+          </p>
         </div>
         <div className="controls-row">
           <div className="date-picker">
@@ -576,18 +619,25 @@ console.log(summary);
               }}
             />
           </div>
-          <button className="btn btn-primary"  disabled={loading} onClick={handleExport}> 
+          <button
+            className="btn btn-primary"
+            disabled={loading}
+            onClick={handleExport}
+          >
             <Download size={18} />
             Export
           </button>
-          
-          <button className="btn btn-primary"  disabled={loading} onClick={openAddModal}> 
+
+          <button
+            className="btn btn-primary"
+            disabled={loading}
+            onClick={openAddModal}
+          >
             <Plus size={18} />
             Mark Attendance
           </button>
         </div>
       </header>
-
 
       <section className="summary-grid">
         <SummaryCard
@@ -600,15 +650,19 @@ console.log(summary);
         <SummaryCard
           label="Present Today"
           value={summary.present_today || 0}
-          percentage={(summary.present_today || 0) / (summary.total_staff || 1) * 100}
+          percentage={
+            ((summary.present_today || 0) / (summary.total_staff || 1)) * 100
+          }
           color="var(--primary-teal)"
           loading={loading}
         />
-        
+
         <SummaryCard
           label="On Leave"
           value={summary.on_leave || 0}
-          percentage={(summary.on_leave || 0) / (summary.total_staff || 1) * 100}
+          percentage={
+            ((summary.on_leave || 0) / (summary.total_staff || 1)) * 100
+          }
           color="var(--primary-blue)"
           loading={loading}
         />
@@ -646,12 +700,12 @@ console.log(summary);
               disabled={loading}
             >
               <option value="teacher">Teacher</option>
-                  <option value="headmaster">Headmaster</option>
-                  <option value="bursar">Bursar</option>
-                  <option value="admin_staff">Admin Staff</option>
-                  <option value="support_staff">Support Staff</option>
+              <option value="headmaster">Headmaster</option>
+              <option value="bursar">Bursar</option>
+              <option value="admin_staff">Admin Staff</option>
+              <option value="support_staff">Support Staff</option>
             </select>
-            
+
             <select
               className="date-picker"
               style={{ fontSize: "0.85rem" }}
@@ -685,23 +739,49 @@ console.log(summary);
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: "3rem" }}>
-                    <Loader2 className="animate-spin" size={32} style={{ margin: "0 auto 1rem", color: "var(--primary-teal)" }} />
-                    <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
+                  <td
+                    colSpan={7}
+                    style={{ textAlign: "center", padding: "3rem" }}
+                  >
+                    <Loader2
+                      className="animate-spin"
+                      size={32}
+                      style={{
+                        margin: "0 auto 1rem",
+                        color: "var(--primary-teal)",
+                      }}
+                    />
+                    <div
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        color: "#94a3b8",
+                        textTransform: "uppercase",
+                      }}
+                    >
                       Loading Attendance...
                     </div>
                   </td>
                 </tr>
               ) : attendanceRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: "3rem" }}>
-                    <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📋</div>
+                  <td
+                    colSpan={7}
+                    style={{ textAlign: "center", padding: "3rem" }}
+                  >
+                    <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>
+                      📋
+                    </div>
                     <p style={{ color: "#94a3b8" }}>
-                      {debouncedSearch || departmentFilter !== "All Departments" || statusFilter !== "All Statuses"
+                      {debouncedSearch ||
+                      departmentFilter !== "All Departments" ||
+                      statusFilter !== "All Statuses"
                         ? "No attendance records match your filters"
                         : "No attendance records for this date"}
                     </p>
-                    {(debouncedSearch || departmentFilter !== "All Departments" || statusFilter !== "All Statuses") && (
+                    {(debouncedSearch ||
+                      departmentFilter !== "All Departments" ||
+                      statusFilter !== "All Statuses") && (
                       <button
                         onClick={() => {
                           setSearchTerm("");
@@ -739,18 +819,22 @@ console.log(summary);
 
         {/* Pagination */}
         {!loading && attendanceRecords.length > 0 && totalPages > 1 && (
-          <div style={{
-            padding: "1rem",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            background: "#f8fafc",
-            borderTop: "1px solid #e2e8f0",
-          }}>
+          <div
+            style={{
+              padding: "1rem",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              background: "#f8fafc",
+              borderTop: "1px solid #e2e8f0",
+            }}
+          >
             <div style={{ fontSize: "0.875rem", color: "#64748b" }}>
               Showing {attendanceRecords.length} of {totalCount}
             </div>
-            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <div
+              style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
+            >
               <button
                 disabled={page <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -775,102 +859,129 @@ console.log(summary);
         )}
       </main>
       {isModalOpen && (
-  <div className="modal-overlay">
-    <div className="modal-content animate-in">
-      <div className="modal-header">
-        <h2 className="text-lg font-black uppercase italic">
-          {editingRecord ? "Edit Attendance" : "Take Attendance"}
-        </h2>
-        <button onClick={() => setIsModalOpen(false)} className="close-btn">×</button>
-      </div>
-      
-      <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="input-group">
-            <label>Staff ID / Name</label>
-                
-  <select
-    required
-    value={formData.staffId}
-    onChange={e => setFormData({...formData, staffId: e.target.value})}
-    disabled={!!editingRecord}
-  >
-    <option value="">Select Staff</option>
-    {staff.map(staff => (
-      <option key={staff.id} value={staff.id}>{staff.fullName}</option>
-    ))}
-  </select>
-          </div>
-          <div className="input-group">
-            <label>Status</label>
-            <select 
-              value={formData.status} 
-              onChange={e => setFormData({...formData, status: e.target.value})}
-            >
-              <option value="present">Present</option>
-              <option value="absent">Absent</option>
-              <option value="on_leave">On Leave</option>
-              <option value="half_day">Half Day</option>
-            </select>
-          </div>
-        </div>
+        <div className="modal-overlay">
+          <div className="modal-content animate-in">
+            <div className="modal-header">
+              <h2 className="text-lg font-black uppercase italic">
+                {editingRecord ? "Edit Attendance" : "Take Attendance"}
+              </h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="close-btn"
+              >
+                ×
+              </button>
+            </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="input-group">
-            <label>Check In</label>
-            <input 
-              type="time" 
-              value={formData.checkIn}
-              onChange={e => setFormData({...formData, checkIn: e.target.value})}
-            />
-          </div>
-          <div className="input-group">
-            <label>Check Out</label>
-            <input 
-              type="time" 
-              value={formData.checkOut}
-              onChange={e => setFormData({...formData, checkOut: e.target.value})}
-            />
-          </div>
-        </div>
+            <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="input-group">
+                  <label>Staff ID / Name</label>
 
-        <div className="input-group">
-          <label>Remarks</label>
-          <textarea 
-            rows={3}
-            value={formData.remarks}
-            onChange={e => setFormData({...formData, remarks: e.target.value})}
-            placeholder="Add any additional notes..."
-          />
-        </div>
+                  <select
+                    required
+                    value={formData.staffId}
+                    onChange={(e) =>
+                      setFormData({ ...formData, staffId: e.target.value })
+                    }
+                    disabled={!!editingRecord}
+                  >
+                    <option value="">Select Staff</option>
+                    {staff.map((staff) => (
+                      <option key={staff.id} value={staff.id}>
+                        {staff.fullName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="input-group">
+                  <label>Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) =>
+                      setFormData({ ...formData, status: e.target.value })
+                    }
+                  >
+                    <option value="present">Present</option>
+                    <option value="absent">Absent</option>
+                    <option value="on_leave">On Leave</option>
+                    <option value="half_day">Half Day</option>
+                  </select>
+                </div>
+              </div>
 
-        <div className="modal-footer pt-4">
-          <button 
-            type="button" 
-            onClick={() => setIsModalOpen(false)} 
-            className="btn btn-outline"
-          >
-            Cancel
-          </button>
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? <Loader2 className="animate-spin" /> : "Save Attendance"}
-          </button>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="input-group">
+                  <label>Check In</label>
+                  <input
+                    type="time"
+                    value={formData.checkIn}
+                    onChange={(e) =>
+                      setFormData({ ...formData, checkIn: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="input-group">
+                  <label>Check Out</label>
+                  <input
+                    type="time"
+                    value={formData.checkOut}
+                    onChange={(e) =>
+                      setFormData({ ...formData, checkOut: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label>Remarks</label>
+                <textarea
+                  rows={3}
+                  value={formData.remarks}
+                  onChange={(e) =>
+                    setFormData({ ...formData, remarks: e.target.value })
+                  }
+                  placeholder="Add any additional notes..."
+                />
+              </div>
+
+              <div className="modal-footer pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="btn btn-outline"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    "Save Attendance"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }
 
 /* ---------------- SUBCOMPONENTS ---------------- */
 
-function SummaryCard({ label, value, percentage, color, loading }: {
+function SummaryCard({
+  label,
+  value,
+  percentage,
+  color,
+  loading,
+}: {
   label: string;
   value: number;
   percentage: number;
@@ -881,22 +992,38 @@ function SummaryCard({ label, value, percentage, color, loading }: {
     <div className="summary-card">
       <span className="label">{label}</span>
       {loading ? (
-        <div style={{ height: "2rem", background: "#e2e8f0", borderRadius: "4px", marginBottom: "0.5rem" }} />
+        <div
+          style={{
+            height: "2rem",
+            background: "#e2e8f0",
+            borderRadius: "4px",
+            marginBottom: "0.5rem",
+          }}
+        />
       ) : (
-        <div className="value" style={{ color }}>{value.toString().padStart(2, "0")}</div>
+        <div className="value" style={{ color }}>
+          {value.toString().padStart(2, "0")}
+        </div>
       )}
       <div className="mini-chart">
-        <div className="chart-fill" style={{ width: `${Math.min(percentage, 100)}%`, background: color }}></div>
+        <div
+          className="chart-fill"
+          style={{ width: `${Math.min(percentage, 100)}%`, background: color }}
+        ></div>
       </div>
     </div>
   );
 }
 
-function AttendanceRow({ record, onEdit,
-  onDelete }: { record: StaffAttendance ,onEdit: (r: StaffAttendance) => void;
-  onDelete: (id: number) => void;}) {
-
-  
+function AttendanceRow({
+  record,
+  onEdit,
+  onDelete,
+}: {
+  record: StaffAttendance;
+  onEdit: (r: StaffAttendance) => void;
+  onDelete: (id: number) => void;
+}) {
   const getStatusClass = (status: string): string => {
     const statusMap: Record<string, string> = {
       present: "status-present",
@@ -923,7 +1050,10 @@ function AttendanceRow({ record, onEdit,
       <td>
         <div className="staff-cell">
           <div className="avatar" style={getAvatarColor(record.status)}>
-            <img src={`https://ui-avatars.com/api/?name=${record.staffName}&background=random`}   style={{ borderRadius: "50%" }} />
+            <img
+              src={`https://ui-avatars.com/api/?name=${record.staffName}&background=random`}
+              style={{ borderRadius: "50%" }}
+            />
           </div>
           <div>
             <span style={{ fontWeight: 600 }}>{record.staffName}</span>
@@ -949,34 +1079,50 @@ function AttendanceRow({ record, onEdit,
               className="chart-fill"
               style={{
                 width: `${record.punctualityScore}%`,
-                background: record.punctualityScore >= 80 ? "var(--primary-teal)" : "#ff9800",
+                background:
+                  record.punctualityScore >= 80
+                    ? "var(--primary-teal)"
+                    : "#ff9800",
               }}
             ></div>
           </div>
         ) : (
-          <div className="mini-chart" style={{ width: "80px", height: "6px", background: "#eee" }}></div>
+          <div
+            className="mini-chart"
+            style={{ width: "80px", height: "6px", background: "#eee" }}
+          ></div>
         )}
       </td>
       <td className="remarks">{record.remarks || "—"}</td>
-<td style={{ textAlign: "right" }}>
-  <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-    <button
-      className="btn btn-outline"
-      style={{ padding: "0.4rem 0.8rem", fontSize: "0.75rem", color: "var(--primary-blue) !important" }}
-      onClick={() => onEdit(record)}
-    >
-      <Edit size={14} style={{ marginRight: "4px" }} />
-      Edit
-    </button>
-    <button
-      className="btn btn-outline"
-      style={{ padding: "0.4rem 0.8rem", fontSize: "0.75rem", color: "#ef4444 !important" }}
-      onClick={() => onDelete(record.id)}
-    >
-      Delete
-    </button>
-  </div>
-</td>
+      <td style={{ textAlign: "right" }}>
+        <div
+          style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}
+        >
+          <button
+            className="btn btn-outline"
+            style={{
+              padding: "0.4rem 0.8rem",
+              fontSize: "0.75rem",
+              color: "var(--primary-blue) !important",
+            }}
+            onClick={() => onEdit(record)}
+          >
+            <Edit size={14} style={{ marginRight: "4px" }} />
+            Edit
+          </button>
+          <button
+            className="btn btn-outline"
+            style={{
+              padding: "0.4rem 0.8rem",
+              fontSize: "0.75rem",
+              color: "#ef4444 !important",
+            }}
+            onClick={() => onDelete(record.id)}
+          >
+            Delete
+          </button>
+        </div>
+      </td>
     </tr>
   );
 }

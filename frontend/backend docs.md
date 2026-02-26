@@ -83,19 +83,19 @@ GET /accounts/get_jwt_token_by_client_id/?client_id=frontend123
 Example Frontend Login Request
 
 const handleLogin = async (e) => {
-  e.preventDefault();
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  const data = await res.json();
-  if (res.ok && data.responseCode === 0) {
-    localStorage.setItem("accessToken", data.data.access);
-    localStorage.setItem("refreshToken", data.data.refresh);
-  } else {
-    console.error("Login failed:", data.responseMessage);
-  }
+e.preventDefault();
+const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login/`, {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ username, password }),
+});
+const data = await res.json();
+if (res.ok && data.responseCode === 0) {
+localStorage.setItem("accessToken", data.data.access);
+localStorage.setItem("refreshToken", data.data.refresh);
+} else {
+console.error("Login failed:", data.responseMessage);
+}
 };
 
 Testing
@@ -109,7 +109,9 @@ Expected output:
 Creating test database for alias 'default'...
 System check identified no issues (0 silenced).
 ....
-----------------------------------------------------------------------
+
+---
+
 Ran 4 tests in 12.049s
 
 OK

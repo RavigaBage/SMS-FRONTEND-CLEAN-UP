@@ -61,7 +61,7 @@ export const TopNav: React.FC<TopNavProps> = ({ loading = false }) => {
 
             <Image
               src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                userName || "User"
+                userName || "User",
               )}&background=random`}
               alt="User avatar"
               width={40}

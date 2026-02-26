@@ -1,5 +1,5 @@
-import React from 'react';
-import '@/styles/management_1.css'; // Adjust the path as needed
+import React from "react";
+import "@/styles/management_1.css"; // Adjust the path as needed
 
 export default function StaffProfilePage() {
   return (
@@ -11,7 +11,16 @@ export default function StaffProfilePage() {
           <div className="headerActions">
             <input type="text" className="searchBar" placeholder="Search..." />
             <div className="iconBtn">
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+              >
+                <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
             </div>
           </div>
         </header>
@@ -21,12 +30,17 @@ export default function StaffProfilePage() {
           <div className="profileHeader">
             <div className="profileInfo">
               <div className="profileAvatar">
-                <img src="https://via.placeholder.com/120" alt="Sarah Jenkins" />
+                <img
+                  src="https://via.placeholder.com/120"
+                  alt="Sarah Jenkins"
+                />
                 <div className="onlineStatus"></div>
               </div>
               <div className="profileText">
                 <h1>Sarah Jenkins</h1>
-                <p className="profileMeta">HOD Science • Senior Faculty • Staff ID: EDU-2025-084</p>
+                <p className="profileMeta">
+                  HOD Science • Senior Faculty • Staff ID: EDU-2025-084
+                </p>
               </div>
             </div>
             <div className="profileActions">
@@ -41,7 +55,9 @@ export default function StaffProfilePage() {
           <div className="statCard">
             <div className="statHeader">
               <span className="statTitle">Attendance Rate</span>
-              <div className="statIcon" style={{ color: '#48bb78' }}>●</div>
+              <div className="statIcon" style={{ color: "#48bb78" }}>
+                ●
+              </div>
             </div>
             <div className="statValue">98.4%</div>
             <div className="statMeta">
@@ -51,7 +67,9 @@ export default function StaffProfilePage() {
           <div className="statCard">
             <div className="statHeader">
               <span className="statTitle">Classes Taught</span>
-              <div className="statIcon" style={{ color: '#4299e1' }}>■</div>
+              <div className="statIcon" style={{ color: "#4299e1" }}>
+                ■
+              </div>
             </div>
             <div className="statValue">142</div>
             <div className="statMeta">Academic Year 2025-26</div>
@@ -59,7 +77,9 @@ export default function StaffProfilePage() {
           <div className="statCard">
             <div className="statHeader">
               <span className="statTitle">Performance Score</span>
-              <div className="statIcon" style={{ color: '#ed8936' }}>★</div>
+              <div className="statIcon" style={{ color: "#ed8936" }}>
+                ★
+              </div>
             </div>
             <div className="statValue">4.9/5</div>
             <div className="statMeta">
@@ -112,13 +132,17 @@ export default function StaffProfilePage() {
                 <tbody>
                   <tr>
                     <td>Term 1 (2025)</td>
-                    <td><span className="grade a">A (92%)</span></td>
+                    <td>
+                      <span className="grade a">A (92%)</span>
+                    </td>
                     <td>124</td>
                     <td>Excellent</td>
                   </tr>
                   <tr>
                     <td>Term 2 (2025)</td>
-                    <td><span className="grade a">A- (89%)</span></td>
+                    <td>
+                      <span className="grade a">A- (89%)</span>
+                    </td>
                     <td>118</td>
                     <td>Good</td>
                   </tr>

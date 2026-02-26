@@ -1,4 +1,13 @@
-import { Users, UserCheck, UserX, Clock, AlertCircle,X, Loader2, Save} from "lucide-react";
+import {
+  Users,
+  UserCheck,
+  UserX,
+  Clock,
+  AlertCircle,
+  X,
+  Loader2,
+  Save,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/src/lib/apiClient";
 import { toast } from "react-hot-toast";
@@ -72,15 +81,17 @@ export function AttendanceStatsCards({ stats, attendanceRate }: StatsProps) {
   );
 }
 
-
-
 interface MarkAttendanceModalProps {
   isOpen: boolean;
   selectedDate: string;
   onClose: () => void;
 }
 
-export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAttendanceModalProps) {
+export function MarkAttendanceModal({
+  isOpen,
+  selectedDate,
+  onClose,
+}: MarkAttendanceModalProps) {
   const [loading, setLoading] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
@@ -97,7 +108,7 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
   useEffect(() => {
     if (isOpen) {
       fetchClasses();
-      setFormData(prev => ({ ...prev, attendance_date: selectedDate }));
+      setFormData((prev) => ({ ...prev, attendance_date: selectedDate }));
     }
   }, [isOpen, selectedDate]);
 
@@ -110,7 +121,7 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
   const fetchClasses = async () => {
     try {
       const res = await apiRequest<any>("/classes/", { method: "GET" });
-      setClasses(res.results as any || res);
+      setClasses((res.results as any) || res);
     } catch (err) {
       console.error("Error fetching classes:", err);
     }
@@ -118,7 +129,9 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
 
   const fetchStudents = async (classId: string) => {
     try {
-      const res = await apiRequest<any>(`/classes/${classId}/students/`, { method: "GET" });
+      const res = await apiRequest<any>(`/classes/${classId}/students/`, {
+        method: "GET",
+      });
       setStudents(res as any);
     } catch (err) {
       console.error("Error fetching students:", err);
@@ -173,7 +186,10 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container modal-md" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container modal-md"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div>
             <h2 className="modal-title">
@@ -181,7 +197,8 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
               Mark Attendance
             </h2>
             <p className="modal-subtitle">
-              Record student attendance for {new Date(selectedDate).toLocaleDateString()}
+              Record student attendance for{" "}
+              {new Date(selectedDate).toLocaleDateString()}
             </p>
           </div>
           <button className="modal-close" onClick={onClose}>
@@ -190,7 +207,9 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          {errors.general && <div className="error-alert">{errors.general}</div>}
+          {errors.general && (
+            <div className="error-alert">{errors.general}</div>
+          )}
 
           <div className="form-section">
             <div className="form-group">
@@ -219,14 +238,17 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
               <select
                 className="form-select"
                 value={formData.student_id}
-                onChange={(e) => setFormData({ ...formData, student_id: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, student_id: e.target.value })
+                }
                 required
                 disabled={!selectedClass}
               >
                 <option value="">-- Select Student --</option>
                 {students.map((student) => (
                   <option key={student.id} value={student.id}>
-                    {student.first_name} {student.last_name} - {student.admission_number}
+                    {student.first_name} {student.last_name} -{" "}
+                    {student.admission_number}
                   </option>
                 ))}
               </select>
@@ -240,7 +262,9 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
                 <select
                   className="form-select"
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, status: e.target.value })
+                  }
                   required
                 >
                   <option value="present">Present</option>
@@ -256,7 +280,9 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
                   type="time"
                   className="form-input"
                   value={formData.check_in_time}
-                  onChange={(e) => setFormData({ ...formData, check_in_time: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, check_in_time: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -268,13 +294,20 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
                 rows={3}
                 placeholder="Additional notes..."
                 value={formData.remarks}
-                onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, remarks: e.target.value })
+                }
               />
             </div>
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="secondary-button" onClick={onClose} disabled={loading}>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </button>
             <button type="submit" className="primary-button" disabled={loading}>
@@ -298,7 +331,11 @@ export function MarkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
 }
 
 // ============= BulkAttendance.tsx =============
-export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAttendanceModalProps) {
+export function BulkAttendanceModal({
+  isOpen,
+  selectedDate,
+  onClose,
+}: MarkAttendanceModalProps) {
   const [loading, setLoading] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
@@ -321,7 +358,7 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
   const fetchClasses = async () => {
     try {
       const res = await apiRequest<any>("/classes/", { method: "GET" });
-      setClasses(res.results as any || res);
+      setClasses((res.results as any) || res);
     } catch (err) {
       console.error("Error fetching classes:", err);
     }
@@ -329,14 +366,16 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
 
   const fetchStudents = async (classId: string) => {
     try {
-      const res = await apiRequest<any>(`/classes/${classId}/students/`, { method: "GET" });
-      setStudents(res.results as any || res );
+      const res = await apiRequest<any>(`/classes/${classId}/students/`, {
+        method: "GET",
+      });
+      setStudents((res.results as any) || res);
       setAttendanceData(
         res.map((s: any) => ({
           student_id: s.id,
           status: defaultStatus,
           remarks: "",
-        }))
+        })),
       );
     } catch (err) {
       console.error("Error fetching students:", err);
@@ -344,10 +383,10 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
   };
 
   const updateStudentStatus = (studentId: number, status: string) => {
-    setAttendanceData(prev =>
-      prev.map(item =>
-        item.student_id === studentId ? { ...item, status } : item
-      )
+    setAttendanceData((prev) =>
+      prev.map((item) =>
+        item.student_id === studentId ? { ...item, status } : item,
+      ),
     );
   };
 
@@ -356,7 +395,7 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
     setLoading(true);
 
     try {
-      const payload = attendanceData.map(item => ({
+      const payload = attendanceData.map((item) => ({
         ...item,
         attendance_date: selectedDate,
       }));
@@ -379,7 +418,10 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container modal-lg" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container modal-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div>
             <h2 className="modal-title">
@@ -387,7 +429,8 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
               Bulk Mark Attendance
             </h2>
             <p className="modal-subtitle">
-              Mark attendance for entire class on {new Date(selectedDate).toLocaleDateString()}
+              Mark attendance for entire class on{" "}
+              {new Date(selectedDate).toLocaleDateString()}
             </p>
           </div>
           <button className="modal-close" onClick={onClose}>
@@ -424,8 +467,8 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
                   value={defaultStatus}
                   onChange={(e) => {
                     setDefaultStatus(e.target.value);
-                    setAttendanceData(prev =>
-                      prev.map(item => ({ ...item, status: e.target.value }))
+                    setAttendanceData((prev) =>
+                      prev.map((item) => ({ ...item, status: e.target.value })),
                     );
                   }}
                 >
@@ -447,8 +490,13 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
                     </div>
                     <select
                       className="status-select-sm"
-                      value={attendanceData.find(a => a.student_id === student.id)?.status}
-                      onChange={(e) => updateStudentStatus(student.id, e.target.value)}
+                      value={
+                        attendanceData.find((a) => a.student_id === student.id)
+                          ?.status
+                      }
+                      onChange={(e) =>
+                        updateStudentStatus(student.id, e.target.value)
+                      }
                     >
                       <option value="present">Present</option>
                       <option value="absent">Absent</option>
@@ -462,7 +510,12 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: MarkAtten
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="secondary-button" onClick={onClose} disabled={loading}>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </button>
             <button
@@ -499,7 +552,12 @@ interface FilterModalProps {
   onApply: (filters: any) => void;
 }
 
-export function AttendanceFilterModal({ isOpen, filters, onClose, onApply }: FilterModalProps) {
+export function AttendanceFilterModal({
+  isOpen,
+  filters,
+  onClose,
+  onApply,
+}: FilterModalProps) {
   const [localFilters, setLocalFilters] = useState(filters);
   const [classes, setClasses] = useState<any[]>([]);
 
@@ -513,19 +571,22 @@ export function AttendanceFilterModal({ isOpen, filters, onClose, onApply }: Fil
   const fetchClasses = async () => {
     try {
       const res = await apiRequest<any>("/classes/", { method: "GET" });
-      setClasses(res.results as any || res);
+      setClasses((res.results as any) || res);
     } catch (err) {
       console.error("Error fetching classes:", err);
     }
   };
 
   const handleApply = () => {
-    const cleanedFilters = Object.entries(localFilters).reduce((acc, [key, value]) => {
-      if (value !== "" && value !== undefined) {
-        acc[key] = value;
-      }
-      return acc;
-    }, {} as any);
+    const cleanedFilters = Object.entries(localFilters).reduce(
+      (acc, [key, value]) => {
+        if (value !== "" && value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as any,
+    );
 
     onApply(cleanedFilters);
   };
@@ -539,7 +600,10 @@ export function AttendanceFilterModal({ isOpen, filters, onClose, onApply }: Fil
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container modal-sm" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container modal-sm"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div>
             <h2 className="modal-title">
@@ -559,7 +623,9 @@ export function AttendanceFilterModal({ isOpen, filters, onClose, onApply }: Fil
               <select
                 className="form-select"
                 value={localFilters.status || ""}
-                onChange={(e) => setLocalFilters({ ...localFilters, status: e.target.value })}
+                onChange={(e) =>
+                  setLocalFilters({ ...localFilters, status: e.target.value })
+                }
               >
                 <option value="">All</option>
                 <option value="present">Present</option>
@@ -574,7 +640,9 @@ export function AttendanceFilterModal({ isOpen, filters, onClose, onApply }: Fil
               <select
                 className="form-select"
                 value={localFilters.class_id || ""}
-                onChange={(e) => setLocalFilters({ ...localFilters, class_id: e.target.value })}
+                onChange={(e) =>
+                  setLocalFilters({ ...localFilters, class_id: e.target.value })
+                }
               >
                 <option value="">All Classes</option>
                 {classes.map((cls) => (
@@ -593,14 +661,24 @@ export function AttendanceFilterModal({ isOpen, filters, onClose, onApply }: Fil
                   className="form-input"
                   placeholder="Start Date"
                   value={localFilters.start_date || ""}
-                  onChange={(e) => setLocalFilters({ ...localFilters, start_date: e.target.value })}
+                  onChange={(e) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      start_date: e.target.value,
+                    })
+                  }
                 />
                 <input
                   type="date"
                   className="form-input"
                   placeholder="End Date"
                   value={localFilters.end_date || ""}
-                  onChange={(e) => setLocalFilters({ ...localFilters, end_date: e.target.value })}
+                  onChange={(e) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      end_date: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>

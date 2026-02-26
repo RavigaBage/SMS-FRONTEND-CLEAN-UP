@@ -1,7 +1,9 @@
-
 * {
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont;
 }
 
 .body {
@@ -84,7 +86,8 @@ nav a:hover {
   font-size: 18px;
 }
 
-.header h1 ,.header p{
+.header h1,
+.header p {
   margin-block-end: 0px;
   margin-block-start: 0px;
 }
@@ -125,15 +128,15 @@ nav a:hover {
   padding: 20px;
   border-radius: 16px;
 }
-.stat-card h4{
+.stat-card h4 {
   color: rgb(6, 142, 167);
   margin-block-start: 40px;
   margin-block-end: 10px;
   font-weight: 600;
   font-size: 21px;
 }
-.stat-card h2{
-    margin-block-start: 0px;
+.stat-card h2 {
+  margin-block-start: 0px;
 }
 .badge {
   font-size: 16px;
@@ -143,9 +146,18 @@ nav a:hover {
   font-weight: bolder;
 }
 
-.success { background: #c6fdf2; color: #047857; }
-.warning { background: #fdebd4; color: #ff4800; }
-.danger  { background: #fdc5c5; color: #b91c1c; }
+.success {
+  background: #c6fdf2;
+  color: #047857;
+}
+.warning {
+  background: #fdebd4;
+  color: #ff4800;
+}
+.danger {
+  background: #fdc5c5;
+  color: #b91c1c;
+}
 
 /* GRID */
 .grid {
@@ -154,12 +166,11 @@ nav a:hover {
   position: relative;
 }
 
-.fee-cardMain{
+.fee-cardMain {
   background: white;
   border-radius: 16px;
   padding: 20px;
 }
-
 
 .card {
   position: fixed;
@@ -167,7 +178,7 @@ nav a:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -191,26 +202,27 @@ nav a:hover {
   text-align: center;
   transform: scale(0);
   opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 .popup-container.active {
   transform: scale(1);
   opacity: 1;
 }
 
-
-.card-wide .fee-cardMain{
+.card-wide .fee-cardMain {
   grid-column: span 1;
   padding: 0px;
   border-radius: 16px;
   border: 1px solid #7d949b71;
 }
 
-.card-header .formData{
+.card-header .formData {
   display: flex;
-  gap:10px;
+  gap: 10px;
 }
-.formData .search_input{
+.formData .search_input {
   min-width: 200px;
   display: flex;
   align-items: center;
@@ -219,11 +231,11 @@ nav a:hover {
   background-color: #fff;
   padding-inline: 10px;
 }
-.formData .search_input input{
+.formData .search_input input {
   border-width: 0px;
   outline: none;
 }
-.card-header  a{
+.card-header a {
   text-decoration: none;
   color: #0fb9b1;
   font-weight: bolder;
@@ -255,7 +267,10 @@ nav a:hover {
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
 .add-fee-btn svg {
@@ -273,8 +288,7 @@ nav a:hover {
   box-shadow: none;
 }
 
-
-.card-header input{
+.card-header input {
   min-width: 200px;
   cursor: pointer;
   background-color: #fff;
@@ -283,7 +297,7 @@ nav a:hover {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  transition: all .2s;
+  transition: all 0.2s;
   display: flex;
   font-size: 18px;
 }
@@ -295,28 +309,28 @@ nav a:hover {
   padding: 14px 0;
   border-bottom: 1px solid #f1f5f9;
 }
-.fee-item .item_card_block{
+.fee-item .item_card_block {
   display: flex;
   flex-direction: column;
   padding-block: 10px;
   text-align: left;
 }
-.fee-item .item_card_block p{
-  color:#0fb9b1;
+.fee-item .item_card_block p {
+  color: #0fb9b1;
   margin-block-end: 0px;
   margin-block-start: 0px;
 }
-.fee-item .item_card_block strong{
+.fee-item .item_card_block strong {
   font-size: 20px;
 }
-.fee-item .amnt{
+.fee-item .amnt {
   font-weight: bold;
   font-size: 18px;
   color: #121213;
 }
 
-
-.fee-item.muted,.fee-item.muted .item_card_block p  {
+.fee-item.muted,
+.fee-item.muted .item_card_block p {
   opacity: 0.5;
   color: #a5a4a4 !important;
 }
@@ -364,7 +378,7 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
-table thead{
+table thead {
   background-color: #3195b40c;
 }
 th {
@@ -373,58 +387,58 @@ th {
   color: #3196b4;
   text-transform: uppercase;
 }
-table h1{
+table h1 {
   font-size: 20px;
   margin-block-end: 3px;
 }
-table p{
+table p {
   font-size: 18px;
 }
-th,td{
+th,
+td {
   padding: 20px;
 }
-td b{
+td b {
   font-size: 19px;
 }
-td p.desc{
+td p.desc {
   margin-block-end: 0px;
   margin-block-start: 4px;
-  color:#3196b4;
+  color: #3196b4;
 }
-tr th:nth-child(1){
+tr th:nth-child(1) {
   width: 50px;
 }
-tr input[type="checkbox"]{
+tr input[type="checkbox"] {
   width: 20px;
   height: 20px;
 }
-tr{
+tr {
   border-bottom: 1px solid #7d949b71;
 }
 
-.table_footer{
+.table_footer {
   padding: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 18px;
 }
-.trigger_btn{
+.trigger_btn {
   display: flex;
-  gap:10px;
-
+  gap: 10px;
 }
-.table_footer .button_trigger{
+.table_footer .button_trigger {
   border-radius: 5px;
   padding-block: 10px;
   padding-inline: 15px;
-  border:1px solid #ccc;
+  border: 1px solid #ccc;
   display: grid;
   place-items: center;
   cursor: pointer;
 }
-.table_footer .button_trigger:hover{
-  border:1px solid #1f1e1e;
+.table_footer .button_trigger:hover {
+  border: 1px solid #1f1e1e;
 }
 .status {
   padding: 5px 10px;
@@ -447,25 +461,26 @@ tr{
   color: #b43908;
 }
 
-.status.overdue,.status .dot {
+.status.overdue,
+.status .dot {
   background: #fee2e2;
   color: #b80c0c;
 }
-.overdue{
+.overdue {
   background: #f8dcdc61;
 }
-.status .dot{
+.status .dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
 }
-.status.overdue .dot{
+.status.overdue .dot {
   background: #b91c1c;
 }
-.status.pending .dot{
+.status.pending .dot {
   background: #ec8f03;
 }
-.status.paid .dot{
+.status.paid .dot {
   background: #047857;
 }
 .actions-cell {
@@ -492,7 +507,7 @@ tr{
   top: -20px;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   width: 180px;
   list-style: none;
   padding: 6px 0;
@@ -535,14 +550,15 @@ tr{
   border-radius: 10px;
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .btn-secondary:hover {
   background: #f1f5f9;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
-
 
 /* fees.css - Updated for functional fee structure page */
 
@@ -1122,7 +1138,8 @@ td b {
     font-size: 0.875rem;
   }
 
-  th, td {
+  th,
+  td {
     padding: 0.75rem 0.5rem;
   }
 }

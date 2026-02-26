@@ -7,18 +7,18 @@ import "@/styles/fees.css";
 import Pagination from "@/src/assets/components/dashboard/Pagnation";
 
 /* ---------- Types ---------- */
-interface Class_obj{
-  id: 1,
-  class_name: String,
-  grade_level: number,
-  section: String,
-  academic_year: number,
-  academic_year_name: String,
-  class_teacher: number,
-  teacher_name: String,
-  capacity: number,
-  current_enrollment: 10,
-  room_number: String
+interface Class_obj {
+  id: 1;
+  class_name: String;
+  grade_level: number;
+  section: String;
+  academic_year: number;
+  academic_year_name: String;
+  class_teacher: number;
+  teacher_name: String;
+  capacity: number;
+  current_enrollment: 10;
+  room_number: String;
 }
 interface FeeStructure {
   id: number;
@@ -26,7 +26,7 @@ interface FeeStructure {
   academic_year_name?: string;
   academic_year?: string;
   class_obj_id?: number;
-  class_obj:Class_obj
+  class_obj: Class_obj;
   class_name?: string;
   term: string;
   category_name: string;
@@ -68,15 +68,14 @@ function unwrap<T>(raw: unknown): T | null {
 }
 
 function normalizeFeeStructure(raw: any): FeeStructure {
-
   return {
     id: raw.id,
-    academic_year_id:  raw.academic_year?.id,
-    academic_year:raw.academic_year,
-    academic_year_name:  raw.academic_year?.year_name,
+    academic_year_id: raw.academic_year?.id,
+    academic_year: raw.academic_year,
+    academic_year_name: raw.academic_year?.year_name,
     class_obj_id: raw.class_obj_id ?? raw.class_obj?.id,
     class_name: raw.class_obj?.class_name,
-    class_obj:raw.class_obj,
+    class_obj: raw.class_obj,
     term: raw.term ?? "",
     category_name: raw.category_name ?? "",
     amount: Number(raw.amount ?? 0),
@@ -109,7 +108,7 @@ function AddEditModal({
   const [form, setForm] = useState({
     academic_year_id: record?.academic_year_id ?? "",
     class_obj_id: record?.class_obj_id ?? "",
-    academic_year:record?.academic_year??"",
+    academic_year: record?.academic_year ?? "",
     term: record?.term ?? "",
     category_name: record?.category_name ?? "",
     amount: String(record?.amount ?? ""),
@@ -123,7 +122,7 @@ function AddEditModal({
       setForm({
         academic_year_id: record.academic_year_id ?? "",
         class_obj_id: record.class_obj_id ?? "",
-        academic_year:record.academic_year ??"",
+        academic_year: record.academic_year ?? "",
         term: record.term ?? "",
         category_name: record.category_name ?? "",
         amount: String(record.amount ?? ""),
@@ -135,7 +134,7 @@ function AddEditModal({
       setForm({
         academic_year_id: "",
         class_obj_id: "",
-        academic_year:"",
+        academic_year: "",
         term: "",
         category_name: "",
         amount: "",
@@ -157,7 +156,7 @@ function AddEditModal({
     }
     const payload = {
       academic_year_id: Number(form.academic_year_id),
-      academic_year:form.academic_year_id,
+      academic_year: form.academic_year_id,
       class_obj_id: form.class_obj_id ? Number(form.class_obj_id) : null,
       term: form.term,
       category_name: form.category_name,
@@ -227,18 +226,16 @@ function AddEditModal({
           <label>
             <select
               value={form.class_obj_id}
-              onChange={(e) => setForm({ ...form, class_obj_id: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, class_obj_id: e.target.value })
+              }
             >
               <option value="">All Classes</option>
               {classes.map((cls, index) => (
-                  <option
-                    key={cls.id ?? cls.class_id ?? index}
-                    value={cls.id}
-                  >
-                    {cls.class_name}
-                  </option>
-                ))}
-
+                <option key={cls.id ?? cls.class_id ?? index} value={cls.id}>
+                  {cls.class_name}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -262,7 +259,9 @@ function AddEditModal({
             <input
               type="text"
               value={form.category_name}
-              onChange={(e) => setForm({ ...form, category_name: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, category_name: e.target.value })
+              }
               placeholder="e.g., Tuition, Library Fee, Lab Fee"
               required
             />
@@ -293,7 +292,9 @@ function AddEditModal({
             Description
             <textarea
               value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
               placeholder="Additional details about this fee"
               rows={3}
             />
@@ -303,17 +304,30 @@ function AddEditModal({
             <input
               type="checkbox"
               checked={form.is_mandatory}
-              onChange={(e) => setForm({ ...form, is_mandatory: e.target.checked })}
+              onChange={(e) =>
+                setForm({ ...form, is_mandatory: e.target.checked })
+              }
             />
             <span>Mandatory Fee</span>
           </label>
 
           <div className="modal-actions">
-            <button type="button" className="btn btn-outline" onClick={onClose} disabled={loading}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </button>
             <button type="submit" className="btn btn-teal" disabled={loading}>
-              {loading ? <Loader2 className="animate-spin" /> : isEdit ? "Save Changes" : "Create Fee"}
+              {loading ? (
+                <Loader2 className="animate-spin" />
+              ) : isEdit ? (
+                "Save Changes"
+              ) : (
+                "Create Fee"
+              )}
             </button>
           </div>
         </form>
@@ -345,13 +359,24 @@ function ConfirmDelete({
           </button>
         </div>
         <div className="p-4">
-          <p>Are you sure you want to delete this fee structure? This action cannot be undone.</p>
+          <p>
+            Are you sure you want to delete this fee structure? This action
+            cannot be undone.
+          </p>
         </div>
         <div className="modal-actions">
-          <button className="btn btn-outline" onClick={onCancel} disabled={loading}>
+          <button
+            className="btn btn-outline"
+            onClick={onCancel}
+            disabled={loading}
+          >
             Cancel
           </button>
-          <button className="btn btn-danger" onClick={onConfirm} disabled={loading}>
+          <button
+            className="btn btn-danger"
+            onClick={onConfirm}
+            disabled={loading}
+          >
             {loading ? <Loader2 className="animate-spin" /> : "Delete"}
           </button>
         </div>
@@ -365,7 +390,7 @@ export default function FinancePage() {
   const [feeStructures, setFeeStructures] = useState<FeeStructure[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [classes, setClasses] = useState<ClassOption[]>([]);
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -381,7 +406,8 @@ export default function FinancePage() {
   const [classFilter, setClassFilter] = useState("");
   const [termFilter, setTermFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [pagination, setPagination] = useState<PaginatedResponse<FeeStructure> | null>(null);
+  const [pagination, setPagination] =
+    useState<PaginatedResponse<FeeStructure> | null>(null);
   const [page, setPage] = useState(1);
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -393,18 +419,25 @@ export default function FinancePage() {
     try {
       const params = new URLSearchParams();
 
-      if (academicYearFilter) params.append("academic_year_id", academicYearFilter);
+      if (academicYearFilter)
+        params.append("academic_year_id", academicYearFilter);
       if (classFilter) params.append("class_id", classFilter);
       if (termFilter) params.append("term", termFilter);
 
-      const url = params.toString() ? `${ENDPOINT}?${params.toString()}` : ENDPOINT;
+      const url = params.toString()
+        ? `${ENDPOINT}?${params.toString()}`
+        : ENDPOINT;
 
       const raw = await apiRequest<any>(url);
-      setPagination(raw as any)
+      setPagination(raw as any);
       const payload = unwrap<any>(raw);
-      const arr = Array.isArray(payload) ? payload : Array.isArray(raw?.results) ? raw.results : [];
+      const arr = Array.isArray(payload)
+        ? payload
+        : Array.isArray(raw?.results)
+          ? raw.results
+          : [];
       const normalized = arr.map((r: any) => normalizeFeeStructure(r));
-    
+
       setFeeStructures(normalized);
     } catch (err: any) {
       console.error("Fetch fee structures failed:", err);
@@ -416,33 +449,32 @@ export default function FinancePage() {
   };
 
   // Fetch academic years for dropdown
-    const generateAcademicYears = (): any => {
+  const generateAcademicYears = (): any => {
     const currentYear = new Date().getFullYear();
-    const startYear   = 2000;
+    const startYear = 2000;
 
-    return Array.from(
-      { length: currentYear - startYear + 1 },
-      (_, i) => {
-        const year = currentYear - i;        
-        return {
-          end_date:   `${year}-${year + 1}`,
-          start_date:  year,
-          id:          i,
-          is_current:  year === currentYear,
-          year_name:  `${year}-${year + 1}`,
-        };
-      }
-    );
+    return Array.from({ length: currentYear - startYear + 1 }, (_, i) => {
+      const year = currentYear - i;
+      return {
+        end_date: `${year}-${year + 1}`,
+        start_date: year,
+        id: i,
+        is_current: year === currentYear,
+        year_name: `${year}-${year + 1}`,
+      };
+    });
   };
-
-  
 
   // Fetch classes for dropdown
   const fetchClasses = async () => {
     try {
       const raw = await apiRequest<any>(CLASSES_ENDPOINT);
       const payload = unwrap<any>(raw);
-      const arr = Array.isArray(payload) ? payload : Array.isArray(raw?.results) ? raw.results : [];
+      const arr = Array.isArray(payload)
+        ? payload
+        : Array.isArray(raw?.results)
+          ? raw.results
+          : [];
       setClasses(arr);
     } catch (err) {
       console.error("Failed to fetch classes:", err);
@@ -458,7 +490,10 @@ export default function FinancePage() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
         setTimeout(() => setShowFilters(false), 1);
       }
     };
@@ -509,11 +544,15 @@ export default function FinancePage() {
     setShowFilters(false);
   };
 
-  const activeFilterCount = [academicYearFilter, classFilter, termFilter].filter(Boolean).length;
+  const activeFilterCount = [
+    academicYearFilter,
+    classFilter,
+    termFilter,
+  ].filter(Boolean).length;
 
   // Calculate stats
   const totalRevenue = feeStructures.reduce((sum, fee) => sum + fee.amount, 0);
-  const mandatoryFees = feeStructures.filter(f => f.is_mandatory).length;
+  const mandatoryFees = feeStructures.filter((f) => f.is_mandatory).length;
 
   return (
     <div className="body">
@@ -526,7 +565,14 @@ export default function FinancePage() {
 
           <div className="actions">
             <button className="btn ghost" onClick={() => fetchFeeStructures()}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
               </svg>
               Refresh
@@ -547,7 +593,12 @@ export default function FinancePage() {
           <div className="stat-card">
             <span className="badge warning">Per Student</span>
             <h4>Average Fee Amount</h4>
-            <h2>${feeStructures.length > 0 ? (totalRevenue / feeStructures.length).toFixed(2) : '0.00'}</h2>
+            <h2>
+              $
+              {feeStructures.length > 0
+                ? (totalRevenue / feeStructures.length).toFixed(2)
+                : "0.00"}
+            </h2>
           </div>
 
           <div className="stat-card">
@@ -581,7 +632,9 @@ export default function FinancePage() {
                         <label>Academic Year</label>
                         <select
                           value={academicYearFilter}
-                          onChange={(e) => setAcademicYearFilter(e.target.value)}
+                          onChange={(e) =>
+                            setAcademicYearFilter(e.target.value)
+                          }
                         >
                           <option value="">All Years</option>
                           {academicYears.map((year) => (
@@ -607,7 +660,6 @@ export default function FinancePage() {
                               {cls.class_name}
                             </option>
                           ))}
-
                         </select>
                       </div>
 
@@ -619,7 +671,7 @@ export default function FinancePage() {
                         >
                           <option value="">All Terms</option>
                           <option value="all">All Terms (Annual)</option>
-                          <option value='1'>First Term</option>
+                          <option value="1">First Term</option>
                           <option value="2">Second Term</option>
                           <option value="3">Third Term</option>
                         </select>
@@ -663,7 +715,8 @@ export default function FinancePage() {
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="text-center py-8">
-                      <Loader2 className="animate-spin inline-block mr-2" /> Loading...
+                      <Loader2 className="animate-spin inline-block mr-2" />{" "}
+                      Loading...
                     </td>
                   </tr>
                 ) : feeStructures.length === 0 ? (
@@ -687,14 +740,18 @@ export default function FinancePage() {
                       <td>{fee.class_name || "All Classes"}</td>
                       <td>
                         <span className="badge-term">
-                          {fee.term === "all" ? "Annual" : fee.term.toUpperCase()}
+                          {fee.term === "all"
+                            ? "Annual"
+                            : fee.term.toUpperCase()}
                         </span>
                       </td>
                       <td>
                         <b>${fee.amount.toFixed(2)}</b>
                       </td>
                       <td>
-                        <span className={`status ${fee.is_mandatory ? "mandatory" : "optional"}`}>
+                        <span
+                          className={`status ${fee.is_mandatory ? "mandatory" : "optional"}`}
+                        >
                           <div className="dot" />
                           {fee.is_mandatory ? "Mandatory" : "Optional"}
                         </span>
@@ -724,16 +781,16 @@ export default function FinancePage() {
         </div>
       </main>
       <div className="footerSpace">
-          {pagination && (
-            <Pagination
-              count={pagination.count}
-              next={pagination.next}
-              previous={pagination.previous}
-              currentPage={page}
-              onPageChange={(newPage) => setPage(newPage)}
-            />
-          )}
-        </div>
+        {pagination && (
+          <Pagination
+            count={pagination.count}
+            next={pagination.next}
+            previous={pagination.previous}
+            currentPage={page}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
+        )}
+      </div>
 
       <AddEditModal
         open={modalOpen}

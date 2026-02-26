@@ -16,14 +16,14 @@ interface PayrollRecord {
   staff_id: number;
   staff_name: string;
   role?: string;
-  base_salary: number;     
+  base_salary: number;
   allowances: number;
   deductions: number;
   tax: number;
-  net_salary: number;  
+  net_salary: number;
   status: "paid" | "pending" | "failed";
-  payment_period: string;  
-  remarks?: string;      
+  payment_period: string;
+  remarks?: string;
 }
 
 function fmtPeriod(ym: string): string {
@@ -47,25 +47,27 @@ function buildMonthOptions(): { value: string; label: string }[] {
 const MONTH_OPTIONS = buildMonthOptions();
 
 function normalizeRecord(raw: any): PayrollRecord {
-  const base       = Number(raw.base_salary  ?? raw.basic_salary ?? 0);  
-  const allowances = Number(raw.allowances   ?? 0);
-  const deductions = Number(raw.deductions   ?? 0);
-  const tax        = Number(raw.tax          ?? 0);
-  const net        = Number(raw.net_salary   ?? raw.net_pay ?? (base + allowances - deductions - tax));
+  const base = Number(raw.base_salary ?? raw.basic_salary ?? 0);
+  const allowances = Number(raw.allowances ?? 0);
+  const deductions = Number(raw.deductions ?? 0);
+  const tax = Number(raw.tax ?? 0);
+  const net = Number(
+    raw.net_salary ?? raw.net_pay ?? base + allowances - deductions - tax,
+  );
 
   return {
-    id:             Number(raw.id),
-    staff_id:       raw.staff ?? raw.staff_id ?? 0,
-    staff_name:     raw.staff_name ?? raw.staff?.full_name ?? "Unknown",
-    role:           raw.role ?? raw.position ?? "",
-    base_salary:    base,
+    id: Number(raw.id),
+    staff_id: raw.staff ?? raw.staff_id ?? 0,
+    staff_name: raw.staff_name ?? raw.staff?.full_name ?? "Unknown",
+    role: raw.role ?? raw.position ?? "",
+    base_salary: base,
     allowances,
     deductions,
     tax,
-    net_salary:     net,
-    status:         (raw.status ?? "pending") as PayrollRecord["status"],
+    net_salary: net,
+    status: (raw.status ?? "pending") as PayrollRecord["status"],
     payment_period: raw.payment_period ?? "",
-    remarks:        raw.remarks ?? raw.notes ?? "",
+    remarks: raw.remarks ?? raw.notes ?? "",
   };
 }
 
@@ -73,7 +75,10 @@ const ghs = (n: number) =>
   `GHS ${Number(n).toLocaleString("en-GH", { minimumFractionDigits: 2 })}`;
 
 function AddEditModal({
-  open, record, onClose, onSaved,
+  open,
+  record,
+  onClose,
+  onSaved,
 }: {
   open: boolean;
   record?: PayrollRecord | null;
@@ -82,32 +87,32 @@ function AddEditModal({
 }) {
   const isEdit = !!record;
 
-  const [loading,      setLoading]      = useState(false);
-  const [error,        setError]        = useState<string | null>(null);
-  const [staffList,    setStaffList]    = useState<StaffOption[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [staffList, setStaffList] = useState<StaffOption[]>([]);
   const [staffLoading, setStaffLoading] = useState(false);
 
   const [form, setForm] = useState({
-    staff:          String(record?.staff_id ?? ""), 
-    base_salary:    String(record?.base_salary ?? ""), 
-    allowances:     String(record?.allowances ?? ""),
-    deductions:     String(record?.deductions ?? ""),
-    status:         (record?.status ?? "pending") as PayrollRecord["status"],
+    staff: String(record?.staff_id ?? ""),
+    base_salary: String(record?.base_salary ?? ""),
+    allowances: String(record?.allowances ?? ""),
+    deductions: String(record?.deductions ?? ""),
+    status: (record?.status ?? "pending") as PayrollRecord["status"],
     payment_period: record?.payment_period ?? "",
-    remarks:        record?.remarks ?? "",       
+    remarks: record?.remarks ?? "",
   });
 
   useEffect(() => {
     if (!open) return;
     setError(null);
     setForm({
-      staff:          String(record?.staff_id ?? ""),
-      base_salary:    String(record?.base_salary ?? ""),
-      allowances:     String(record?.allowances ?? ""),
-      deductions:     String(record?.deductions ?? ""),
-      status:         record?.status ?? "pending",
+      staff: String(record?.staff_id ?? ""),
+      base_salary: String(record?.base_salary ?? ""),
+      allowances: String(record?.allowances ?? ""),
+      deductions: String(record?.deductions ?? ""),
+      status: record?.status ?? "pending",
       payment_period: record?.payment_period ?? "",
-      remarks:        record?.remarks ?? "",
+      remarks: record?.remarks ?? "",
     });
   }, [record, open]);
 
@@ -119,8 +124,8 @@ function AddEditModal({
         const list: StaffOption[] = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.results)
-          ? res.results
-          : [];
+            ? res.results
+            : [];
         setStaffList(list);
       })
       .catch(() => setError("Could not load staff list."))
@@ -131,21 +136,23 @@ function AddEditModal({
     setForm((f) => ({ ...f, staff: staffId }));
     if (!staffId) return;
     try {
-      const res = await apiRequest<any>(`/salary-structures/?staff_id=${staffId}`);
+      const res = await apiRequest<any>(
+        `/salary-structures/?staff_id=${staffId}`,
+      );
       const structures: any[] = Array.isArray(res.data)
         ? res.data
         : Array.isArray(res.results)
-        ? res.results
-        : [];
+          ? res.results
+          : [];
       if (structures.length > 0) {
-        const s = structures[0]; 
+        const s = structures[0];
         setForm((f) => ({
           ...f,
           base_salary: String(s.base_salary ?? ""),
-          allowances:  String(
+          allowances: String(
             Number(s.housing_allowance ?? 0) +
-            Number(s.transport_allowance ?? 0) +
-            Number(s.other_allowances ?? 0)
+              Number(s.transport_allowance ?? 0) +
+              Number(s.other_allowances ?? 0),
           ),
         }));
       }
@@ -158,22 +165,31 @@ function AddEditModal({
     e.preventDefault();
     setError(null);
 
-    if (!form.staff)          { setError("Please select a staff member."); return; }
-    if (!form.payment_period) { setError("Please select a payment period."); return; }
+    if (!form.staff) {
+      setError("Please select a staff member.");
+      return;
+    }
+    if (!form.payment_period) {
+      setError("Please select a payment period.");
+      return;
+    }
     if (!form.base_salary || Number(form.base_salary) <= 0) {
       setError("Please enter a valid base salary.");
       return;
     }
 
     const payload = {
-      staff:          Number(form.staff),
-      base_salary:    Number(form.base_salary  || 0),
-      allowances:     Number(form.allowances   || 0),
-      deductions:     Number(form.deductions   || 0),
-       net_salary:    Number(form.base_salary || 0) + Number(form.allowances || 0) - Number(form.deductions || 0),
-      status:         form.status,
+      staff: Number(form.staff),
+      base_salary: Number(form.base_salary || 0),
+      allowances: Number(form.allowances || 0),
+      deductions: Number(form.deductions || 0),
+      net_salary:
+        Number(form.base_salary || 0) +
+        Number(form.allowances || 0) -
+        Number(form.deductions || 0),
+      status: form.status,
       payment_period: form.payment_period,
-      remarks:        form.remarks,
+      remarks: form.remarks,
     };
 
     setLoading(true);
@@ -210,27 +226,31 @@ function AddEditModal({
   if (!open) return null;
 
   const computedNet =
-    Number(form.base_salary  || 0) +
-    Number(form.allowances   || 0) -
-    Number(form.deductions   || 0);
+    Number(form.base_salary || 0) +
+    Number(form.allowances || 0) -
+    Number(form.deductions || 0);
 
   return (
     <div className="modal-backdrop">
       <div className="modal-card">
         <div className="modal-header">
           <h3>{isEdit ? "Edit Payroll Record" : "Add Payroll Record"}</h3>
-          <button onClick={onClose} className="icon-btn"><X size={16} /></button>
+          <button onClick={onClose} className="icon-btn">
+            <X size={16} />
+          </button>
         </div>
 
         {error && (
-          <div className="error-message" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div
+            className="error-message"
+            style={{ display: "flex", alignItems: "center", gap: 8 }}
+          >
             <AlertCircle size={14} />
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="modal-form">
-
           <label>
             Staff Member *
             <select
@@ -245,7 +265,8 @@ function AddEditModal({
               </option>
               {staffList.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.full_name}{s.role ? ` · ${s.role}` : ""}
+                  {s.full_name}
+                  {s.role ? ` · ${s.role}` : ""}
                 </option>
               ))}
             </select>
@@ -256,12 +277,16 @@ function AddEditModal({
             <select
               required
               value={form.payment_period}
-              onChange={(e) => setForm({ ...form, payment_period: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, payment_period: e.target.value })
+              }
               style={{ width: "100%" }}
             >
               <option value="">— Select month —</option>
               {MONTH_OPTIONS.map((m) => (
-                <option key={m.value} value={m.value}>{m.label}</option>
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
               ))}
             </select>
           </label>
@@ -275,7 +300,9 @@ function AddEditModal({
                 min="0"
                 required
                 value={form.base_salary}
-                onChange={(e) => setForm({ ...form, base_salary: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, base_salary: e.target.value })
+                }
                 placeholder="0.00"
               />
             </label>
@@ -286,7 +313,9 @@ function AddEditModal({
                 step="0.01"
                 min="0"
                 value={form.allowances}
-                onChange={(e) => setForm({ ...form, allowances: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, allowances: e.target.value })
+                }
                 placeholder="0.00"
               />
             </label>
@@ -305,12 +334,19 @@ function AddEditModal({
           </label>
 
           {Number(form.base_salary) > 0 && (
-            <div style={{
-              padding: "10px 14px", borderRadius: 8,
-              background: "#f0fdf4", border: "1px solid #bbf7d0",
-              fontSize: 13, color: "#166534", fontWeight: 600,
-              display: "flex", justifyContent: "space-between",
-            }}>
+            <div
+              style={{
+                padding: "10px 14px",
+                borderRadius: 8,
+                background: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                fontSize: 13,
+                color: "#166534",
+                fontWeight: 600,
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
               <span>Estimated Net Pay</span>
               <span>{ghs(computedNet)}</span>
             </div>
@@ -320,7 +356,12 @@ function AddEditModal({
             Status
             <select
               value={form.status}
-              onChange={(e) => setForm({ ...form, status: e.target.value as PayrollRecord["status"] })}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  status: e.target.value as PayrollRecord["status"],
+                })
+              }
             >
               <option value="pending">Pending</option>
               <option value="paid">Paid</option>
@@ -338,14 +379,24 @@ function AddEditModal({
           </label>
 
           <div className="modal-actions">
-            <button type="button" className="btn btn-outline" onClick={onClose} disabled={loading}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </button>
             <button type="submit" className="btn btn-teal" disabled={loading}>
-              {loading
-                ? <><Loader2 size={14} className="animate-spin" /> Saving…</>
-                : isEdit ? "Save Changes" : "Create Record"
-              }
+              {loading ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" /> Saving…
+                </>
+              ) : isEdit ? (
+                "Save Changes"
+              ) : (
+                "Create Record"
+              )}
             </button>
           </div>
         </form>
@@ -354,8 +405,16 @@ function AddEditModal({
   );
 }
 
-function ConfirmDelete({ open, onCancel, onConfirm, loading }: {
-  open: boolean; onCancel: () => void; onConfirm: () => void; loading?: boolean;
+function ConfirmDelete({
+  open,
+  onCancel,
+  onConfirm,
+  loading,
+}: {
+  open: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+  loading?: boolean;
 }) {
   if (!open) return null;
   return (
@@ -363,17 +422,34 @@ function ConfirmDelete({ open, onCancel, onConfirm, loading }: {
       <div className="modal-card small">
         <div className="modal-header">
           <h3>Confirm Delete</h3>
-          <button onClick={onCancel} className="icon-btn"><X size={16} /></button>
+          <button onClick={onCancel} className="icon-btn">
+            <X size={16} />
+          </button>
         </div>
         <div className="p-4" style={{ padding: "16px 20px" }}>
           <p style={{ color: "#475569", fontSize: 14 }}>
-            Are you sure you want to delete this payroll record? This action cannot be undone.
+            Are you sure you want to delete this payroll record? This action
+            cannot be undone.
           </p>
         </div>
         <div className="modal-actions">
-          <button className="btn btn-outline" onClick={onCancel} disabled={loading}>Cancel</button>
-          <button className="btn btn-danger" onClick={onConfirm} disabled={loading}>
-            {loading ? <Loader2 size={14} className="animate-spin" /> : "Delete"}
+          <button
+            className="btn btn-outline"
+            onClick={onCancel}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={onConfirm}
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              "Delete"
+            )}
           </button>
         </div>
       </div>
@@ -381,21 +457,33 @@ function ConfirmDelete({ open, onCancel, onConfirm, loading }: {
   );
 }
 
-
-function RunPayrollModal({ open, onClose, onDone }: {
-  open: boolean; onClose: () => void; onDone: () => void;
+function RunPayrollModal({
+  open,
+  onClose,
+  onDone,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onDone: () => void;
 }) {
-  const [period,  setPeriod]  = useState("");
+  const [period, setPeriod] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[] | null>(null);
-  const [error,   setError]   = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open) { setPeriod(""); setResults(null); setError(null); }
+    if (!open) {
+      setPeriod("");
+      setResults(null);
+      setError(null);
+    }
   }, [open]);
 
   const handleRun = async () => {
-    if (!period) { setError("Please select a payment period."); return; }
+    if (!period) {
+      setError("Please select a payment period.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -416,39 +504,69 @@ function RunPayrollModal({ open, onClose, onDone }: {
   if (!open) return null;
 
   const succeeded = results?.filter((r) => r.status === "ok").length ?? 0;
-  const skipped   = results?.filter((r) => r.status === "skipped").length ?? 0;
+  const skipped = results?.filter((r) => r.status === "skipped").length ?? 0;
 
   return (
     <div className="modal-backdrop">
       <div className="modal-card">
         <div className="modal-header">
           <h3>Run Payroll</h3>
-          <button onClick={onClose} className="icon-btn"><X size={16} /></button>
+          <button onClick={onClose} className="icon-btn">
+            <X size={16} />
+          </button>
         </div>
 
-        <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <div
+          style={{
+            padding: "20px 24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 16,
+          }}
+        >
           {error && (
-            <div className="error-message" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <AlertCircle size={14} />{error}
+            <div
+              className="error-message"
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+            >
+              <AlertCircle size={14} />
+              {error}
             </div>
           )}
 
           {!results && (
             <>
               <p style={{ fontSize: 14, color: "#475569" }}>
-                This will process salaries for <strong>all active staff</strong> for the selected period.
-                Staff who already have a record for that period will be skipped.
+                This will process salaries for <strong>all active staff</strong>{" "}
+                for the selected period. Staff who already have a record for
+                that period will be skipped.
               </p>
-              <label style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13, fontWeight: 600, color: "#374151" }}>
+              <label
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 6,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#374151",
+                }}
+              >
                 Payment Period *
                 <select
                   value={period}
                   onChange={(e) => setPeriod(e.target.value)}
-                  style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 13 }}
+                  style={{
+                    padding: "8px 12px",
+                    borderRadius: 8,
+                    border: "1px solid #e2e8f0",
+                    fontSize: 13,
+                  }}
                 >
                   <option value="">— Select month —</option>
                   {MONTH_OPTIONS.map((m) => (
-                    <option key={m.value} value={m.value}>{m.label}</option>
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -458,17 +576,71 @@ function RunPayrollModal({ open, onClose, onDone }: {
           {results && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", gap: 12 }}>
-                <div style={{ flex: 1, padding: "12px 16px", borderRadius: 10, background: "#f0fdf4", border: "1px solid #bbf7d0", textAlign: "center" }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#16a34a" }}>{succeeded}</div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#166534", textTransform: "uppercase", letterSpacing: "0.05em" }}>Processed</div>
+                <div
+                  style={{
+                    flex: 1,
+                    padding: "12px 16px",
+                    borderRadius: 10,
+                    background: "#f0fdf4",
+                    border: "1px solid #bbf7d0",
+                    textAlign: "center",
+                  }}
+                >
+                  <div
+                    style={{ fontSize: 22, fontWeight: 800, color: "#16a34a" }}
+                  >
+                    {succeeded}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "#166534",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Processed
+                  </div>
                 </div>
-                <div style={{ flex: 1, padding: "12px 16px", borderRadius: 10, background: "#fffbeb", border: "1px solid #fcd34d", textAlign: "center" }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#d97706" }}>{skipped}</div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#92400e", textTransform: "uppercase", letterSpacing: "0.05em" }}>Skipped</div>
+                <div
+                  style={{
+                    flex: 1,
+                    padding: "12px 16px",
+                    borderRadius: 10,
+                    background: "#fffbeb",
+                    border: "1px solid #fcd34d",
+                    textAlign: "center",
+                  }}
+                >
+                  <div
+                    style={{ fontSize: 22, fontWeight: 800, color: "#d97706" }}
+                  >
+                    {skipped}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "#92400e",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Skipped
+                  </div>
                 </div>
               </div>
               {skipped > 0 && (
-                <p style={{ fontSize: 12, color: "#92400e", background: "#fffbeb", padding: "8px 12px", borderRadius: 8 }}>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: "#92400e",
+                    background: "#fffbeb",
+                    padding: "8px 12px",
+                    borderRadius: 8,
+                  }}
+                >
                   Skipped staff already had a record for {fmtPeriod(period)}.
                 </p>
               )}
@@ -477,15 +649,26 @@ function RunPayrollModal({ open, onClose, onDone }: {
         </div>
 
         <div className="modal-actions">
-          <button className="btn btn-outline" onClick={onClose} disabled={loading}>
+          <button
+            className="btn btn-outline"
+            onClick={onClose}
+            disabled={loading}
+          >
             {results ? "Close" : "Cancel"}
           </button>
           {!results && (
-            <button className="btn btn-teal" onClick={handleRun} disabled={loading || !period}>
-              {loading
-                ? <><Loader2 size={14} className="animate-spin" /> Processing…</>
-                : "Run Payroll"
-              }
+            <button
+              className="btn btn-teal"
+              onClick={handleRun}
+              disabled={loading || !period}
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" /> Processing…
+                </>
+              ) : (
+                "Run Payroll"
+              )}
             </button>
           )}
         </div>
@@ -497,44 +680,49 @@ function RunPayrollModal({ open, onClose, onDone }: {
 // ─── Main Payroll Page ────────────────────────────────────────────────────────
 
 export default function PayrollPage() {
-  const [records,      setRecords]      = useState<PayrollRecord[]>([]);
-  const [loading,      setLoading]      = useState(false);
-  const [error,        setError]        = useState<string | null>(null);
+  const [records, setRecords] = useState<PayrollRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [modalOpen,    setModalOpen]    = useState(false);
-  const [editRecord,   setEditRecord]   = useState<PayrollRecord | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editRecord, setEditRecord] = useState<PayrollRecord | null>(null);
 
-  const [confirmOpen,  setConfirmOpen]  = useState(false);
-  const [toDeleteId,   setToDeleteId]   = useState<number | null>(null);
-  const [deleting,     setDeleting]     = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [toDeleteId, setToDeleteId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [runPayrollOpen, setRunPayrollOpen] = useState(false);
 
-  const [statusFilter, setStatusFilter]             = useState<"" | "paid" | "pending">("");
+  const [statusFilter, setStatusFilter] = useState<"" | "paid" | "pending">("");
   const [paymentPeriodFilter, setPaymentPeriodFilter] = useState("");
-  const [staffIdFilter, setStaffIdFilter]           = useState("");
-  const [showFilters,  setShowFilters]              = useState(false);
+  const [staffIdFilter, setStaffIdFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
-  const activeFilterCount = [statusFilter, paymentPeriodFilter, staffIdFilter].filter(Boolean).length;
+  const activeFilterCount = [
+    statusFilter,
+    paymentPeriodFilter,
+    staffIdFilter,
+  ].filter(Boolean).length;
 
   const fetchRecords = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
-      if (statusFilter)         params.append("status",         statusFilter);
-      if (paymentPeriodFilter)  params.append("payment_period", paymentPeriodFilter);
-      if (staffIdFilter)        params.append("staff_id",       staffIdFilter);
+      if (statusFilter) params.append("status", statusFilter);
+      if (paymentPeriodFilter)
+        params.append("payment_period", paymentPeriodFilter);
+      if (staffIdFilter) params.append("staff_id", staffIdFilter);
 
-      const qs  = params.toString();
+      const qs = params.toString();
       const url = qs ? `/salary-payments/?${qs}` : "/salary-payments/";
       const raw = await apiRequest<any>(url);
 
       const arr: any[] = Array.isArray(raw.data)
         ? raw.data
         : Array.isArray(raw.results)
-        ? raw.results
-        : [];
+          ? raw.results
+          : [];
 
       setRecords(arr.map(normalizeRecord));
     } catch (err: any) {
@@ -545,7 +733,9 @@ export default function PayrollPage() {
     }
   }, [statusFilter, paymentPeriodFilter, staffIdFilter]);
 
-  useEffect(() => { fetchRecords(); }, [fetchRecords]);
+  useEffect(() => {
+    fetchRecords();
+  }, [fetchRecords]);
 
   const handleDelete = async () => {
     if (!toDeleteId) return;
@@ -562,17 +752,19 @@ export default function PayrollPage() {
     }
   };
 
-  const totalBase       = records.reduce((s, r) => s + r.base_salary,  0);
-  const totalAllowances = records.reduce((s, r) => s + r.allowances,   0);
-  const totalDeductions = records.reduce((s, r) => s + r.deductions,   0);
-  const totalNet        = records.reduce((s, r) => s + r.net_salary,   0);
+  const totalBase = records.reduce((s, r) => s + r.base_salary, 0);
+  const totalAllowances = records.reduce((s, r) => s + r.allowances, 0);
+  const totalDeductions = records.reduce((s, r) => s + r.deductions, 0);
+  const totalNet = records.reduce((s, r) => s + r.net_salary, 0);
 
   return (
     <div className="container">
       <header className="header">
         <div className="header-text">
           <h1 className="page-title">Payroll Management</h1>
-          <p className="page-subtitle">Manage staff compensation and salary disbursements.</p>
+          <p className="page-subtitle">
+            Manage staff compensation and salary disbursements.
+          </p>
         </div>
 
         <div className="header-actions">
@@ -583,12 +775,21 @@ export default function PayrollPage() {
           >
             <option value="">All Months</option>
             {MONTH_OPTIONS.map((m) => (
-              <option key={m.value} value={m.value}>{m.label}</option>
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
             ))}
           </select>
 
           <button className="btn btn-outline" onClick={fetchRecords}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <polyline points="23 4 23 10 17 10" />
               <polyline points="1 20 1 14 7 14" />
               <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
@@ -596,24 +797,62 @@ export default function PayrollPage() {
             Refresh
           </button>
 
-          <button className="btn btn-teal" onClick={() => setRunPayrollOpen(true)}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <button
+            className="btn btn-teal"
+            onClick={() => setRunPayrollOpen(true)}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <rect x="2" y="5" width="20" height="14" rx="2" />
               <line x1="2" y1="10" x2="22" y2="10" />
             </svg>
             Run Payroll
           </button>
 
-          <button className="btn btn-teal" onClick={() => { setEditRecord(null); setModalOpen(true); }}>
+          <button
+            className="btn btn-teal"
+            onClick={() => {
+              setEditRecord(null);
+              setModalOpen(true);
+            }}
+          >
             <Plus size={14} /> Add
           </button>
         </div>
       </header>
 
       {error && (
-        <div className="error-message" style={{ margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
-          <AlertCircle size={14} />{error}
-          <button onClick={fetchRecords} style={{ marginLeft: "auto", fontWeight: 700, fontSize: 12, background: "none", border: "none", cursor: "pointer", color: "inherit" }}>Retry</button>
+        <div
+          className="error-message"
+          style={{
+            margin: "0 0 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <AlertCircle size={14} />
+          {error}
+          <button
+            onClick={fetchRecords}
+            style={{
+              marginLeft: "auto",
+              fontWeight: 700,
+              fontSize: 12,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "inherit",
+            }}
+          >
+            Retry
+          </button>
         </div>
       )}
 
@@ -643,21 +882,36 @@ export default function PayrollPage() {
 
           <div className="table-tools">
             <div className="filter-wrapper">
-              <button className="btn btn-outline filter-btn" onClick={() => setShowFilters((p) => !p)}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <button
+                className="btn btn-outline filter-btn"
+                onClick={() => setShowFilters((p) => !p)}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <line x1="3" y1="6" x2="21" y2="6" />
                   <line x1="6" y1="12" x2="18" y2="12" />
                   <line x1="10" y1="18" x2="14" y2="18" />
                 </svg>
                 Filters
-                {activeFilterCount > 0 && <span className="filter-badge">{activeFilterCount}</span>}
+                {activeFilterCount > 0 && (
+                  <span className="filter-badge">{activeFilterCount}</span>
+                )}
               </button>
 
               {showFilters && (
                 <div className="filter-panel">
                   <div className="filter-group">
                     <label>Status</label>
-                    <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)}>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value as any)}
+                    >
                       <option value="">All</option>
                       <option value="paid">Paid</option>
                       <option value="pending">Pending</option>
@@ -667,10 +921,15 @@ export default function PayrollPage() {
                   {/* ✅ Bug 5 fix: YYYY-MM dropdown not free-text */}
                   <div className="filter-group">
                     <label>Payment Period</label>
-                    <select value={paymentPeriodFilter} onChange={(e) => setPaymentPeriodFilter(e.target.value)}>
+                    <select
+                      value={paymentPeriodFilter}
+                      onChange={(e) => setPaymentPeriodFilter(e.target.value)}
+                    >
                       <option value="">All Months</option>
                       {MONTH_OPTIONS.map((m) => (
-                        <option key={m.value} value={m.value}>{m.label}</option>
+                        <option key={m.value} value={m.value}>
+                          {m.label}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -686,10 +945,20 @@ export default function PayrollPage() {
                   </div>
 
                   <div className="filter-actions">
-                    <button className="btn btn-outline" onClick={() => { setStatusFilter(""); setPaymentPeriodFilter(""); setStaffIdFilter(""); }}>
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => {
+                        setStatusFilter("");
+                        setPaymentPeriodFilter("");
+                        setStaffIdFilter("");
+                      }}
+                    >
                       Reset
                     </button>
-                    <button className="btn btn-teal" onClick={() => setShowFilters(false)}>
+                    <button
+                      className="btn btn-teal"
+                      onClick={() => setShowFilters(false)}
+                    >
                       Apply
                     </button>
                   </div>
@@ -719,7 +988,16 @@ export default function PayrollPage() {
                 <tr key={i}>
                   {[...Array(8)].map((_, j) => (
                     <td key={j}>
-                      <div style={{ height: 12, background: "#f1f5f9", borderRadius: 4, width: `${55 + j * 8}%`, animation: "pulse 1.5s ease-in-out infinite", animationDelay: `${j * 60}ms` }} />
+                      <div
+                        style={{
+                          height: 12,
+                          background: "#f1f5f9",
+                          borderRadius: 4,
+                          width: `${55 + j * 8}%`,
+                          animation: "pulse 1.5s ease-in-out infinite",
+                          animationDelay: `${j * 60}ms`,
+                        }}
+                      />
                     </td>
                   ))}
                 </tr>
@@ -729,7 +1007,7 @@ export default function PayrollPage() {
                 <td colSpan={8} className="text-center py-8 text-slate-500">
                   {activeFilterCount > 0
                     ? "No records match your filters."
-                    : "No payroll records yet. Click \"Run Payroll\" to generate."}
+                    : 'No payroll records yet. Click "Run Payroll" to generate.'}
                 </td>
               </tr>
             ) : (
@@ -753,7 +1031,9 @@ export default function PayrollPage() {
                   <td className="amt deduction">-{ghs(r.deductions)}</td>
                   <td className="amt net-pay">{ghs(r.net_salary)}</td>
                   <td>
-                    <span className={`badge ${r.status === "paid" ? "badge-paid" : "badge-pending"}`}>
+                    <span
+                      className={`badge ${r.status === "paid" ? "badge-paid" : "badge-pending"}`}
+                    >
                       {r.status.toUpperCase()}
                     </span>
                   </td>
@@ -761,7 +1041,10 @@ export default function PayrollPage() {
                     <button
                       className="icon-btn"
                       title="Edit"
-                      onClick={() => { setEditRecord(r); setModalOpen(true); }}
+                      onClick={() => {
+                        setEditRecord(r);
+                        setModalOpen(true);
+                      }}
                     >
                       {/* Edit (Pencil) */}
                       <svg
@@ -775,15 +1058,18 @@ export default function PayrollPage() {
                         width="16"
                         height="16"
                       >
-                        <path d="M12 20h9"/>
-                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
                       </svg>
                     </button>
 
                     <button
                       className="icon-btn"
                       title="Delete"
-                      onClick={() => { setToDeleteId(r.id); setConfirmOpen(true); }}
+                      onClick={() => {
+                        setToDeleteId(r.id);
+                        setConfirmOpen(true);
+                      }}
                     >
                       {/* Trash */}
                       <svg
@@ -797,11 +1083,11 @@ export default function PayrollPage() {
                         width="16"
                         height="16"
                       >
-                        <polyline points="3 6 5 6 21 6"/>
-                        <path d="M19 6l-1 14H6L5 6"/>
-                        <path d="M10 11v6"/>
-                        <path d="M14 11v6"/>
-                        <path d="M9 6V4h6v2"/>
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                        <path d="M9 6V4h6v2" />
                       </svg>
                     </button>
                   </td>

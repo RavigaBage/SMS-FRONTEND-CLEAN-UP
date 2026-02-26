@@ -86,7 +86,10 @@
 
 /* Print Logic */
 @media print {
-  .header, .form-section, .add-item-btn, .remove-btn {
+  .header,
+  .form-section,
+  .add-item-btn,
+  .remove-btn {
     display: none !important;
   }
   .main-grid {

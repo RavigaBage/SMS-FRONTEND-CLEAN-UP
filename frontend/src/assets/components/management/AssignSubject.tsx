@@ -19,7 +19,11 @@ interface Subject {
   grade_level: string;
 }
 
-export function AssignSubjectsModal({ isOpen, teacher, onClose }: AssignSubjectsModalProps) {
+export function AssignSubjectsModal({
+  isOpen,
+  teacher,
+  onClose,
+}: AssignSubjectsModalProps) {
   const [loading, setLoading] = useState(false);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedSubjects, setSelectedSubjects] = useState<number[]>([]);
@@ -38,7 +42,7 @@ export function AssignSubjectsModal({ isOpen, teacher, onClose }: AssignSubjects
       const res = await apiRequest<any>("/subjects/", {
         method: "GET",
       });
-      setSubjects(res.results as any || res);
+      setSubjects((res.results as any) || res);
     } catch (err: any) {
       console.error("Error fetching subjects:", err);
       toast.error("Failed to load subjects");
@@ -46,10 +50,10 @@ export function AssignSubjectsModal({ isOpen, teacher, onClose }: AssignSubjects
   };
 
   const handleToggleSubject = (subjectId: number) => {
-    setSelectedSubjects(prev =>
+    setSelectedSubjects((prev) =>
       prev.includes(subjectId)
-        ? prev.filter(id => id !== subjectId)
-        : [...prev, subjectId]
+        ? prev.filter((id) => id !== subjectId)
+        : [...prev, subjectId],
     );
   };
 
@@ -68,10 +72,10 @@ export function AssignSubjectsModal({ isOpen, teacher, onClose }: AssignSubjects
       onClose();
     } catch (err: any) {
       console.error("Error assigning subjects:", err);
-      
+
       if (err.response?.data) {
         const errorData = err.response.data;
-        
+
         if (errorData.error && errorData.detail) {
           toast.error(errorData.detail);
           setErrors({ general: errorData.detail });
@@ -90,7 +94,10 @@ export function AssignSubjectsModal({ isOpen, teacher, onClose }: AssignSubjects
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container modal-md" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container modal-md"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div>
             <h2 className="modal-title">
@@ -108,9 +115,7 @@ export function AssignSubjectsModal({ isOpen, teacher, onClose }: AssignSubjects
 
         <form onSubmit={handleSubmit} className="modal-form">
           {errors.general && (
-            <div className="error-alert">
-              {errors.general}
-            </div>
+            <div className="error-alert">{errors.general}</div>
           )}
 
           <div className="form-section">
@@ -121,14 +126,16 @@ export function AssignSubjectsModal({ isOpen, teacher, onClose }: AssignSubjects
                 subjects.map((subject) => (
                   <div
                     key={subject.id}
-                    className={`subject-card ${selectedSubjects.includes(subject.id) ? 'selected' : ''}`}
+                    className={`subject-card ${selectedSubjects.includes(subject.id) ? "selected" : ""}`}
                     onClick={() => handleToggleSubject(subject.id)}
                   >
                     <div className="subject-info">
                       <h4 className="subject-name">{subject.subject_name}</h4>
                       <p className="subject-code">{subject.subject_code}</p>
                       {subject.grade_level && (
-                        <span className="badge badge-sm">{subject.grade_level}</span>
+                        <span className="badge badge-sm">
+                          {subject.grade_level}
+                        </span>
                       )}
                     </div>
                     {selectedSubjects.includes(subject.id) && (
@@ -143,7 +150,8 @@ export function AssignSubjectsModal({ isOpen, teacher, onClose }: AssignSubjects
 
             <div className="selected-count">
               <p>
-                <strong>{selectedSubjects.length}</strong> subject{selectedSubjects.length !== 1 ? 's' : ''} selected
+                <strong>{selectedSubjects.length}</strong> subject
+                {selectedSubjects.length !== 1 ? "s" : ""} selected
               </p>
             </div>
           </div>
@@ -157,11 +165,7 @@ export function AssignSubjectsModal({ isOpen, teacher, onClose }: AssignSubjects
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="primary-button"
-              disabled={loading}
-            >
+            <button type="submit" className="primary-button" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="animate-spin" size={18} />

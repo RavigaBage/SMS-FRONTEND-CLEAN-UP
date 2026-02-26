@@ -1,6 +1,9 @@
 * {
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont;
 }
 
 body {
@@ -137,7 +140,8 @@ label {
   color: #64748b;
 }
 
-input, select {
+input,
+select {
   width: 100%;
   margin-top: 6px;
   padding: 10px;
@@ -209,9 +213,15 @@ td span {
   color: #475569;
 }
 
-.gpa.good { color: #16a34a; }
-.gpa.excellent { color: #0284c7; }
-.gpa.bad { color: #dc2626; }
+.gpa.good {
+  color: #16a34a;
+}
+.gpa.excellent {
+  color: #0284c7;
+}
+.gpa.bad {
+  color: #dc2626;
+}
 
 .danger-row {
   background: #fff7f7;

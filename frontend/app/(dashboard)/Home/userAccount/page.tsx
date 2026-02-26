@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import '@/styles/userAcc.css';
-import { apiRequest } from '@/src/lib/apiClient';
-import Pagination from '@/src/assets/components/dashboard/Pagnation';
-import Loading from '@/src/assets/components/dashboard/loader';
+import React, { useState, useEffect } from "react";
+import "@/styles/userAcc.css";
+import { apiRequest } from "@/src/lib/apiClient";
+import Pagination from "@/src/assets/components/dashboard/Pagnation";
+import Loading from "@/src/assets/components/dashboard/loader";
 
 interface User {
   id: number;
   username: string;
   email: string;
-  role: 'admin' | 'headmaster' | 'bursar' | 'teacher';
+  role: "admin" | "headmaster" | "bursar" | "teacher";
   role_display: string;
   is_active: boolean;
   last_login: string | null;
@@ -40,34 +40,38 @@ export default function UserAccounts() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [fetchLoader, setfetchLoader] = useState(false);
-  
+
   // Pagination
   const [pagination, setPagination] = useState<PaginatedResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   // Filters
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
   // Form state
   const [formData, setFormData] = useState<CreateUserForm>({
-    username: '',
-    email: '',
-    password: '',
-    role: '',
+    username: "",
+    email: "",
+    password: "",
+    role: "",
     is_active: true,
   });
-  
+
   // Password reset state
   const [resetPasswordData, setResetPasswordData] = useState({
     userId: 0,
-    newPassword: '',
-    confirmPassword: '',
+    newPassword: "",
+    confirmPassword: "",
   });
-  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
-  
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] =
+    useState(false);
+
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -75,11 +79,11 @@ export default function UserAccounts() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (searchQuery || searchQuery === '') {
+      if (searchQuery || searchQuery === "") {
         fetchUsers();
       }
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
@@ -87,21 +91,21 @@ export default function UserAccounts() {
     setLoading(true);
     try {
       let endpoint = `/users/?page=${currentPage}`;
-      
+
       if (roleFilter) {
         endpoint += `&role=${roleFilter}`;
       }
-      
+
       if (statusFilter) {
         endpoint += `&is_active=${statusFilter}`;
       }
-      
+
       if (searchQuery) {
         endpoint += `&search=${encodeURIComponent(searchQuery)}`;
       }
-      
+
       const response = await apiRequest<User>(endpoint);
-      
+
       if (response.results) {
         setUsers(response.results);
         setPagination({
@@ -120,10 +124,10 @@ export default function UserAccounts() {
         } else {
           setUsers([]);
         }
-              }
+      }
     } catch (error) {
-      console.error('Error fetching users:', error);
-      showMessage('error', 'Failed to fetch users');
+      console.error("Error fetching users:", error);
+      showMessage("error", "Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -132,25 +136,30 @@ export default function UserAccounts() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setfetchLoader(true);
-    
-    if (!formData.username || !formData.email || !formData.password || !formData.role) {
-      showMessage('error', 'Please fill in all required fields');
+
+    if (
+      !formData.username ||
+      !formData.email ||
+      !formData.password ||
+      !formData.role
+    ) {
+      showMessage("error", "Please fill in all required fields");
       return;
     }
-    
+
     try {
-      await apiRequest('/users/', {
-        method: 'POST',
+      await apiRequest("/users/", {
+        method: "POST",
         body: JSON.stringify(formData),
       });
-      
-      showMessage('success', 'User created successfully');
+
+      showMessage("success", "User created successfully");
       setModalOpen(false);
       resetForm();
       fetchUsers();
     } catch (error: any) {
-      console.error('Error creating user:', error);
-      showMessage('error', error.message || 'Failed to create user');
+      console.error("Error creating user:", error);
+      showMessage("error", error.message || "Failed to create user");
     }
     setfetchLoader(false);
   };
@@ -158,12 +167,12 @@ export default function UserAccounts() {
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setfetchLoader(true);
-    
+
     if (!selectedUser) return;
-    
+
     try {
       await apiRequest(`/users/${selectedUser.id}/`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: JSON.stringify({
           username: formData.username,
           email: formData.email,
@@ -171,69 +180,71 @@ export default function UserAccounts() {
           is_active: formData.is_active,
         }),
       });
-      
-      showMessage('success', 'User updated successfully');
+
+      showMessage("success", "User updated successfully");
       setModalOpen(false);
       setIsEditMode(false);
       resetForm();
       fetchUsers();
     } catch (error: any) {
-      console.error('Error updating user:', error);
-      showMessage('error', error.message || 'Failed to update user');
+      console.error("Error updating user:", error);
+      showMessage("error", error.message || "Failed to update user");
     }
     setfetchLoader(false);
   };
 
-  const handleDeactivateUser = async (userId: number, currentStatus: boolean) => {
+  const handleDeactivateUser = async (
+    userId: number,
+    currentStatus: boolean,
+  ) => {
+    const action = currentStatus ? "deactivate" : "activate";
 
-    const action = currentStatus ? 'deactivate' : 'activate';
-    
     if (!confirm(`Are you sure you want to ${action} this user?`)) {
       return;
     }
-    
+
     try {
       await apiRequest(`/users/${userId}/${action}/`, {
-        method: 'POST',
+        method: "POST",
       });
-      
-      showMessage('success', `User ${action}d successfully`);
+
+      showMessage("success", `User ${action}d successfully`);
       fetchUsers();
     } catch (error: any) {
       console.error(`Error ${action}ing user:`, error);
-      showMessage('error', error.message || `Failed to ${action} user`);
+      showMessage("error", error.message || `Failed to ${action} user`);
     }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (resetPasswordData.newPassword !== resetPasswordData.confirmPassword) {
-      showMessage('error', 'Passwords do not match');
+      showMessage("error", "Passwords do not match");
       return;
     }
-    
+
     if (resetPasswordData.newPassword.length < 10) {
-      showMessage('error', 'Password must be at least 10 characters long');
+      showMessage("error", "Password must be at least 10 characters long");
       return;
     }
-    
+
     try {
       setfetchLoader(true);
       await apiRequest(`/users/${resetPasswordData.userId}/change_password/`, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({
           new_password: resetPasswordData.newPassword,
           confirm_password: resetPasswordData.confirmPassword,
         }),
       });
-      
-      showMessage('success', 'Password reset successfully');
+
+      showMessage("success", "Password reset successfully");
       setIsResetPasswordModalOpen(false);
-      setResetPasswordData({ userId: 0, newPassword: '', confirmPassword: '' });
+      setResetPasswordData({ userId: 0, newPassword: "", confirmPassword: "" });
     } catch (error: any) {
-      console.error('Error resetting password:', error);
-      showMessage('error', error.message || 'Failed to reset password');
+      console.error("Error resetting password:", error);
+      showMessage("error", error.message || "Failed to reset password");
     }
     setfetchLoader(false);
   };
@@ -243,7 +254,7 @@ export default function UserAccounts() {
     setFormData({
       username: user.username,
       email: user.email,
-      password: '',
+      password: "",
       role: user.role,
       is_active: user.is_active,
     });
@@ -252,55 +263,55 @@ export default function UserAccounts() {
   };
 
   const openResetPasswordModal = (userId: number) => {
-    setResetPasswordData({ userId, newPassword: '', confirmPassword: '' });
+    setResetPasswordData({ userId, newPassword: "", confirmPassword: "" });
     setIsResetPasswordModalOpen(true);
   };
 
   const resetForm = () => {
     setFormData({
-      username: '',
-      email: '',
-      password: '',
-      role: '',
+      username: "",
+      email: "",
+      password: "",
+      role: "",
       is_active: true,
     });
     setSelectedUser(null);
     setIsEditMode(false);
   };
 
-  const showMessage = (type: 'success' | 'error', text: string) => {
+  const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 5000);
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Never';
+    if (!dateString) return "Never";
     const date = new Date(dateString);
-    return date.toLocaleString('en-GB', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleString("en-GB", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   return (
     <div className="dashboardWrapper">
       <div className="dashboard">
-        
         {/* Message Alert */}
         {message && (
           <div
             style={{
-              position: 'fixed',
-              top: '20px',
-              right: '20px',
-              padding: '12px 20px',
-              borderRadius: '8px',
-              backgroundColor: message.type === 'success' ? '#d1fae5' : '#fee2e2',
-              color: message.type === 'success' ? '#065f46' : '#991b1b',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              position: "fixed",
+              top: "20px",
+              right: "20px",
+              padding: "12px 20px",
+              borderRadius: "8px",
+              backgroundColor:
+                message.type === "success" ? "#d1fae5" : "#fee2e2",
+              color: message.type === "success" ? "#065f46" : "#991b1b",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
               zIndex: 1000,
               fontWeight: 500,
             }}
@@ -366,7 +377,9 @@ export default function UserAccounts() {
         {/* Users Table */}
         <main className="card">
           {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center' }}>Loading users...</div>
+            <div style={{ padding: "40px", textAlign: "center" }}>
+              Loading users...
+            </div>
           ) : users.length > 0 ? (
             <>
               <table className="userTable">
@@ -390,14 +403,14 @@ export default function UserAccounts() {
                       <td>
                         <span
                           className={`statusBadge ${
-                            user.is_active ? 'activeStatus' : 'inactiveStatus'
+                            user.is_active ? "activeStatus" : "inactiveStatus"
                           }`}
                         >
-                          {user.is_active ? 'Active' : 'Inactive'}
+                          {user.is_active ? "Active" : "Inactive"}
                         </span>
                       </td>
                       <td>{formatDate(user.last_login)}</td>
-                      <td>{user.created_by_username || 'System'}</td>
+                      <td>{user.created_by_username || "System"}</td>
                       <td>
                         <div className="actionGroup">
                           <button
@@ -408,9 +421,11 @@ export default function UserAccounts() {
                           </button>
                           <button
                             className="actionBtn btnDeactivate"
-                            onClick={() => handleDeactivateUser(user.id, user.is_active)}
+                            onClick={() =>
+                              handleDeactivateUser(user.id, user.is_active)
+                            }
                           >
-                            {user.is_active ? 'Deactivate' : 'Activate'}
+                            {user.is_active ? "Deactivate" : "Activate"}
                           </button>
                           <button
                             className="actionBtn btnReset"
@@ -427,7 +442,7 @@ export default function UserAccounts() {
 
               {/* Pagination */}
               {pagination && pagination.count > 0 && (
-                <div style={{ marginTop: '20px' }}>
+                <div style={{ marginTop: "20px" }}>
                   <Pagination
                     count={pagination.count}
                     next={pagination.next}
@@ -439,7 +454,9 @@ export default function UserAccounts() {
               )}
             </>
           ) : (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+            <div
+              style={{ padding: "40px", textAlign: "center", color: "#666" }}
+            >
               No users found
             </div>
           )}
@@ -447,55 +464,74 @@ export default function UserAccounts() {
 
         {/* Create/Edit User Modal */}
         {isModalOpen && (
-          <div className="modalOverlay" onClick={() => {
-            setModalOpen(false);
-            resetForm();
-          }}>
+          <div
+            className="modalOverlay"
+            onClick={() => {
+              setModalOpen(false);
+              resetForm();
+            }}
+          >
             <div className="modalContent" onClick={(e) => e.stopPropagation()}>
-              <div> {fetchLoader ? <Loading /> : ''}</div>
-              <h2>{isEditMode ? 'Edit User' : 'Create New User'}</h2>
-              
+              <div> {fetchLoader ? <Loading /> : ""}</div>
+              <h2>{isEditMode ? "Edit User" : "Create New User"}</h2>
+
               <form onSubmit={isEditMode ? handleUpdateUser : handleCreateUser}>
-                <label className="modalLabel">Username <span className="text-red-500">*</span></label>
+                <label className="modalLabel">
+                  Username <span className="text-red-500">*</span>
+                </label>
                 <input
                   className="modalInput"
                   type="text"
                   placeholder="Enter username"
                   value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
                   required
                 />
 
-                <label className="modalLabel">Email <span className="text-red-500">*</span></label>
+                <label className="modalLabel">
+                  Email <span className="text-red-500">*</span>
+                </label>
                 <input
                   className="modalInput"
                   type="email"
                   placeholder="Enter email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   required
                 />
 
                 {!isEditMode && (
                   <>
-                    <label className="modalLabel">Password <span className="text-red-500">*</span></label>
+                    <label className="modalLabel">
+                      Password <span className="text-red-500">*</span>
+                    </label>
                     <input
                       className="modalInput"
                       type="password"
                       placeholder="Enter password (min 10 characters)"
                       value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
                       minLength={10}
                       required
                     />
                   </>
                 )}
 
-                <label className="modalLabel">Role <span className="text-red-500">*</span></label>
+                <label className="modalLabel">
+                  Role <span className="text-red-500">*</span>
+                </label>
                 <select
                   className="modalInput"
                   value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Role</option>
@@ -505,12 +541,17 @@ export default function UserAccounts() {
                   <option value="teacher">Teacher</option>
                 </select>
 
-                <label className="modalLabel">Status <span className="text-red-500">*</span></label>
+                <label className="modalLabel">
+                  Status <span className="text-red-500">*</span>
+                </label>
                 <select
                   className="modalInput"
-                  value={formData.is_active ? 'true' : 'false'}
+                  value={formData.is_active ? "true" : "false"}
                   onChange={(e) =>
-                    setFormData({ ...formData, is_active: e.target.value === 'true' })
+                    setFormData({
+                      ...formData,
+                      is_active: e.target.value === "true",
+                    })
                   }
                 >
                   <option value="true">Active</option>
@@ -519,10 +560,10 @@ export default function UserAccounts() {
 
                 <div
                   style={{
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                    marginTop: '20px',
+                    display: "flex",
+                    gap: "12px",
+                    justifyContent: "flex-end",
+                    marginTop: "20px",
                   }}
                 >
                   <button
@@ -536,7 +577,7 @@ export default function UserAccounts() {
                     Cancel
                   </button>
                   <button type="submit" className="primaryBtn">
-                    {isEditMode ? 'Update User' : 'Create User'}
+                    {isEditMode ? "Update User" : "Create User"}
                   </button>
                 </div>
               </form>
@@ -546,26 +587,36 @@ export default function UserAccounts() {
 
         {/* Reset Password Modal */}
         {isResetPasswordModalOpen && (
-          <div className="modalOverlay" onClick={() => setIsResetPasswordModalOpen(false)}>
+          <div
+            className="modalOverlay"
+            onClick={() => setIsResetPasswordModalOpen(false)}
+          >
             <div className="modalContent" onClick={(e) => e.stopPropagation()}>
               <h2>Reset User Password</h2>
-              <div> {fetchLoader ? <Loading /> : ''}</div>
-              
+              <div> {fetchLoader ? <Loading /> : ""}</div>
+
               <form onSubmit={handleResetPassword}>
-                <label className="modalLabel">New Password <span className="text-red-500">*</span></label>
+                <label className="modalLabel">
+                  New Password <span className="text-red-500">*</span>
+                </label>
                 <input
                   className="modalInput"
                   type="password"
                   placeholder="Enter new password (min 10 characters)"
                   value={resetPasswordData.newPassword}
                   onChange={(e) =>
-                    setResetPasswordData({ ...resetPasswordData, newPassword: e.target.value })
+                    setResetPasswordData({
+                      ...resetPasswordData,
+                      newPassword: e.target.value,
+                    })
                   }
                   minLength={10}
                   required
                 />
 
-                <label className="modalLabel">Confirm Password <span className="text-red-500">*</span></label>
+                <label className="modalLabel">
+                  Confirm Password <span className="text-red-500">*</span>
+                </label>
                 <input
                   className="modalInput"
                   type="password"
@@ -583,10 +634,10 @@ export default function UserAccounts() {
 
                 <div
                   style={{
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                    marginTop: '20px',
+                    display: "flex",
+                    gap: "12px",
+                    justifyContent: "flex-end",
+                    marginTop: "20px",
                   }}
                 >
                   <button
@@ -604,7 +655,6 @@ export default function UserAccounts() {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

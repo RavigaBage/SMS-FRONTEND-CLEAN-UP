@@ -22,9 +22,9 @@
   text-align: center;
   padding: 20px;
 }
-.loader_wrapper.active{
-    background: transparent;
-    border-radius: 10px;
+.loader_wrapper.active {
+  background: transparent;
+  border-radius: 10px;
 }
 .loader_wrapper .load-3,
 .loader_wrapper .text {

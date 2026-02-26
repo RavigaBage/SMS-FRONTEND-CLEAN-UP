@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight,
   Check,
@@ -7,8 +7,8 @@ import {
   BookOpen,
   Settings,
   Sparkles,
-  X
-} from 'lucide-react';
+  X,
+} from "lucide-react";
 
 interface FirstTimeGuideProps {
   onFinish?: () => void;
@@ -17,7 +17,7 @@ interface FirstTimeGuideProps {
 
 export default function FirstTimeGuide({
   onFinish,
-  initiallyOpen = true
+  initiallyOpen = true,
 }: FirstTimeGuideProps) {
   const [open, setOpen] = useState(initiallyOpen);
   const [currentStep, setCurrentStep] = useState(0);
@@ -27,35 +27,38 @@ export default function FirstTimeGuide({
 
   const prerequisites = [
     {
-      id: 'teachers',
+      id: "teachers",
       icon: Users,
-      title: 'Add Teachers',
+      title: "Add Teachers",
       description:
-        'We Advice that administrators add at least one teacher so you can assign classes and manage subjects.',
-      action: 'Next Step'
+        "We Advice that administrators add at least one teacher so you can assign classes and manage subjects.",
+      action: "Next Step",
     },
     {
-      id: 'classes',
+      id: "classes",
       icon: BookOpen,
-      title: 'Create Classes',
+      title: "Create Classes",
       description:
-        'Create your class groups and attach teachers, subjects and schedules.',
-      action: 'Next Step'
+        "Create your class groups and attach teachers, subjects and schedules.",
+      action: "Next Step",
     },
     {
-      id: 'settings',
+      id: "settings",
       icon: Settings,
-      title: 'Configure Settings',
+      title: "Configure Settings",
       description:
-        'Adjust grading system, and the academic calendar for your school.',
-      action: 'Finish'
-    }
+        "Adjust grading system, and the academic calendar for your school.",
+      action: "Finish",
+    },
   ];
   const features = [
-    { title: 'Dashboard', desc: 'Overview of classes and upcoming activities.' },
-    { title: 'Attendance', desc: 'Quickly mark attendance for each class.' },
-    { title: 'Grades', desc: 'Record and analyze student performance.' },
-    { title: 'Reports', desc: 'Generate printable academic reports.' }
+    {
+      title: "Dashboard",
+      desc: "Overview of classes and upcoming activities.",
+    },
+    { title: "Attendance", desc: "Quickly mark attendance for each class." },
+    { title: "Grades", desc: "Record and analyze student performance." },
+    { title: "Reports", desc: "Generate printable academic reports." },
   ];
 
   // Focus trap helpers
@@ -63,27 +66,27 @@ export default function FirstTimeGuide({
     const onKey = (e: KeyboardEvent) => {
       if (!open) return;
 
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         e.preventDefault();
         closeGuide();
       }
 
       // Arrow nav
-      if (e.key === 'ArrowRight') {
+      if (e.key === "ArrowRight") {
         e.preventDefault();
         goNext();
       }
-      if (e.key === 'ArrowLeft') {
+      if (e.key === "ArrowLeft") {
         e.preventDefault();
         goPrev();
       }
 
       // Manage Tab focus trap
-      if (e.key === 'Tab' && containerRef.current) {
+      if (e.key === "Tab" && containerRef.current) {
         const focusables = Array.from(
           containerRef.current.querySelectorAll<HTMLElement>(
-            'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
-          )
+            'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+          ),
         ).filter(Boolean);
 
         if (focusables.length === 0) return;
@@ -104,15 +107,17 @@ export default function FirstTimeGuide({
 
     if (open) {
       previouslyFocused.current = document.activeElement as HTMLElement | null;
-      document.addEventListener('keydown', onKey);
+      document.addEventListener("keydown", onKey);
       // autofocus first actionable element
       setTimeout(() => {
-        containerRef.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus();
+        containerRef.current
+          ?.querySelector<HTMLElement>("[data-autofocus]")
+          ?.focus();
       }, 80);
     }
 
     return () => {
-      document.removeEventListener('keydown', onKey);
+      document.removeEventListener("keydown", onKey);
       // restore previous focus
       if (previouslyFocused.current) {
         previouslyFocused.current.focus();
@@ -354,12 +359,17 @@ export default function FirstTimeGuide({
           <div className="ftg-head">
             <div>
               <div id="ftg-title">Quick setup guide</div>
-              <div className="ftg-sub">A short, guided checklist — completes in less than 2 minutes.</div>
+              <div className="ftg-sub">
+                A short, guided checklist — completes in less than 2 minutes.
+              </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ textAlign: 'right', fontSize: 13, color: '#64748b' }}>
-                Step {Math.min(currentStep + 1, prerequisites.length + 1)} / {prerequisites.length + 1}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div
+                style={{ textAlign: "right", fontSize: 13, color: "#64748b" }}
+              >
+                Step {Math.min(currentStep + 1, prerequisites.length + 1)} /{" "}
+                {prerequisites.length + 1}
               </div>
               <button
                 className="ftg-close"
@@ -372,11 +382,11 @@ export default function FirstTimeGuide({
           </div>
 
           <div className="ftg-progress" aria-hidden>
-            <div className="ftg-bar" style={{ width: '100%' }}>
+            <div className="ftg-bar" style={{ width: "100%" }}>
               <div
                 className="ftg-fill"
                 style={{
-                  width: `${(currentStep / (prerequisites.length)) * 100}%`
+                  width: `${(currentStep / prerequisites.length) * 100}%`,
                 }}
               />
             </div>
@@ -386,9 +396,13 @@ export default function FirstTimeGuide({
                 const done = completedSteps.includes(p.id);
                 const active = i === currentStep;
                 return (
-                  <div key={p.id} role="listitem" style={{ textAlign: 'center' }}>
+                  <div
+                    key={p.id}
+                    role="listitem"
+                    style={{ textAlign: "center" }}
+                  >
                     <div
-                      className={`ftg-step-dot ${done ? 'done' : ''} ${active ? 'active' : ''}`}
+                      className={`ftg-step-dot ${done ? "done" : ""} ${active ? "active" : ""}`}
                       title={p.title}
                     >
                       {done ? <Check size={16} /> : i + 1}
@@ -396,8 +410,10 @@ export default function FirstTimeGuide({
                   </div>
                 );
               })}
-              <div style={{ textAlign: 'center' }}>
-                <div className={`ftg-step-dot ${currentStep === prerequisites.length ? 'active' : ''}`}>
+              <div style={{ textAlign: "center" }}>
+                <div
+                  className={`ftg-step-dot ${currentStep === prerequisites.length ? "active" : ""}`}
+                >
                   <Sparkles size={16} />
                 </div>
               </div>
@@ -410,9 +426,12 @@ export default function FirstTimeGuide({
                 <div className="ftg-alert" role="note">
                   <AlertCircle size={18} />
                   <div>
-                    <div style={{ fontWeight: 700, marginBottom: 6 }}>Before you begin</div>
-                    <div style={{ fontSize: 13, color: '#475569' }}>
-                      Complete steps in order. Use keyboard arrows ← → to navigate and Esc to close.
+                    <div style={{ fontWeight: 700, marginBottom: 6 }}>
+                      Before you begin
+                    </div>
+                    <div style={{ fontSize: 13, color: "#475569" }}>
+                      Complete steps in order. Use keyboard arrows ← → to
+                      navigate and Esc to close.
                     </div>
                   </div>
                 </div>
@@ -426,7 +445,9 @@ export default function FirstTimeGuide({
                       <div
                         className="icon"
                         style={{
-                          background: done ? '#10b981' : 'linear-gradient(135deg,#667eea,#764ba2)'
+                          background: done
+                            ? "#10b981"
+                            : "linear-gradient(135deg,#667eea,#764ba2)",
                         }}
                       >
                         <Icon size={22} />
@@ -441,7 +462,9 @@ export default function FirstTimeGuide({
                             data-autofocus
                             className="ftg-action"
                             style={{
-                              background: done ? '#10b981' : 'linear-gradient(135deg,#667eea,#764ba2)'
+                              background: done
+                                ? "#10b981"
+                                : "linear-gradient(135deg,#667eea,#764ba2)",
                             }}
                             onClick={() => markComplete(pr.id)}
                           >
@@ -464,26 +487,49 @@ export default function FirstTimeGuide({
             ) : (
               /* Final / Ready pane */
               <div style={{ paddingTop: 6 }}>
-                <div style={{ textAlign: 'left', marginBottom: 12 }}>
-                  <div style={{ fontSize: 20, fontWeight: 800 }}>You're all set 🎉</div>
-                  <div style={{ fontSize: 14, color: '#475569', marginTop: 6 }}>
-                    You finished the quick setup. Below are a few things you can explore next.
+                <div style={{ textAlign: "left", marginBottom: 12 }}>
+                  <div style={{ fontSize: 20, fontWeight: 800 }}>
+                    You're all set 🎉
+                  </div>
+                  <div style={{ fontSize: 14, color: "#475569", marginTop: 6 }}>
+                    You finished the quick setup. Below are a few things you can
+                    explore next.
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gap: 10 }}>
+                <div style={{ display: "grid", gap: 10 }}>
                   {features.map((f, idx) => (
-                    <div key={idx} style={{
-                      display: 'flex', gap: 12, alignItems: 'center',
-                      background: '#fff', borderRadius: 10, padding: 12, border: '1px solid #eef2ff'
-                    }}>
-                      <div style={{
-                        width: 44, height: 44, borderRadius: 10, display: 'grid',
-                        placeItems: 'center', background: '#f8fafc', color: '#0f172a', fontWeight: 700
-                      }}>{f.title.charAt(0)}</div>
+                    <div
+                      key={idx}
+                      style={{
+                        display: "flex",
+                        gap: 12,
+                        alignItems: "center",
+                        background: "#fff",
+                        borderRadius: 10,
+                        padding: 12,
+                        border: "1px solid #eef2ff",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 10,
+                          display: "grid",
+                          placeItems: "center",
+                          background: "#f8fafc",
+                          color: "#0f172a",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {f.title.charAt(0)}
+                      </div>
                       <div>
                         <div style={{ fontWeight: 700 }}>{f.title}</div>
-                        <div style={{ color: '#64748b', fontSize: 13 }}>{f.desc}</div>
+                        <div style={{ color: "#64748b", fontSize: 13 }}>
+                          {f.desc}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -493,7 +539,7 @@ export default function FirstTimeGuide({
           </div>
 
           <div className="ftg-footer">
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: "flex", gap: 8 }}>
               <button
                 className="btn ghost"
                 onClick={() => {
@@ -516,8 +562,12 @@ export default function FirstTimeGuide({
               </button>
             </div>
 
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn ghost" onClick={goPrev} disabled={currentStep === 0}>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                className="btn ghost"
+                onClick={goPrev}
+                disabled={currentStep === 0}
+              >
                 ← Previous
               </button>
 
@@ -551,44 +601,84 @@ export default function FirstTimeGuide({
         <aside className="ftg-right" aria-hidden={false}>
           {currentStep < prerequisites.length ? (
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: '#0f172a' }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div
+                  style={{ fontSize: 22, fontWeight: 800, color: "#0f172a" }}
+                >
                   {prerequisites[currentStep].title}
                 </div>
-                <div style={{ marginLeft: 'auto', color: '#64748b' }}>
+                <div style={{ marginLeft: "auto", color: "#64748b" }}>
                   {completedSteps.includes(prerequisites[currentStep].id) ? (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
                       <Check size={16} color="#10b981" /> Done
                     </span>
                   ) : (
-                    <span style={{ color: '#94a3b8' }}>In progress</span>
+                    <span style={{ color: "#94a3b8" }}>In progress</span>
                   )}
                 </div>
               </div>
 
-              <div style={{ marginTop: 12, color: '#64748b', fontSize: 14 }}>
+              <div style={{ marginTop: 12, color: "#64748b", fontSize: 14 }}>
                 {prerequisites[currentStep].description}
               </div>
 
               <div style={{ marginTop: 18 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#0f172a",
+                    marginBottom: 8,
+                  }}
+                >
                   Checklist
                 </div>
 
-                <div style={{ display: 'grid', gap: 8 }}>
+                <div style={{ display: "grid", gap: 8 }}>
                   {prerequisites.map((p) => (
-                    <div key={p.id} style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      background: completedSteps.includes(p.id) ? '#f0fdf4' : 'transparent',
-                      padding: '8px', borderRadius: 8
-                    }}>
-                      <div style={{
-                        width:18, height:18, borderRadius:6, display:'grid', placeItems:'center',
-                        background: completedSteps.includes(p.id) ? '#10b981' : '#eef2ff', color: completedSteps.includes(p.id)?'white':'#64748b'
-                      }}>
-                        {completedSteps.includes(p.id) ? <Check size={12} /> : <small>{p.title.charAt(0)}</small>}
+                    <div
+                      key={p.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        background: completedSteps.includes(p.id)
+                          ? "#f0fdf4"
+                          : "transparent",
+                        padding: "8px",
+                        borderRadius: 8,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 18,
+                          height: 18,
+                          borderRadius: 6,
+                          display: "grid",
+                          placeItems: "center",
+                          background: completedSteps.includes(p.id)
+                            ? "#10b981"
+                            : "#eef2ff",
+                          color: completedSteps.includes(p.id)
+                            ? "white"
+                            : "#64748b",
+                        }}
+                      >
+                        {completedSteps.includes(p.id) ? (
+                          <Check size={12} />
+                        ) : (
+                          <small>{p.title.charAt(0)}</small>
+                        )}
                       </div>
-                      <div style={{ fontSize:13, color: '#475569' }}>{p.title}</div>
+                      <div style={{ fontSize: 13, color: "#475569" }}>
+                        {p.title}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -596,17 +686,24 @@ export default function FirstTimeGuide({
             </div>
           ) : (
             <div className="ftg-ready">
-              <div className="ftg-success-badge"><Check size={36} /></div>
-              <div style={{ fontWeight: 800, fontSize: 18 }}>Setup complete</div>
-              <div style={{ color: '#64748b', marginTop: 8 }}>
-                Nice work — your system is ready. Continue to the dashboard to start managing classes.
+              <div className="ftg-success-badge">
+                <Check size={36} />
+              </div>
+              <div style={{ fontWeight: 800, fontSize: 18 }}>
+                Setup complete
+              </div>
+              <div style={{ color: "#64748b", marginTop: 8 }}>
+                Nice work — your system is ready. Continue to the dashboard to
+                start managing classes.
               </div>
 
               <div style={{ marginTop: 16 }} className="ftg-features">
                 {features.map((f, i) => (
                   <div key={i} className="ftg-feature">
                     <div style={{ fontWeight: 700 }}>{f.title}</div>
-                    <div style={{ color: '#64748b', fontSize: 13 }}>{f.desc}</div>
+                    <div style={{ color: "#64748b", fontSize: 13 }}>
+                      {f.desc}
+                    </div>
                   </div>
                 ))}
               </div>

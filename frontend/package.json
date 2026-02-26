@@ -4,7 +4,6 @@
   "overrides": {
     "minimatch": "^10.2.1"
   },
-  
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -1,17 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar, Search, Download, UserCheck, Users, Clock, Filter } from "lucide-react";
+import {
+  Calendar,
+  Search,
+  Download,
+  UserCheck,
+  Users,
+  Clock,
+  Filter,
+} from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
-import { AttendanceTable, AttendanceRecord } from "@/src/assets/components/management/AttendanceTable";
+import {
+  AttendanceTable,
+  AttendanceRecord,
+} from "@/src/assets/components/management/AttendanceTable";
 import { MarkAttendanceModal } from "@/src/assets/components/management/MarkAttendance";
 import { BulkAttendanceModal } from "@/src/assets/components/management/BulkAttendance";
 import { AttendanceStatsCards } from "@/src/assets/components/management/Attendancestat";
 import { AttendanceFilterModal } from "@/src/assets/components/management/AttendanceFilter";
 import { Pagination } from "@/src/assets/components/management/Pagination";
 import { toast } from "react-hot-toast";
-import '@/styles/attpage.css';
-import Image from 'next/image'
+import "@/styles/attpage.css";
+import Image from "next/image";
 
 interface PaginatedResponse {
   count: number;
@@ -34,9 +45,13 @@ export default function StudentAttendancePage() {
   const [isMarkModalOpen, setIsMarkModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(
+    null,
+  );
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -56,7 +71,7 @@ export default function StudentAttendancePage() {
     page: number,
     search: string,
     date: string,
-    filterParams: FilterState = {}
+    filterParams: FilterState = {},
   ) => {
     setLoading(true);
     try {
@@ -83,8 +98,14 @@ export default function StudentAttendancePage() {
         id: a.id,
         studentId: a.student?.id,
         studentName: `${a.student?.first_name} ${a.student?.last_name}`,
-        studentImage: a.student?.photo_url || `https://ui-avatars.com/api/?name=${a.student?.first_name}+${a.student?.last_name}&background=0D9488&color=fff`,
-        className: a.class_obj.class_name ||a.class_name || a.student?.class_name || "N/A",
+        studentImage:
+          a.student?.photo_url ||
+          `https://ui-avatars.com/api/?name=${a.student?.first_name}+${a.student?.last_name}&background=0D9488&color=fff`,
+        className:
+          a.class_obj.class_name ||
+          a.class_name ||
+          a.student?.class_name ||
+          "N/A",
         attendanceDate: a.attendance_date,
         status: a.status,
         checkInTime: a.check_in_time,
@@ -109,16 +130,20 @@ export default function StudentAttendancePage() {
   // Calculate Stats
   const calculateStats = (records: AttendanceRecord[]) => {
     const total = records.length;
-    const present = records.filter(r => r.status === 'present').length;
-    const absent = records.filter(r => r.status === 'absent').length;
-    const late = records.filter(r => r.status === 'late').length;
-    const excused = records.filter(r => r.status === 'excused').length;
+    const present = records.filter((r) => r.status === "present").length;
+    const absent = records.filter((r) => r.status === "absent").length;
+    const late = records.filter((r) => r.status === "late").length;
+    const excused = records.filter((r) => r.status === "excused").length;
 
     setStats({ total, present, absent, late, excused });
   };
 
   // Update Attendance
-  const handleUpdateAttendance = async (id: number, status: string, remarks?: string) => {
+  const handleUpdateAttendance = async (
+    id: number,
+    status: string,
+    remarks?: string,
+  ) => {
     try {
       await apiRequest(`/attendance/${id}/`, {
         method: "PATCH",
@@ -164,10 +189,19 @@ export default function StudentAttendancePage() {
 
       const res = await apiRequest<PaginatedResponse>(
         `/attendance/?${query}&page_size=1000`,
-        { method: "GET" }
+        { method: "GET" },
       );
 
-      const headers = ["Date", "Student Name", "Class", "Status", "Check In", "Check Out", "Remarks", "Marked By"];
+      const headers = [
+        "Date",
+        "Student Name",
+        "Class",
+        "Status",
+        "Check In",
+        "Check Out",
+        "Remarks",
+        "Marked By",
+      ];
       const csvData = res?.results?.map((a: any) => [
         a.attendance_date,
         `${a.student?.first_name} ${a.student?.last_name}`,
@@ -176,11 +210,13 @@ export default function StudentAttendancePage() {
         a.check_in_time || "N/A",
         a.check_out_time || "N/A",
         a.remarks || "",
-        a.marked_by_username || "System"
+        a.marked_by_username || "System",
       ]);
-        const csv = [headers.join(","), 
-          ...(csvData ?? []).map((row: any[]) => row.map((cell: any) => `"${cell}"`).join(","))
-        
+      const csv = [
+        headers.join(","),
+        ...(csvData ?? []).map((row: any[]) =>
+          row.map((cell: any) => `"${cell}"`).join(","),
+        ),
       ].join("\n");
 
       const blob = new Blob([csv], { type: "text/csv" });
@@ -216,7 +252,8 @@ export default function StudentAttendancePage() {
   }, [currentPage, searchTerm, selectedDate, filters]);
 
   const totalPages = Math.ceil(totalResults / resultsPerPage);
-  const attendanceRate = stats.total > 0 ? ((stats.present / stats.total) * 100).toFixed(1) : 0;
+  const attendanceRate =
+    stats.total > 0 ? ((stats.present / stats.total) * 100).toFixed(1) : 0;
 
   return (
     <div className="attendance-page">
@@ -257,7 +294,10 @@ export default function StudentAttendancePage() {
       </div>
 
       {/* Stats Cards */}
-      <AttendanceStatsCards stats={stats} attendanceRate={Number(attendanceRate)} />
+      <AttendanceStatsCards
+        stats={stats}
+        attendanceRate={Number(attendanceRate)}
+      />
 
       {/* Date & Controls */}
       <div className="attendance-controls">

@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import ClassPopup from "@/components/ui/classPopup";
-import { fetchWithAuth } from '@/src/lib/apiClient';
-import SkeletonTable from '@/components/ui/SkeletonLoader';
-import Pagination from '@/src/assets/components/dashboard/Pagnation';
-import {ErrorState} from '@/src/assets/components/dashboard/ErrorState';
-import '@/styles/classM.css'
-import '@/styles/global.css'
-import Loading from '@/src/assets/components/dashboard/loader';
+import { fetchWithAuth } from "@/src/lib/apiClient";
+import SkeletonTable from "@/components/ui/SkeletonLoader";
+import Pagination from "@/src/assets/components/dashboard/Pagnation";
+import { ErrorState } from "@/src/assets/components/dashboard/ErrorState";
+import "@/styles/classM.css";
+import "@/styles/global.css";
+import Loading from "@/src/assets/components/dashboard/loader";
 
 export interface User {
   id: string;
@@ -21,18 +21,18 @@ export interface User {
   created_at: string;
 }
 export interface YearsModel {
-  end_date: string
-  id: number
-  is_current: boolean
-  start_date: string
-  year_name: string
+  end_date: string;
+  id: number;
+  is_current: boolean;
+  start_date: string;
+  year_name: string;
 }
 
 export interface Teacher {
   id: number;
   first_name: string;
   last_name: string;
-  full_name:string;
+  full_name: string;
   email: string;
 }
 
@@ -61,10 +61,9 @@ interface PaginatedResponse<T> {
 
 type ClassBase = PaginatedResponse<Classroom>;
 
-
 export async function fetchStudentsByClass(
   className: string,
-  academicYear: string
+  academicYear: string,
 ) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -117,54 +116,57 @@ export default function ClassesManagement() {
     subjects: [],
     capacity: 0,
     current_enrollment: 0,
-    students_on_leave: 0
-  }
-  
+    students_on_leave: 0,
+  };
+
   const [selectedClass, setSelectedClass] = useState<Classroom | null>(null);
-  const [selectedYear, setSelectedYear] = useState('2025-2026');
-  const [pagination, setPagination] = useState<PaginatedResponse<Classroom> | null>(null);
+  const [selectedYear, setSelectedYear] = useState("2025-2026");
+  const [pagination, setPagination] =
+    useState<PaginatedResponse<Classroom> | null>(null);
   const [page, setPage] = useState(1);
 
   const handleEditClick = (item: Classroom) => {
     setSelectedClass(item);
-    
+
     setFormData({
-        id: item.id,
-        class_name: item.class_name,
-        academic_year: item.academic_year,
-        academic_year_name: item.academic_year,
-        room_number: item.room_number,
-        class_teacher: item.class_teacher,
-        teacher_name: item.teacher_name,
-        subjects: item.subjects,
-        capacity: item.capacity,
-        current_enrollment: item.current_enrollment,
-        grade_level: item.grade_level,
-        section: item.section
+      id: item.id,
+      class_name: item.class_name,
+      academic_year: item.academic_year,
+      academic_year_name: item.academic_year,
+      room_number: item.room_number,
+      class_teacher: item.class_teacher,
+      teacher_name: item.teacher_name,
+      subjects: item.subjects,
+      capacity: item.capacity,
+      current_enrollment: item.current_enrollment,
+      grade_level: item.grade_level,
+      section: item.section,
     });
-    setActive(true); 
+    setActive(true);
     setClickvelvet(null);
-    
   };
   useEffect(() => {
     const date = new Date().getFullYear();
     loadData();
-    setLoading(false)
+    setLoading(false);
     setAcademicYears(generateAcademicYears());
   }, [selectedClass, selectedYear]);
 
-    const loadData = async () => {
-        setLoading(true);
-        if (!selectedClass) return;
-        try {
-            const data = await fetchStudentsByClass(selectedClass.class_name, selectedYear);
-        } catch (err) {
-            console.error("Error loading students:", err);
-        }
-    };
+  const loadData = async () => {
+    setLoading(true);
+    if (!selectedClass) return;
+    try {
+      const data = await fetchStudentsByClass(
+        selectedClass.class_name,
+        selectedYear,
+      );
+    } catch (err) {
+      console.error("Error loading students:", err);
+    }
+  };
   const handleDelete = async (item: Classroom) => {
     const confirmDelete = window.confirm(
-      `Are you sure you want to delete the class "${item.class_name}"? This action cannot be undone.`
+      `Are you sure you want to delete the class "${item.class_name}"? This action cannot be undone.`,
     );
 
     if (!confirmDelete) {
@@ -179,9 +181,9 @@ export default function ClassesManagement() {
         {
           method: "DELETE",
           headers: {
-            "Content-Type": "application/json"
-          }
-        }
+            "Content-Type": "application/json",
+          },
+        },
       );
 
       if (!fetchRequest.ok) {
@@ -194,7 +196,6 @@ export default function ClassesManagement() {
 
       await fetchClassData();
       setClickvelvet(null);
-
     } catch (err) {
       console.error("Delete request failed:", err);
       alert("Network error. Please try again.");
@@ -209,7 +210,7 @@ export default function ClassesManagement() {
   const handlePopup = () => {
     setActive((prev) => {
       const isClosing = prev === true;
-      
+
       if (isClosing) {
         setUpdating(false);
         setFormData({
@@ -227,45 +228,42 @@ export default function ClassesManagement() {
           year: "",
         });
       }
-      
+
       return !prev;
     });
   };
 
   const handleVelvetToggle = (index: number) => {
-    setClickvelvet(prevIndex => (prevIndex === index ? null : index));
+    setClickvelvet((prevIndex) => (prevIndex === index ? null : index));
   };
 
+  const generateAcademicYears = (): any => {
+    const currentYear = new Date().getFullYear();
+    const startYear = 2000;
 
-    const generateAcademicYears = (): any => {
-      const currentYear = new Date().getFullYear();
-      const startYear   = 2000;
-
-      return Array.from(
-        { length: currentYear - startYear + 1 },
-        (_, i) => {
-          const year = currentYear - i;        
-          return {
-            end_date:   `${year}-${year + 1}`,
-            start_date:  year,
-            id:          i,
-            is_current:  year === currentYear,
-            year_name:  `${year}-${year + 1}`,
-          };
-        }
-      );
-    };
-  
+    return Array.from({ length: currentYear - startYear + 1 }, (_, i) => {
+      const year = currentYear - i;
+      return {
+        end_date: `${year}-${year + 1}`,
+        start_date: year,
+        id: i,
+        is_current: year === currentYear,
+        year_name: `${year}-${year + 1}`,
+      };
+    });
+  };
 
   const handleClearFilter = () => {
-    setSelectedYear('');
-    fetchClassData_(); 
+    setSelectedYear("");
+    fetchClassData_();
   };
 
   useEffect(() => {
-    
     const handleClickOutside = (event: MouseEvent) => {
-      if (checkvelvetClick.current && !checkvelvetClick.current.contains(event.target as Node)) {
+      if (
+        checkvelvetClick.current &&
+        !checkvelvetClick.current.contains(event.target as Node)
+      ) {
         setClickvelvet(null);
       }
     };
@@ -277,61 +275,59 @@ export default function ClassesManagement() {
     };
   }, [clickvelvet]);
 
-  const FilterPop = ()=>{
+  const FilterPop = () => {
     fetchClassData(selectedYear);
-  }
+  };
 
   useEffect(() => {
     fetchClassData_();
   }, [selectedYear]);
 
   const fetchClassData = async (year: string = selectedYear) => {
-      try {
-        const params = new URLSearchParams();
-        if (year) params.append('academic_year', year);
+    try {
+      const params = new URLSearchParams();
+      if (year) params.append("academic_year", year);
 
-        const res = await fetchWithAuth(
-          `${process.env.NEXT_PUBLIC_API_URL}/classes?${params.toString()}`,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        const data: PaginatedResponse<Classroom> = await res.json();
-        if (data) {
-          setPagination(data);
-          setClassData(data.results);
-          setPage(1);
-        }
-      } catch (err) {
-        console.error("Failed to load classes", err);
+      const res = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/classes?${params.toString()}`,
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+      const data: PaginatedResponse<Classroom> = await res.json();
+      if (data) {
+        setPagination(data);
+        setClassData(data.results);
+        setPage(1);
       }
-    };
+    } catch (err) {
+      console.error("Failed to load classes", err);
+    }
+  };
   const fetchClassData_ = async () => {
-      try {
-        const params = new URLSearchParams();
-        const res = await fetchWithAuth(
-          `${process.env.NEXT_PUBLIC_API_URL}/classes`,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        const data: PaginatedResponse<Classroom> = await res.json();
-        if (data) {
-          setPagination(data);
-          setClassData(data.results);
-          setPage(1);
-        }
-      } catch (err) {
-        console.error("Failed to load classes", err);
+    try {
+      const params = new URLSearchParams();
+      const res = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/classes`,
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+      const data: PaginatedResponse<Classroom> = await res.json();
+      if (data) {
+        setPagination(data);
+        setClassData(data.results);
+        setPage(1);
       }
-    };
+    } catch (err) {
+      console.error("Failed to load classes", err);
+    }
+  };
   const handleUpdate = () => {
     setDeleting(!isUpdating);
-  }
-
+  };
 
   return (
-
     <div className="dashboardWrapper CLASSDATA">
       <ClassPopup
         active={active}
@@ -346,19 +342,17 @@ export default function ClassesManagement() {
         }}
       />
       {isLoading ? (
-                  <SkeletonTable rows={5} columns={3} />
-                ) : (
-      <div className="dashboard">
-        {/* Header */}
-        <header className="header">
-          <div>
-            <h1>Classes Management</h1>
-            <p>Manage academic classes, teachers, and students</p>
-          </div>
-        </header>
+        <SkeletonTable rows={5} columns={3} />
+      ) : (
+        <div className="dashboard">
+          <header className="header">
+            <div>
+              <h1>Classes Management</h1>
+              <p>Manage academic classes, teachers, and students</p>
+            </div>
+          </header>
 
-        {/* Filters */}
-        <section className="filters">
+          <section className="filters">
             <select
               className="nav-select short"
               value={selectedYear}
@@ -372,145 +366,178 @@ export default function ClassesManagement() {
               ))}
             </select>
 
-          
             <div className="filter" onClick={FilterPop}>
               <div className="filter_list">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
-                  <path d="M400-240v-80h160v80H400ZM240-440v-80h480v80H240ZM120-640v-80h720v80H120Z"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                  fill="#ffffff"
+                >
+                  <path d="M400-240v-80h160v80H400ZM240-440v-80h480v80H240ZM120-640v-80h720v80H120Z" />
                 </svg>
               </div>
               <p>Filter</p>
             </div>
 
-              {selectedYear && (
-                <div className="filter" onClick={handleClearFilter} style={{ background: '#6b7280' }}>
-                  <div className="filter_list">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
-                      <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
-                    </svg>
-                  </div>
-                  <p>Clear</p>
-                </div>
-              )}
-
-          <div className="add_subject" onClick={() => {
-            setTimeout(() => { handleEditClick(EmptyForm); }, 100);
-          }}>
-            <div className="filter_list">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff">
-                <path d="M680-40v-120H560v-80h120v-120h80v120h120v80H760v120h-80ZM200-200v-560 560Zm0 80q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v353q-18-11-38-18t-42-11v-324H200v560h280q0 21 3 41t10 39H200Zm120-160q17 0 28.5-11.5T360-320q0-17-11.5-28.5T320-360q-17 0-28.5 11.5T280-320q0 17 11.5 28.5T320-280Zm0-160q17 0 28.5-11.5T360-480q0-17-11.5-28.5T320-520q-17 0-28.5 11.5T280-480q0 17 11.5 28.5T320-440Zm0-160q17 0 28.5-11.5T360-640q0-17-11.5-28.5T320-680q-17 0-28.5 11.5T280-640q0 17 11.5 28.5T320-600Zm120 160h240v-80H440v80Zm0-160h240v-80H440v80Zm0 320h54q8-23 20-43t28-37H440v80Z"/>
-              </svg>
-            </div>
-            <p>Add Class</p>
-          </div>
-        </section>
-
-        {/* Table Card */}
-        <main className="tableCard">
-          <table className="classTable">
-            <thead>
-              <tr>
-                <th>Class Name</th>
-                <th>Academic Year</th>
-                <th>Assigned Teacher</th>
-                <th>Room Number</th>
-                <th>Students</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {classData.length === 0 ? (
-                <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: "2rem" }}>
-                    <div>
-                      <ErrorState code={6} message="No Subject Found"/>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                classData.map((item, index) => (
-                  <tr 
-                    key={item.id} 
-                    ref={clickvelvet === index ? checkvelvetClick : null}
+            {selectedYear && (
+              <div
+                className="filter"
+                onClick={handleClearFilter}
+                style={{ background: "#6b7280" }}
+              >
+                <div className="filter_list">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#ffffff"
                   >
-                    <td style={{ fontWeight: 600 }}>{item.class_name}</td>
-                    
-                    <td>{item.academic_year}</td>
-                    
-                    <td>{item.teacher_name || "Unassigned"}</td>
+                    <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                  </svg>
+                </div>
+                <p>Clear</p>
+              </div>
+            )}
 
-                    <td>{item.room_number}</td>
+            <div
+              className="add_subject"
+              onClick={() => {
+                setTimeout(() => {
+                  handleEditClick(EmptyForm);
+                }, 100);
+              }}
+            >
+              <div className="filter_list">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                  fill="#fff"
+                >
+                  <path d="M680-40v-120H560v-80h120v-120h80v120h120v80H760v120h-80ZM200-200v-560 560Zm0 80q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v353q-18-11-38-18t-42-11v-324H200v560h280q0 21 3 41t10 39H200Zm120-160q17 0 28.5-11.5T360-320q0-17-11.5-28.5T320-360q-17 0-28.5 11.5T280-320q0 17 11.5 28.5T320-280Zm0-160q17 0 28.5-11.5T360-480q0-17-11.5-28.5T320-520q-17 0-28.5 11.5T280-480q0 17 11.5 28.5T320-440Zm0-160q17 0 28.5-11.5T360-640q0-17-11.5-28.5T320-680q-17 0-28.5 11.5T280-640q0 17 11.5 28.5T320-600Zm120 160h240v-80H440v80Zm0-160h240v-80H440v80Zm0 320h54q8-23 20-43t28-37H440v80Z" />
+                </svg>
+              </div>
+              <p>Add Class</p>
+            </div>
+          </section>
 
-                    <td>
-                      {item.capacity > 0 
-                        ? `${item.current_enrollment} / ${item.capacity}` 
-                        : '0'}
-                    </td>
-                    
-
-                    <td className="action_tr">
-                      <div className="action_btn">
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation(); 
-                            handleVelvetToggle(index);
-                          }}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                          aria-label="Actions menu"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
-                            <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/>
-                          </svg>
-                        </button>
-                      </div>
-
-                      <div className={`actionContainer ${clickvelvet === index ? 'active' : ""}`}>
-                        <button 
-                          className="actionBtn btnEdit" 
-                          onClick={() => handleEditClick(item)}
-                        >
-                          Edit
-                        </button>
-                        <button className="actionBtn btnAssign">
-                          Assign Teacher
-                        </button>
-                        <button 
-                          className="actionBtn btnManage" 
-                          onClick={() => handleDelete(item)}
-                          disabled={isDeleting}
-                        >
-                          Delete
-                        </button>
+          <main className="tableCard">
+            <table className="classTable">
+              <thead>
+                <tr>
+                  <th>Class Name</th>
+                  <th>Academic Year</th>
+                  <th>Assigned Teacher</th>
+                  <th>Room Number</th>
+                  <th>Students</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {classData.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      style={{ textAlign: "center", padding: "2rem" }}
+                    >
+                      <div>
+                        <ErrorState code={6} message="No Subject Found" />
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </main>
+                ) : (
+                  classData.map((item, index) => (
+                    <tr
+                      key={item.id}
+                      ref={clickvelvet === index ? checkvelvetClick : null}
+                    >
+                      <td style={{ fontWeight: 600 }}>{item.class_name}</td>
 
-        <div className="footerSpace">
+                      <td>{item.academic_year}</td>
+
+                      <td>{item.teacher_name || "Unassigned"}</td>
+
+                      <td>{item.room_number}</td>
+
+                      <td>
+                        {item.capacity > 0
+                          ? `${item.current_enrollment} / ${item.capacity}`
+                          : "0"}
+                      </td>
+
+                      <td className="action_tr">
+                        <div className="action_btn">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleVelvetToggle(index);
+                            }}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                            }}
+                            aria-label="Actions menu"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              height="24px"
+                              viewBox="0 -960 960 960"
+                              width="24px"
+                              fill="#000000"
+                            >
+                              <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        <div
+                          className={`actionContainer ${clickvelvet === index ? "active" : ""}`}
+                        >
+                          <button
+                            className="actionBtn btnEdit"
+                            onClick={() => handleEditClick(item)}
+                          >
+                            Edit
+                          </button>
+                          <button className="actionBtn btnAssign">
+                            Assign Teacher
+                          </button>
+                          <button
+                            className="actionBtn btnManage"
+                            onClick={() => handleDelete(item)}
+                            disabled={isDeleting}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </main>
+
           <div className="footerSpace">
-            {pagination && (
-              <Pagination
-                count={pagination.count}
-                next={pagination.next}
-                previous={pagination.previous}
-                currentPage={page}
-                onPageChange={(newPage) => setPage(newPage)}
-              />
-            )}
+            <div className="footerSpace">
+              {pagination && (
+                <Pagination
+                  count={pagination.count}
+                  next={pagination.next}
+                  previous={pagination.previous}
+                  currentPage={page}
+                  onPageChange={(newPage) => setPage(newPage)}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>)}
+      )}
     </div>
   );
 }
-
-
-
-
-
-
-

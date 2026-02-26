@@ -1,4 +1,3 @@
-
 # School Management System — Frontend
 
 This is a **Next.js** application built using `create-next-app`.
@@ -72,11 +71,11 @@ The application will automatically reload as you edit files.
 
 ## 🛠 Project Structure
 
-* `app/` — Application routes and layouts
-* `components/` — Reusable UI components
-* `public/` — Static assets
-* `globals.css` — Global styles
-* `.env` — Environment configuration
+- `app/` — Application routes and layouts
+- `components/` — Reusable UI components
+- `public/` — Static assets
+- `globals.css` — Global styles
+- `.env` — Environment configuration
 
 ---
 
@@ -100,10 +99,10 @@ npm start
 
 This project can be deployed on:
 
-* Vercel
-* Netlify
-* AWS
-* Any Node.js hosting environment
+- Vercel
+- Netlify
+- AWS
+- Any Node.js hosting environment
 
 Make sure to configure all required environment variables in your hosting provider’s dashboard before deployment.
 
@@ -113,6 +112,5 @@ Make sure to configure all required environment variables in your hosting provid
 
 To learn more about Next.js, visit:
 
-* [https://nextjs.org/docs](https://nextjs.org/docs)
-* [https://nextjs.org/learn](https://nextjs.org/learn)
-
+- [https://nextjs.org/docs](https://nextjs.org/docs)
+- [https://nextjs.org/learn](https://nextjs.org/learn)

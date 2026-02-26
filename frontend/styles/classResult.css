@@ -12,10 +12,9 @@
   display: flex;
   min-height: 100vh;
   background-color: var(--bg-light);
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   color: var(--text-dark);
 }
-
 
 .GRADEDATA .content {
   flex: 1;
@@ -187,8 +186,14 @@
   font-size: 12px;
 }
 
-.GRADEDATA .grade-pill.ap { background: #dcfce7; color: #166534; }
-.GRADEDATA .grade-pill.a { background: #e0f2fe; color: #0369a1; }
+.GRADEDATA .grade-pill.ap {
+  background: #dcfce7;
+  color: #166534;
+}
+.GRADEDATA .grade-pill.a {
+  background: #e0f2fe;
+  color: #0369a1;
+}
 
 .GRADEDATA .btn-export {
   background: var(--primary-teal);
@@ -201,7 +206,9 @@
   transition: opacity 0.2s;
 }
 
-.GRADEDATA .btn-export:hover { opacity: 0.9; }
+.GRADEDATA .btn-export:hover {
+  opacity: 0.9;
+}
 
 .GRADEDATA .btn-filter {
   background: white;

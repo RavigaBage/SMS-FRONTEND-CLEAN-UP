@@ -19,15 +19,17 @@ export default function SubjectForm({
   onSuccess,
 }: SubjectFormProps) {
   const [messageMsg, setMessageMsg] = useState("");
-  const [error, setError]           = useState(false);
-  const [isLoading, setIsLoading]   = useState(false); 
+  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setMessageMsg("");
     setError(false);
   }, [selectedIM]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData(name, value);
   };
@@ -61,19 +63,23 @@ export default function SubjectForm({
       }
 
       setError(false);
-      setMessageMsg(`Subject successfully ${isEditing ? "updated" : "created"}`);
+      setMessageMsg(
+        `Subject successfully ${isEditing ? "updated" : "created"}`,
+      );
       onSuccess?.();
-
     } catch (err: any) {
       setError(true);
 
       // Extract the most useful message from the backend error shape
       const detail = err?.detail;
-      const message = typeof detail === "string"
-        ? detail
-        : detail?.non_field_errors?.[0]
-        ?? Object.values(detail ?? {}).flat().find((m) => typeof m === "string")
-        ?? "Operation failed. Please try again.";
+      const message =
+        typeof detail === "string"
+          ? detail
+          : (detail?.non_field_errors?.[0] ??
+            Object.values(detail ?? {})
+              .flat()
+              .find((m) => typeof m === "string") ??
+            "Operation failed. Please try again.");
 
       setMessageMsg(message);
     } finally {
@@ -89,26 +95,31 @@ export default function SubjectForm({
         </h2>
 
         <form onSubmit={handleSubmit} className="teaching-form">
-
           {/* ── Loader ── */}
           {isLoading && (
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "10px 14px",
-              background: "#eff6ff",
-              border: "1px solid #bfdbfe",
-              marginBottom: 16,
-            }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 14px",
+                background: "#eff6ff",
+                border: "1px solid #bfdbfe",
+                marginBottom: 16,
+              }}
+            >
               {/* Spinning ring */}
-              <div style={{
-                width: 18, height: 18, flexShrink: 0,
-                border: "2px solid #bfdbfe",
-                borderTopColor: "#1a56db",
-                borderRadius: "50%",
-                animation: "spin 0.7s linear infinite",
-              }} />
+              <div
+                style={{
+                  width: 18,
+                  height: 18,
+                  flexShrink: 0,
+                  border: "2px solid #bfdbfe",
+                  borderTopColor: "#1a56db",
+                  borderRadius: "50%",
+                  animation: "spin 0.7s linear infinite",
+                }}
+              />
               <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
               <span style={{ fontSize: 13, color: "#1a56db", fontWeight: 500 }}>
                 {selectedIM ? "Updating subject…" : "Creating subject…"}
@@ -154,17 +165,17 @@ export default function SubjectForm({
             </div>
           </div>
 
-          <button type="submit" disabled={isLoading} style={{
-            opacity: isLoading ? 0.6 : 1,
-            cursor: isLoading ? "not-allowed" : "pointer",
-            transition: "opacity 0.2s",
-          }}>
-            {isLoading
-              ? (selectedIM ? "Updating…" : "Creating…")
-              : "Submit"
-            }
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              opacity: isLoading ? 0.6 : 1,
+              cursor: isLoading ? "not-allowed" : "pointer",
+              transition: "opacity 0.2s",
+            }}
+          >
+            {isLoading ? (selectedIM ? "Updating…" : "Creating…") : "Submit"}
           </button>
-
         </form>
       </div>
     </div>

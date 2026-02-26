@@ -12,7 +12,11 @@ interface EditTeacherModalProps {
   onClose: () => void;
 }
 
-export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalProps) {
+export function EditTeacherModal({
+  isOpen,
+  teacher,
+  onClose,
+}: EditTeacherModalProps) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<any>({});
 
@@ -58,17 +62,19 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
       onClose();
     } catch (err: any) {
       console.error("Error updating teacher:", err);
-      
+
       if (err.response?.data) {
         const errorData = err.response.data;
-        
+
         if (errorData.error && errorData.detail) {
           toast.error(errorData.detail);
           setErrors({ general: errorData.detail });
-        } else if (typeof errorData === 'object') {
+        } else if (typeof errorData === "object") {
           setErrors(errorData);
           const firstError = Object.values(errorData)[0];
-          toast.error(Array.isArray(firstError) ? firstError[0] : String(firstError));
+          toast.error(
+            Array.isArray(firstError) ? firstError[0] : String(firstError),
+          );
         } else {
           toast.error("Failed to update teacher");
         }
@@ -100,14 +106,12 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
 
         <form onSubmit={handleSubmit} className="modal-form">
           {errors.general && (
-            <div className="error-alert">
-              {errors.general}
-            </div>
+            <div className="error-alert">{errors.general}</div>
           )}
 
           <div className="form-section">
             <h3 className="section-title">Personal Information</h3>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">
@@ -115,12 +119,16 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
                 </label>
                 <input
                   type="text"
-                  className={`form-input ${errors.first_name ? 'error' : ''}`}
+                  className={`form-input ${errors.first_name ? "error" : ""}`}
                   value={formData.first_name}
-                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, first_name: e.target.value })
+                  }
                   required
                 />
-                {errors.first_name && <span className="error-text">{errors.first_name}</span>}
+                {errors.first_name && (
+                  <span className="error-text">{errors.first_name}</span>
+                )}
               </div>
 
               <div className="form-group">
@@ -129,19 +137,23 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
                 </label>
                 <input
                   type="text"
-                  className={`form-input ${errors.last_name ? 'error' : ''}`}
+                  className={`form-input ${errors.last_name ? "error" : ""}`}
                   value={formData.last_name}
-                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, last_name: e.target.value })
+                  }
                   required
                 />
-                {errors.last_name && <span className="error-text">{errors.last_name}</span>}
+                {errors.last_name && (
+                  <span className="error-text">{errors.last_name}</span>
+                )}
               </div>
             </div>
           </div>
 
           <div className="form-section">
             <h3 className="section-title">Teaching Information</h3>
-            
+
             <div className="form-group">
               <label className="form-label">Specialization</label>
               <input
@@ -149,7 +161,9 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
                 className="form-input"
                 placeholder="e.g., Mathematics, Science, English"
                 value={formData.specialization}
-                onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, specialization: e.target.value })
+                }
               />
             </div>
 
@@ -159,7 +173,9 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
                 className="form-textarea"
                 placeholder="e.g., B.Ed Mathematics, M.Sc Applied Mathematics"
                 value={formData.qualifications}
-                onChange={(e) => setFormData({ ...formData, qualifications: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, qualifications: e.target.value })
+                }
                 rows={3}
               />
             </div>
@@ -171,14 +187,19 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
                 className="form-input"
                 min="0"
                 value={formData.years_of_experience}
-                onChange={(e) => setFormData({ ...formData, years_of_experience: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    years_of_experience: parseInt(e.target.value) || 0,
+                  })
+                }
               />
             </div>
           </div>
 
           <div className="form-section">
             <h3 className="section-title">Contact Information</h3>
-            
+
             <div className="form-group">
               <label className="form-label">Phone Number</label>
               <input
@@ -186,7 +207,9 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
                 className="form-input"
                 placeholder="+233 XX XXX XXXX"
                 value={formData.phone_number}
-                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone_number: e.target.value })
+                }
               />
             </div>
 
@@ -197,20 +220,27 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
                 className="form-input"
                 placeholder="+233 XX XXX XXXX"
                 value={formData.emergency_contact}
-                onChange={(e) => setFormData({ ...formData, emergency_contact: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    emergency_contact: e.target.value,
+                  })
+                }
               />
             </div>
           </div>
 
           <div className="form-section">
             <h3 className="section-title">Status</h3>
-            
+
             <div className="form-group">
               <label className="checkbox-label">
                 <input
                   type="checkbox"
                   checked={formData.is_active}
-                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, is_active: e.target.checked })
+                  }
                 />
                 <span>Active Teacher</span>
               </label>
@@ -226,11 +256,7 @@ export function EditTeacherModal({ isOpen, teacher, onClose }: EditTeacherModalP
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="primary-button"
-              disabled={loading}
-            >
+            <button type="submit" className="primary-button" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="animate-spin" size={18} />

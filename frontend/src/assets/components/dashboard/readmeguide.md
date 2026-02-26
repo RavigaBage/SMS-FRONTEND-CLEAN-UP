@@ -31,15 +31,15 @@ npm install lucide-react
 Import and use the component in your main app file:
 
 ```jsx
-import FirstTimeGuide from './first-time-guide';
-import { useState, useEffect } from 'react';
+import FirstTimeGuide from "./first-time-guide";
+import { useState, useEffect } from "react";
 
 function App() {
   const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
     // Check if this is the user's first time
-    const hasSeenGuide = localStorage.getItem('hasSeenGuide');
+    const hasSeenGuide = localStorage.getItem("hasSeenGuide");
     if (!hasSeenGuide) {
       setShowGuide(true);
     }
@@ -47,7 +47,7 @@ function App() {
 
   const handleGuideComplete = () => {
     setShowGuide(false);
-    localStorage.setItem('hasSeenGuide', 'true');
+    localStorage.setItem("hasSeenGuide", "true");
   };
 
   return (
@@ -65,17 +65,17 @@ Modify the component to actually perform actions when users click the buttons:
 
 ```jsx
 const handleStepComplete = async (stepId) => {
-  if (stepId === 'teachers') {
+  if (stepId === "teachers") {
     // Navigate to teacher creation page
-    navigate('/teachers/add');
-  } else if (stepId === 'classes') {
+    navigate("/teachers/add");
+  } else if (stepId === "classes") {
     // Navigate to class creation page
-    navigate('/classes/create');
-  } else if (stepId === 'settings') {
+    navigate("/classes/create");
+  } else if (stepId === "settings") {
     // Navigate to settings page
-    navigate('/settings');
+    navigate("/settings");
   }
-  
+
   // Mark as completed
   if (!completedSteps.includes(stepId)) {
     setCompletedSteps([...completedSteps, stepId]);
@@ -94,13 +94,13 @@ Edit the `prerequisites` array in the component:
 ```jsx
 const prerequisites = [
   {
-    id: 'your-step-id',
+    id: "your-step-id",
     icon: YourIcon, // from lucide-react
-    title: 'Step Title',
-    description: 'Step description text',
-    action: 'Button Text',
-    color: '#HEX_COLOR',
-    bgGradient: 'linear-gradient(135deg, #START 0%, #END 100%)'
+    title: "Step Title",
+    description: "Step description text",
+    action: "Button Text",
+    color: "#HEX_COLOR",
+    bgGradient: "linear-gradient(135deg, #START 0%, #END 100%)",
   },
   // Add more steps...
 ];
@@ -127,7 +127,7 @@ Update the `features` array to show your app's capabilities:
 
 ```jsx
 const features = [
-  { title: 'Feature Name', desc: 'Feature description' },
+  { title: "Feature Name", desc: "Feature description" },
   // Add more features...
 ];
 ```
@@ -137,16 +137,18 @@ const features = [
 ### With Redux
 
 ```jsx
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from "react-redux";
 
 function FirstTimeGuide() {
   const dispatch = useDispatch();
-  const completedSteps = useSelector(state => state.onboarding.completedSteps);
-  
+  const completedSteps = useSelector(
+    (state) => state.onboarding.completedSteps,
+  );
+
   const handleStepComplete = (stepId) => {
     dispatch(completeOnboardingStep(stepId));
   };
-  
+
   // ... rest of component
 }
 ```
@@ -154,15 +156,15 @@ function FirstTimeGuide() {
 ### With Context API
 
 ```jsx
-import { useOnboarding } from './OnboardingContext';
+import { useOnboarding } from "./OnboardingContext";
 
 function FirstTimeGuide() {
   const { completedSteps, completeStep } = useOnboarding();
-  
+
   const handleStepComplete = (stepId) => {
     completeStep(stepId);
   };
-  
+
   // ... rest of component
 }
 ```
@@ -177,7 +179,7 @@ const arePrerequisitesMet = () => {
   const hasTeachers = checkIfTeachersExist();
   const hasClasses = checkIfClassesExist();
   const settingsConfigured = checkIfSettingsConfigured();
-  
+
   return hasTeachers && hasClasses && settingsConfigured;
 };
 
@@ -190,6 +192,7 @@ if (!arePrerequisitesMet()) {
 ## Accessibility
 
 The component includes:
+
 - Keyboard navigation support
 - Semantic HTML structure
 - Clear visual feedback
@@ -220,26 +223,32 @@ To improve accessibility further:
 
 ```jsx
 const handleSkip = () => {
-  if (window.confirm('Are you sure you want to skip the setup guide? You can access it later from Settings.')) {
+  if (
+    window.confirm(
+      "Are you sure you want to skip the setup guide? You can access it later from Settings.",
+    )
+  ) {
     setIsVisible(false);
-    localStorage.setItem('guideSkipped', 'true');
+    localStorage.setItem("guideSkipped", "true");
   }
 };
 
 // Add skip button in navigation
 <button className="nav-button secondary" onClick={handleSkip}>
   Skip Tour
-</button>
+</button>;
 ```
 
 ## Example: Reopening the Guide
 
 ```jsx
 // In your settings page
-<button onClick={() => {
-  localStorage.removeItem('hasSeenGuide');
-  window.location.reload(); // Or update state to show guide
-}}>
+<button
+  onClick={() => {
+    localStorage.removeItem("hasSeenGuide");
+    window.location.reload(); // Or update state to show guide
+  }}
+>
   Replay Setup Guide
 </button>
 ```

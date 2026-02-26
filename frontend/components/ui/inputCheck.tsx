@@ -7,10 +7,7 @@ interface RowCheckboxProps {
   setChange: (checked: boolean) => void;
 }
 
-export default function RowCheckbox({
-  checked,
-  setChange,
-}: RowCheckboxProps) {
+export default function RowCheckbox({ checked, setChange }: RowCheckboxProps) {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setChange(e.target.checked);
   };

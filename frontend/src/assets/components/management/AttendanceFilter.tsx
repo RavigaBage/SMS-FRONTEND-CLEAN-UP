@@ -38,7 +38,7 @@ export function AttendanceFilterModal({
   const fetchClasses = async () => {
     try {
       const res = await apiRequest<any>("/classes/", { method: "GET" });
-      setClasses(res.results as any || res);
+      setClasses((res.results as any) || res);
     } catch (err) {
       console.error("Error fetching classes:", err);
     }
@@ -46,12 +46,15 @@ export function AttendanceFilterModal({
 
   const handleApply = () => {
     // Remove empty filters
-    const cleanedFilters = Object.entries(localFilters).reduce((acc, [key, value]) => {
-      if (value !== "" && value !== undefined) {
-        acc[key as keyof FilterState] = value;
-      }
-      return acc;
-    }, {} as FilterState);
+    const cleanedFilters = Object.entries(localFilters).reduce(
+      (acc, [key, value]) => {
+        if (value !== "" && value !== undefined) {
+          acc[key as keyof FilterState] = value;
+        }
+        return acc;
+      },
+      {} as FilterState,
+    );
 
     onApply(cleanedFilters);
   };
@@ -65,14 +68,19 @@ export function AttendanceFilterModal({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container modal-sm" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container modal-sm"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div>
             <h2 className="modal-title">
               <Filter className="modal-icon" />
               Filter Attendance
             </h2>
-            <p className="modal-subtitle">Filter attendance records by criteria</p>
+            <p className="modal-subtitle">
+              Filter attendance records by criteria
+            </p>
           </div>
           <button className="modal-close" onClick={onClose}>
             <X size={24} />
@@ -126,7 +134,10 @@ export function AttendanceFilterModal({
                     className="form-input"
                     value={localFilters.start_date || ""}
                     onChange={(e) =>
-                      setLocalFilters({ ...localFilters, start_date: e.target.value })
+                      setLocalFilters({
+                        ...localFilters,
+                        start_date: e.target.value,
+                      })
                     }
                   />
                 </div>
@@ -137,7 +148,10 @@ export function AttendanceFilterModal({
                     className="form-input"
                     value={localFilters.end_date || ""}
                     onChange={(e) =>
-                      setLocalFilters({ ...localFilters, end_date: e.target.value })
+                      setLocalFilters({
+                        ...localFilters,
+                        end_date: e.target.value,
+                      })
                     }
                   />
                 </div>

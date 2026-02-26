@@ -3,84 +3,135 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { fetchWithAuth } from "@/src/lib/apiClient";
-import Pagination from '@/src/assets/components/dashboard/Pagnation';
+import Pagination from "@/src/assets/components/dashboard/Pagnation";
 
 /* ── All interfaces & types unchanged ─────────────────────────────────────── */
 interface ClassApiResponse {
-  count: number; next: string | null; previous: string | null;
+  count: number;
+  next: string | null;
+  previous: string | null;
   results: { id: number; class_name: string; academic_year: string }[];
 }
 interface SubjectApiResponse {
-  count: number; next: string | null; previous: string | null;
+  count: number;
+  next: string | null;
+  previous: string | null;
   results: { id: number; subject_name: string; subject_code: string }[];
 }
 export interface YearsModel {
-  end_date: string
-  id: number
-  is_current: boolean
-  start_date: string
-  year_name: string
+  end_date: string;
+  id: number;
+  is_current: boolean;
+  start_date: string;
+  year_name: string;
 }
 
-interface ClassType { id: number; name: string; }
-interface SubjectType { id: number; name: string; subject_code: string; }
+interface ClassType {
+  id: number;
+  name: string;
+}
+interface SubjectType {
+  id: number;
+  name: string;
+  subject_code: string;
+}
 interface UserType {
-  id: string; email: string; first_name: string; last_name: string;
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
   role: "student" | "teacher" | "admin" | string;
-  is_active: boolean; is_staff: boolean; created_at: string;
+  is_active: boolean;
+  is_staff: boolean;
+  created_at: string;
 }
 interface StudentType {
-  id: number; user: UserType; parent: number | null;
-  first_name: string; last_name: string; date_of_birth: string;
+  id: number;
+  user: UserType;
+  parent: number | null;
+  first_name: string;
+  last_name: string;
+  date_of_birth: string;
   status: "active" | "inactive" | "graduated" | string;
 }
 interface ResultType {
-  id: number; student: StudentType;
-  assessment_score: number; assessment_total: number;
-  test_score: number; test_total: number;
-  exam_score: number; exam_total: number;
-  weighted_assessment: number; weighted_test: number; weighted_exam: number;
-  total_score: number; grade_letter: string; grade_date: string; subject_rank: string;
+  id: number;
+  student: StudentType;
+  assessment_score: number;
+  assessment_total: number;
+  test_score: number;
+  test_total: number;
+  exam_score: number;
+  exam_total: number;
+  weighted_assessment: number;
+  weighted_test: number;
+  weighted_exam: number;
+  total_score: number;
+  grade_letter: string;
+  grade_date: string;
+  subject_rank: string;
 }
-interface StudentWithGrade { student: StudentType; grade: ResultType | null; }
+interface StudentWithGrade {
+  student: StudentType;
+  grade: ResultType | null;
+}
 interface PaginatedResponse<T> {
-  count: number; next: string | null; previous: string | null; results: T[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
 }
 
 /* ── API layer unchanged ───────────────────────────────────────────────────── */
 const api = {
   getTeacherAssignments: async () => {
-    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/classes/`);
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+    );
     if (!res.ok) throw new Error("Failed to fetch classes");
     return res.json();
   },
   getSubjects: async () => {
-    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/subjects/`);
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}/subjects/`,
+    );
     if (!res.ok) throw new Error("Failed to fetch subjects");
     return res.json();
   },
   getSubjectsForClass: async (classId: number) => {
-    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/classes/${classId}/subjects/`);
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}/classes/${classId}/subjects/`,
+    );
     if (!res.ok) throw new Error("Failed to fetch subjects for class");
     return res.json();
   },
   getClassesForSubject: async (subjectId: number) => {
-    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/subjects/${subjectId}/classes/`);
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}/subjects/${subjectId}/classes/`,
+    );
     if (!res.ok) throw new Error("Failed to fetch classes for subject");
     return res.json();
   },
-  getResults: async ({ classId, subjectId, academicYear, term }: {
-    classId: number; subjectId: number; academicYear: string; term: string;
+  getResults: async ({
+    classId,
+    subjectId,
+    academicYear,
+    term,
+  }: {
+    classId: number;
+    subjectId: number;
+    academicYear: string;
+    term: string;
   }) => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/grades/?class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`
+      `${process.env.NEXT_PUBLIC_API_URL}/grades/?class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
     );
     if (!res.ok) throw new Error("Failed to fetch results");
     return res.json();
   },
   getStudentsInClass: async (classId: number, page: number = 1) => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/classes/${classId}/students/?page=${page}`
+      `${process.env.NEXT_PUBLIC_API_URL}/classes/${classId}/students/?page=${page}`,
     );
     if (!res.ok) throw new Error("Failed to fetch students");
     return res.json();
@@ -104,12 +155,20 @@ function GradePill({ letter }: { letter?: string }) {
   };
   const c = map[l] ?? { bg: "#f1f5f9", color: "#475569" };
   return (
-    <span style={{
-      display: "inline-block", padding: "4px 10px", borderRadius: 8,
-      background: c.bg, color: c.color,
-      fontFamily: "var(--cr-mono)", fontWeight: 700, fontSize: 13,
-      minWidth: 32, textAlign: "center",
-    }}>
+    <span
+      style={{
+        display: "inline-block",
+        padding: "4px 10px",
+        borderRadius: 8,
+        background: c.bg,
+        color: c.color,
+        fontFamily: "var(--cr-mono)",
+        fontWeight: 700,
+        fontSize: 13,
+        minWidth: 32,
+        textAlign: "center",
+      }}
+    >
       {letter}
     </span>
   );
@@ -120,23 +179,37 @@ function RankBadge({ rankStr }: { rankStr?: string | null }) {
   const n = parseInt(rankStr, 10);
   if (isNaN(n)) return <span style={styles.dash}>—</span>;
   const suffix = n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
-  const configs: Record<number, { bg: string; color: string; border: string }> = {
-    1: { bg: "linear-gradient(135deg,#ffd700,#fdb931)", color: "#78350f", border: "#b45309" },
-    2: { bg: "#1d4ed8",  color: "#fff", border: "#3b82f6" },
-    3: { bg: "#92400e",  color: "#fff", border: "#d97706" },
-  };
+  const configs: Record<number, { bg: string; color: string; border: string }> =
+    {
+      1: {
+        bg: "linear-gradient(135deg,#ffd700,#fdb931)",
+        color: "#78350f",
+        border: "#b45309",
+      },
+      2: { bg: "#1d4ed8", color: "#fff", border: "#3b82f6" },
+      3: { bg: "#92400e", color: "#fff", border: "#d97706" },
+    };
   const cfg = configs[n];
   return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", justifyContent: "center",
-      padding: "4px 10px", borderRadius: 8, minWidth: 44,
-      fontFamily: "var(--cr-mono)", fontWeight: 700, fontSize: 12,
-      background: cfg?.bg ?? "#f1f5f9",
-      color: cfg?.color ?? "#475569",
-      border: `1px solid ${cfg?.border ?? "#e2e8f0"}`,
-      boxShadow: n <= 3 ? "0 2px 6px rgba(0,0,0,.12)" : "none",
-    }}>
-      {n}{suffix}
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "4px 10px",
+        borderRadius: 8,
+        minWidth: 44,
+        fontFamily: "var(--cr-mono)",
+        fontWeight: 700,
+        fontSize: 12,
+        background: cfg?.bg ?? "#f1f5f9",
+        color: cfg?.color ?? "#475569",
+        border: `1px solid ${cfg?.border ?? "#e2e8f0"}`,
+        boxShadow: n <= 3 ? "0 2px 6px rgba(0,0,0,.12)" : "none",
+      }}
+    >
+      {n}
+      {suffix}
     </span>
   );
 }
@@ -147,18 +220,45 @@ function ScoreBar({ value }: { value?: number }) {
   const color = pct >= 70 ? "#059669" : pct >= 50 ? "#d97706" : "#dc2626";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <span style={{ fontFamily: "var(--cr-mono)", fontSize: 12, fontWeight: 600, minWidth: 32 }}>
+      <span
+        style={{
+          fontFamily: "var(--cr-mono)",
+          fontSize: 12,
+          fontWeight: 600,
+          minWidth: 32,
+        }}
+      >
         {value}
       </span>
-      <div style={{ flex: 1, height: 5, background: "#e2e8f0", borderRadius: 99, overflow: "hidden", minWidth: 40 }}>
-        <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 99 }} />
+      <div
+        style={{
+          flex: 1,
+          height: 5,
+          background: "#e2e8f0",
+          borderRadius: 99,
+          overflow: "hidden",
+          minWidth: 40,
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${pct}%`,
+            background: color,
+            borderRadius: 99,
+          }}
+        />
       </div>
     </div>
   );
 }
 
 const styles = {
-  dash: { color: "#94a3b8", fontFamily: "var(--cr-mono)", fontSize: 13 } as React.CSSProperties,
+  dash: {
+    color: "#94a3b8",
+    fontFamily: "var(--cr-mono)",
+    fontSize: 13,
+  } as React.CSSProperties,
 };
 
 const css = `
@@ -352,71 +452,218 @@ const css = `
 
 /* ── ICON helpers ─────────────────────────────────────────────────────────── */
 const IC = {
-  cal: <svg className="icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M5 1v4M11 1v4M2 7h12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>,
-  clock: <svg className="icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4"/><path d="M8 5v3l2 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>,
-  home: <svg className="icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 13V5.5L8 2l6 3.5V13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><rect x="5.5" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.4"/></svg>,
-  book: <svg className="icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4"/><path d="M5 6h6M5 9h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>,
-  down: <svg className="cr-select-caret" width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-  list: <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-  edit: <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/></svg>,
-  plus: <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,
+  cal: (
+    <svg
+      className="icon"
+      width="13"
+      height="13"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <rect
+        x="2"
+        y="3"
+        width="12"
+        height="11"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.4"
+      />
+      <path
+        d="M5 1v4M11 1v4M2 7h12"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  clock: (
+    <svg
+      className="icon"
+      width="13"
+      height="13"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4" />
+      <path
+        d="M8 5v3l2 1.5"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  home: (
+    <svg
+      className="icon"
+      width="13"
+      height="13"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M2 13V5.5L8 2l6 3.5V13"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <rect
+        x="5.5"
+        y="8"
+        width="5"
+        height="5"
+        rx="1"
+        stroke="currentColor"
+        strokeWidth="1.4"
+      />
+    </svg>
+  ),
+  book: (
+    <svg
+      className="icon"
+      width="13"
+      height="13"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+      />
+      <path
+        d="M5 6h6M5 9h4"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  down: (
+    <svg
+      className="cr-select-caret"
+      width="13"
+      height="13"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M4 6l4 4 4-4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  list: (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M2 4h12M2 8h12M2 12h8"
+        stroke="#6366f1"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  edit: (
+    <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  plus: (
+    <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M8 3v10M3 8h10"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
 };
 
 function SelectField({ icon, value, onChange, children, minWidth = 140 }: any) {
   return (
     <div className="cr-select-wrap">
       {icon}
-      <select className="cr-select" style={{ minWidth }} value={value} onChange={onChange}>{children}</select>
+      <select
+        className="cr-select"
+        style={{ minWidth }}
+        value={value}
+        onChange={onChange}
+      >
+        {children}
+      </select>
       {IC.down}
     </div>
   );
 }
 
 export default function ClassResults() {
-  const [assignedClasses,   setAssignedClasses]   = useState<ClassType[]>([]);
-  const [assignedSubjects,  setAssignedSubjects]  = useState<SubjectType[]>([]);
-  const [availableClasses,  setAvailableClasses]  = useState<ClassType[]>([]);
+  const [assignedClasses, setAssignedClasses] = useState<ClassType[]>([]);
+  const [assignedSubjects, setAssignedSubjects] = useState<SubjectType[]>([]);
+  const [availableClasses, setAvailableClasses] = useState<ClassType[]>([]);
   const [availableSubjects, setAvailableSubjects] = useState<SubjectType[]>([]);
-  const [selectedClass,     setSelectedClass]     = useState<ClassType | null>(null);
-  const [selectedSubject,   setSelectedSubject]   = useState<SubjectType | null>(null);
-  const [academicYear,      setAcademicYear]      = useState<string>("2025-26");
-  const [term,              setTerm]              = useState<string>("first");
-  const [studentsWithGrades, setStudentsWithGrades] = useState<StudentWithGrade[]>([]);
-  const [loading,            setLoading]           = useState(false);
-  const [message,            setMessage]           = useState("");
-  const [selectedYear,       setSelectedYear]      = useState("2025-26");
-  const [pagination,         setPagination]        = useState<PaginatedResponse<StudentWithGrade> | null>(null);
-  const [page,               setPage]              = useState(1);
+  const [selectedClass, setSelectedClass] = useState<ClassType | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<SubjectType | null>(
+    null,
+  );
+  const [academicYear, setAcademicYear] = useState<string>("2025-26");
+  const [term, setTerm] = useState<string>("first");
+  const [studentsWithGrades, setStudentsWithGrades] = useState<
+    StudentWithGrade[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [selectedYear, setSelectedYear] = useState("2025-26");
+  const [pagination, setPagination] =
+    useState<PaginatedResponse<StudentWithGrade> | null>(null);
+  const [page, setPage] = useState(1);
 
   const generateAcademicYears = (): any => {
     const currentYear = new Date().getFullYear();
-    const startYear   = 2000;
+    const startYear = 2000;
 
-    return Array.from(
-      { length: currentYear - startYear + 1 },
-      (_, i) => {
-        const year = currentYear - i;        
-        return {
-          end_date:   `${year}-${year + 1}`,
-          start_date:  year,
-          id:          i,
-          is_current:  year === currentYear,
-          year_name:  `${year}-${year + 1}`,
-        };
-      }
-    );
+    return Array.from({ length: currentYear - startYear + 1 }, (_, i) => {
+      const year = currentYear - i;
+      return {
+        end_date: `${year}-${year + 1}`,
+        start_date: year,
+        id: i,
+        is_current: year === currentYear,
+        year_name: `${year}-${year + 1}`,
+      };
+    });
   };
   const academicYears = generateAcademicYears();
 
   useEffect(() => {
     async function initAssignments() {
       const classRes: ClassApiResponse = await api.getTeacherAssignments();
-      const classes: ClassType[] = classRes.results.map(c => ({ id: c.id, name: c.class_name }));
-      setAssignedClasses(classes); setAvailableClasses(classes);
+      const classes: ClassType[] = classRes.results.map((c) => ({
+        id: c.id,
+        name: c.class_name,
+      }));
+      setAssignedClasses(classes);
+      setAvailableClasses(classes);
       const subRes: SubjectApiResponse = await api.getSubjects();
-      const subjects: SubjectType[] = subRes.results.map(s => ({ id: s.id, name: s.subject_name, subject_code: s.subject_code }));
-      setAssignedSubjects(subjects); setAvailableSubjects(subjects);
-      if (!classes.length && !subjects.length) setMessage("You are not yet assigned to any class or subject.");
+      const subjects: SubjectType[] = subRes.results.map((s) => ({
+        id: s.id,
+        name: s.subject_name,
+        subject_code: s.subject_code,
+      }));
+      setAssignedSubjects(subjects);
+      setAvailableSubjects(subjects);
+      if (!classes.length && !subjects.length)
+        setMessage("You are not yet assigned to any class or subject.");
       else if (!subjects.length) setMessage("No subjects available yet.");
       else if (!classes.length) setMessage("No classes assigned yet.");
     }
@@ -426,24 +673,31 @@ export default function ClassResults() {
   useEffect(() => {
     async function loadSubjects() {
       if (!selectedClass) return;
-      if (!assignedSubjects.length) setAvailableSubjects(await api.getSubjectsForClass(selectedClass.id));
+      if (!assignedSubjects.length)
+        setAvailableSubjects(await api.getSubjectsForClass(selectedClass.id));
       fetchResults();
     }
     loadSubjects();
   }, [selectedClass]);
 
-  useEffect(() => { fetchResults(); }, [academicYear, term, page]);
+  useEffect(() => {
+    fetchResults();
+  }, [academicYear, term, page]);
 
   useEffect(() => {
     async function loadClasses() {
       if (!selectedSubject) return;
-      if (!assignedClasses.length) setAvailableClasses(await api.getClassesForSubject(selectedSubject.id));
+      if (!assignedClasses.length)
+        setAvailableClasses(await api.getClassesForSubject(selectedSubject.id));
       fetchResults();
     }
     loadClasses();
   }, [selectedSubject]);
 
-  const handleYearSelect = (val: string) => { setSelectedYear(val); setAcademicYear(val); };
+  const handleYearSelect = (val: string) => {
+    setSelectedYear(val);
+    setAcademicYear(val);
+  };
 
   async function fetchResults() {
     if (!selectedClass || !selectedSubject) return;
@@ -451,18 +705,32 @@ export default function ClassResults() {
     try {
       const [studentsData, gradesData] = await Promise.all([
         api.getStudentsInClass(selectedClass.id, page),
-        api.getResults({ classId: selectedClass.id, subjectId: selectedSubject.id, academicYear, term }),
+        api.getResults({
+          classId: selectedClass.id,
+          subjectId: selectedSubject.id,
+          academicYear,
+          term,
+        }),
       ]);
       const students: StudentType[] = studentsData.results || studentsData;
       const grades: ResultType[] = gradesData.results || [];
       const gradeMap = new Map<number, ResultType>();
-      grades.forEach(g => gradeMap.set(g.student.id, g));
-      const merged: StudentWithGrade[] = students.map(s => ({ student: s, grade: gradeMap.get(s.id) || null }));
+      grades.forEach((g) => gradeMap.set(g.student.id, g));
+      const merged: StudentWithGrade[] = students.map((s) => ({
+        student: s,
+        grade: gradeMap.get(s.id) || null,
+      }));
       setStudentsWithGrades(merged);
-      setPagination({ count: studentsData.count, next: studentsData.next, previous: studentsData.previous, results: merged });
+      setPagination({
+        count: studentsData.count,
+        next: studentsData.next,
+        previous: studentsData.previous,
+        results: merged,
+      });
     } catch (err) {
       console.error("Error fetching results:", err);
-      setStudentsWithGrades([]); setPagination(null);
+      setStudentsWithGrades([]);
+      setPagination(null);
     } finally {
       setLoading(false);
     }
@@ -470,10 +738,15 @@ export default function ClassResults() {
 
   const handlePageChange = (newPage: number) => setPage(newPage);
 
-  const gradedCount  = studentsWithGrades.filter(r => r.grade).length;
+  const gradedCount = studentsWithGrades.filter((r) => r.grade).length;
   const pendingCount = studentsWithGrades.length - gradedCount;
-  const avgScore     = studentsWithGrades.length
-    ? (studentsWithGrades.reduce((s, r) => s + (r.grade?.total_score ?? 0), 0) / studentsWithGrades.length).toFixed(1)
+  const avgScore = studentsWithGrades.length
+    ? (
+        studentsWithGrades.reduce(
+          (s, r) => s + (r.grade?.total_score ?? 0),
+          0,
+        ) / studentsWithGrades.length
+      ).toFixed(1)
     : null;
 
   const gradeQuery = (student: StudentType) => ({
@@ -503,7 +776,9 @@ export default function ClassResults() {
               {selectedClass?.name ?? "No class selected"}
             </span>
             <span className={`cr-tag ${selectedSubject ? "active" : ""}`}>
-              {selectedSubject ? `${selectedSubject.name} · ${selectedSubject.subject_code}` : "No subject"}
+              {selectedSubject
+                ? `${selectedSubject.name} · ${selectedSubject.subject_code}`
+                : "No subject"}
             </span>
           </div>
         </div>
@@ -514,35 +789,69 @@ export default function ClassResults() {
         <span className="cr-filter-label">Filters</span>
         <div className="cr-divider" />
 
-        <SelectField icon={IC.cal} value={selectedYear} onChange={(e: any) => handleYearSelect(e.target.value)}>
-          {academicYears.map((y: any) => <option key={y.id} value={y.year_name}>{y.year_name}</option>)}
+        <SelectField
+          icon={IC.cal}
+          value={selectedYear}
+          onChange={(e: any) => handleYearSelect(e.target.value)}
+        >
+          {academicYears.map((y: any) => (
+            <option key={y.id} value={y.year_name}>
+              {y.year_name}
+            </option>
+          ))}
         </SelectField>
 
-        <SelectField icon={IC.clock} value={term} onChange={(e: any) => setTerm(e.target.value)}>
+        <SelectField
+          icon={IC.clock}
+          value={term}
+          onChange={(e: any) => setTerm(e.target.value)}
+        >
           <option value="first">First Term</option>
           <option value="second">Second Term</option>
           <option value="third">Third Term</option>
         </SelectField>
 
-        <SelectField icon={IC.home} value={selectedClass?.id || ""} onChange={(e: any) => {
-          setSelectedClass(availableClasses.find(c => c.id === Number(e.target.value)) || null);
-          setPage(1);
-        }}>
+        <SelectField
+          icon={IC.home}
+          value={selectedClass?.id || ""}
+          onChange={(e: any) => {
+            setSelectedClass(
+              availableClasses.find((c) => c.id === Number(e.target.value)) ||
+                null,
+            );
+            setPage(1);
+          }}
+        >
           <option value="">Select Class</option>
-          {availableClasses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          {availableClasses.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
         </SelectField>
 
-        <SelectField icon={IC.book} value={selectedSubject?.id || ""} minWidth={170} onChange={(e: any) => {
-          setSelectedSubject(availableSubjects.find(s => s.id === Number(e.target.value)) || null);
-          setPage(1);
-        }}>
+        <SelectField
+          icon={IC.book}
+          value={selectedSubject?.id || ""}
+          minWidth={170}
+          onChange={(e: any) => {
+            setSelectedSubject(
+              availableSubjects.find((s) => s.id === Number(e.target.value)) ||
+                null,
+            );
+            setPage(1);
+          }}
+        >
           <option value="">Select Subject</option>
-          {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.name} · {s.subject_code}</option>)}
+          {availableSubjects.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name} · {s.subject_code}
+            </option>
+          ))}
         </SelectField>
       </div>
 
       <div className="cr-body">
-
         {message && <div className="cr-message">{message}</div>}
 
         {studentsWithGrades.length > 0 && (
@@ -573,7 +882,9 @@ export default function ClassResults() {
             {IC.list}
             <span className="cr-card-title">Grade Sheet</span>
             {studentsWithGrades.length > 0 && (
-              <span className="cr-card-chip">{studentsWithGrades.length} students</span>
+              <span className="cr-card-chip">
+                {studentsWithGrades.length} students
+              </span>
             )}
           </div>
 
@@ -589,9 +900,15 @@ export default function ClassResults() {
                   <tr>
                     <th className="cr-sticky">Student</th>
                     <th>Status</th>
-                    <th className="gc" colSpan={2}>Assessment</th>
-                    <th className="gc" colSpan={2}>Class Test</th>
-                    <th className="gc" colSpan={2}>Exam</th>
+                    <th className="gc" colSpan={2}>
+                      Assessment
+                    </th>
+                    <th className="gc" colSpan={2}>
+                      Class Test
+                    </th>
+                    <th className="gc" colSpan={2}>
+                      Exam
+                    </th>
                     <th>Asmt 20%</th>
                     <th>Test 30%</th>
                     <th>Exam 50%</th>
@@ -604,14 +921,21 @@ export default function ClassResults() {
                 <tbody>
                   {studentsWithGrades.map(({ student, grade }) => (
                     <tr key={student.id} className={!grade ? "cr-pending" : ""}>
-
                       {/* name */}
                       <td className="cr-sticky">
                         <div className="cr-name-cell">
-                          <div className={`cr-avatar ${grade ? "graded" : "pending"}`}>
+                          <div
+                            className={`cr-avatar ${grade ? "graded" : "pending"}`}
+                          >
                             {getInitials(student.first_name, student.last_name)}
                           </div>
-                          <Link href={{ pathname: `/Home/Academics/grades/student`, query: gradeQuery(student) }} className="cr-name-link">
+                          <Link
+                            href={{
+                              pathname: `/Home/Academics/grades/student`,
+                              query: gradeQuery(student),
+                            }}
+                            className="cr-name-link"
+                          >
                             {student.first_name} {student.last_name}
                           </Link>
                         </div>
@@ -619,14 +943,20 @@ export default function ClassResults() {
 
                       {/* status */}
                       <td>
-                        <span className={`cr-status ${grade ? "graded" : "pending"}`}>
+                        <span
+                          className={`cr-status ${grade ? "graded" : "pending"}`}
+                        >
                           {grade ? "✓ Graded" : "○ Pending"}
                         </span>
                       </td>
 
                       {/* assessment */}
-                      <td className="mono gcd">{grade?.assessment_score ?? "—"}</td>
-                      <td className="mono gcd">{grade?.assessment_total ?? "—"}</td>
+                      <td className="mono gcd">
+                        {grade?.assessment_score ?? "—"}
+                      </td>
+                      <td className="mono gcd">
+                        {grade?.assessment_total ?? "—"}
+                      </td>
 
                       {/* test */}
                       <td className="mono gcd">{grade?.test_score ?? "—"}</td>
@@ -637,23 +967,34 @@ export default function ClassResults() {
                       <td className="mono gcd">{grade?.exam_total ?? "—"}</td>
 
                       {/* weighted */}
-                      <td className="mono">{grade?.weighted_assessment ?? "—"}</td>
+                      <td className="mono">
+                        {grade?.weighted_assessment ?? "—"}
+                      </td>
                       <td className="mono">{grade?.weighted_test ?? "—"}</td>
                       <td className="mono">{grade?.weighted_exam ?? "—"}</td>
 
                       {/* total */}
-                      <td style={{ minWidth: 110 }}><ScoreBar value={grade?.total_score} /></td>
+                      <td style={{ minWidth: 110 }}>
+                        <ScoreBar value={grade?.total_score} />
+                      </td>
 
                       {/* grade */}
-                      <td><GradePill letter={grade?.grade_letter} /></td>
+                      <td>
+                        <GradePill letter={grade?.grade_letter} />
+                      </td>
 
                       {/* rank */}
-                      <td><RankBadge rankStr={grade?.subject_rank} /></td>
+                      <td>
+                        <RankBadge rankStr={grade?.subject_rank} />
+                      </td>
 
                       {/* action */}
                       <td>
                         <Link
-                          href={{ pathname: `/Home/Academics/grades/student`, query: gradeQuery(student) }}
+                          href={{
+                            pathname: `/Home/Academics/grades/student`,
+                            query: gradeQuery(student),
+                          }}
                           className={`cr-btn ${grade ? "edit" : "add"}`}
                         >
                           {grade ? <>{IC.edit} Edit</> : <>{IC.plus} Add</>}
@@ -677,7 +1018,9 @@ export default function ClassResults() {
 
           {pagination && pagination.count > 0 && (
             <div className="cr-footer">
-              <span className="cr-footer-info">Page {page} · {pagination.count} students total</span>
+              <span className="cr-footer-info">
+                Page {page} · {pagination.count} students total
+              </span>
               <Pagination
                 count={pagination.count}
                 next={pagination.next}
@@ -688,7 +1031,6 @@ export default function ClassResults() {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

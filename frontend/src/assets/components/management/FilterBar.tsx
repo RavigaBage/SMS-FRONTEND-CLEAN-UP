@@ -30,7 +30,9 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
 
   const fetchClassData = async () => {
     try {
-      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/classes`);
+      const res = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/classes`,
+      );
       const data = await res.json();
       if (data?.results) setClassData(data.results);
     } catch (err) {
@@ -49,12 +51,17 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
 
   return (
     <div className="bg-white p-6 rounded-t-3xl border border-slate-200 shadow-sm space-y-5 w-full max-w-[70%] mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6 w-full" style={{width:"100%"}}>
+      <div
+        className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6 w-full"
+        style={{ width: "100%" }}
+      >
         {/* Filters */}
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Grade/Class */}
           <div className="flex flex-col space-y-1">
-            <label className="text-xs font-semibold text-slate-500 uppercase">Grade / Class</label>
+            <label className="text-xs font-semibold text-slate-500 uppercase">
+              Grade / Class
+            </label>
             <div className="relative">
               <select
                 value={selectedClass}
@@ -68,13 +75,18 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <ChevronDown
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={16}
+              />
             </div>
           </div>
 
           {/* Status */}
           <div className="flex flex-col space-y-1">
-            <label className="text-xs font-semibold text-slate-500 uppercase">Status</label>
+            <label className="text-xs font-semibold text-slate-500 uppercase">
+              Status
+            </label>
             <div className="relative">
               <select
                 value={selectedStatus}
@@ -88,7 +100,10 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                 <option value="transferred">Transferred</option>
                 <option value="withdrawn">Withdrawn</option>
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <ChevronDown
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={16}
+              />
             </div>
           </div>
         </div>
@@ -103,7 +118,11 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
       </div>
 
       {/* Add Student Modal */}
-      <AddStudentModal isOpen={isModalOpen} onSuccess={()=>setIsModalOpen(false)} onClose={() => setIsModalOpen(false)} />
+      <AddStudentModal
+        isOpen={isModalOpen}
+        onSuccess={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

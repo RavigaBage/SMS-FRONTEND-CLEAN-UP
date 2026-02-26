@@ -37,7 +37,9 @@ interface Syllabus {
 
 export default function Syllabi() {
   const [syllabi, setSyllabi] = useState<Syllabus[]>([]);
-  const [selectedSyllabus, setSelectedSyllabus] = useState<Syllabus | null>(null);
+  const [selectedSyllabus, setSelectedSyllabus] = useState<Syllabus | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -47,7 +49,7 @@ export default function Syllabi() {
   const [selectSubject, setSelectSubject] = useState("");
   const [classes, setClasses] = useState<ClassObj[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
-  
+
   // Fetch initial data on mount
   useEffect(() => {
     fetchData();
@@ -58,18 +60,17 @@ export default function Syllabi() {
     try {
       // Fetch classes
       const classResponse = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes/`
+        `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
       );
       const classData = await classResponse.json();
       setClasses(classData.results || classData);
 
       // Fetch subjects
       const subjectResponse = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/subjects/`
+        `${process.env.NEXT_PUBLIC_API_URL}/subjects/`,
       );
       const subjectData = await subjectResponse.json();
       setSubjects(subjectData.results || subjectData);
-
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
@@ -86,7 +87,7 @@ export default function Syllabi() {
     try {
       setLoading(true);
       let url = `${process.env.NEXT_PUBLIC_API_URL}/syllabi/?`;
-      
+
       if (selectedClass) {
         url += `class_obj=${selectedClass}&`;
       }
@@ -96,10 +97,10 @@ export default function Syllabi() {
 
       const syllResponse = await fetchWithAuth(url);
       const syllData = await syllResponse.json();
-      
+
       const syllabusArray = syllData.results || syllData;
       setSyllabi(syllabusArray);
-      
+
       // Set first syllabus as selected if available
       if (syllabusArray.length > 0) {
         setSelectedSyllabus(syllabusArray[0]);
@@ -116,7 +117,11 @@ export default function Syllabi() {
   };
 
   const handleDeleteSyllabus = async (syllabusId: number) => {
-    if (!confirm("Are you sure you want to delete this syllabus? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this syllabus? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
@@ -125,13 +130,13 @@ export default function Syllabi() {
         `${process.env.NEXT_PUBLIC_API_URL}/syllabi/${syllabusId}/`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       if (response.ok) {
         alert("Syllabus deleted successfully!");
         // Remove from list
-        setSyllabi(prev => prev.filter(s => s.id !== syllabusId));
+        setSyllabi((prev) => prev.filter((s) => s.id !== syllabusId));
         // Clear selection if deleted syllabus was selected
         if (selectedSyllabus?.id === syllabusId) {
           setSelectedSyllabus(syllabi.length > 1 ? syllabi[0] : null);
@@ -151,27 +156,32 @@ export default function Syllabi() {
   };
 
   // Group syllabi by week number
-  const groupedSyllabi = syllabi.reduce((acc, syllabus) => {
-    const weekKey = `Week ${syllabus.week_number}`;
-    if (!acc[weekKey]) {
-      acc[weekKey] = [];
-    }
-    acc[weekKey].push(syllabus);
-    return acc;
-  }, {} as Record<string, Syllabus[]>);
+  const groupedSyllabi = syllabi.reduce(
+    (acc, syllabus) => {
+      const weekKey = `Week ${syllabus.week_number}`;
+      if (!acc[weekKey]) {
+        acc[weekKey] = [];
+      }
+      acc[weekKey].push(syllabus);
+      return acc;
+    },
+    {} as Record<string, Syllabus[]>,
+  );
 
   // Filter syllabi based on search
   const filteredSyllabi = syllabi.filter(
     (s) =>
-      s.subject?.subject_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.subject?.subject_name
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       s.topic_title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.content_summary?.toLowerCase().includes(searchQuery.toLowerCase())
+      s.content_summary?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleBulkDownload = async () => {
     alert("Bulk download feature coming soon!");
   };
-  
+
   if (loading && syllabi.length === 0) {
     return (
       <div className="container SYLLABIDATA">
@@ -187,9 +197,7 @@ export default function Syllabi() {
       <header className="header">
         <div>
           <h1>Syllabi Management</h1>
-          <p>
-            Academic Year 2025-2026 • {syllabi.length} Syllabi Found
-          </p>
+          <p>Academic Year 2025-2026 • {syllabi.length} Syllabi Found</p>
         </div>
         <div className="header-div">
           <button className="btn btn-outline" onClick={handleBulkDownload}>
@@ -228,39 +236,39 @@ export default function Syllabi() {
         <aside className="list-panel">
           <div className="panel-header">
             <h3>Filter Syllabi</h3>
-            <select 
-              className="search-box" 
+            <select
+              className="search-box"
               value={selectSubject}
               onChange={(e) => setSelectSubject(e.target.value)}
             >
               <option value="">All Subjects</option>
-              {subjects.map(item => (
+              {subjects.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.subject_name} - {item.subject_code}
                 </option>
               ))}
             </select>
-            <select 
-              className="search-box" 
+            <select
+              className="search-box"
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
             >
               <option value="">All Classes</option>
-              {classes.map(item => (
+              {classes.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.class_name}
                 </option>
               ))}
             </select>
-            <button 
-              className="btn btn-primary" 
+            <button
+              className="btn btn-primary"
               onClick={handleSyllabiClick}
-              style={{ width: '100%', marginTop: '8px' }}
+              style={{ width: "100%", marginTop: "8px" }}
             >
               Load Syllabi
             </button>
           </div>
-          
+
           <div className="scroll-area">
             {Object.entries(groupedSyllabi).map(([weekLabel, weekSyllabi]) => (
               <div className="class-group" key={weekLabel}>
@@ -272,7 +280,7 @@ export default function Syllabi() {
                       selectedSyllabus?.id === syllabus.id ? "active" : ""
                     }`}
                   >
-                    <div 
+                    <div
                       className="item-info"
                       onClick={() => setSelectedSyllabus(syllabus)}
                       style={{ cursor: "pointer", flex: 1 }}
@@ -280,7 +288,13 @@ export default function Syllabi() {
                       <h4>{syllabus.topic_title}</h4>
                       <span>{syllabus.subject?.subject_name}</span>
                     </div>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "8px",
+                        alignItems: "center",
+                      }}
+                    >
                       <button
                         className="icon-btn"
                         onClick={(e) => {
@@ -328,7 +342,13 @@ export default function Syllabi() {
             ))}
 
             {Object.keys(groupedSyllabi).length === 0 && (
-              <div style={{ padding: "20px", textAlign: "center", color: "#64748b" }}>
+              <div
+                style={{
+                  padding: "20px",
+                  textAlign: "center",
+                  color: "#64748b",
+                }}
+              >
                 <p>No syllabi found. Select filters and click "Load Syllabi"</p>
               </div>
             )}
@@ -354,7 +374,7 @@ export default function Syllabi() {
                           stroke="currentColor"
                           strokeWidth="2.5"
                         >
-                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                         </svg>
                         {selectedSyllabus.subject?.subject_name}
                       </span>
@@ -383,17 +403,25 @@ export default function Syllabi() {
                           stroke="currentColor"
                           strokeWidth="2.5"
                         >
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                          <line x1="16" y1="2" x2="16" y2="6"/>
-                          <line x1="8" y1="2" x2="8" y2="6"/>
-                          <line x1="3" y1="10" x2="21" y2="10"/>
+                          <rect
+                            x="3"
+                            y="4"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                          />
+                          <line x1="16" y1="2" x2="16" y2="6" />
+                          <line x1="8" y1="2" x2="8" y2="6" />
+                          <line x1="3" y1="10" x2="21" y2="10" />
                         </svg>
                         Week {selectedSyllabus.week_number}
                       </span>
                     </div>
                   </div>
-                  <div style={{ fontSize: '14px', color: '#64748b' }}>
-                    Teacher: {selectedSyllabus.teacher?.full_name || 'Not assigned'}
+                  <div style={{ fontSize: "14px", color: "#64748b" }}>
+                    Teacher:{" "}
+                    {selectedSyllabus.teacher?.full_name || "Not assigned"}
                   </div>
                 </div>
               </div>
@@ -402,15 +430,16 @@ export default function Syllabi() {
                 <div className="main-content">
                   <h3 className="section-title">Content Summary</h3>
                   <p className="course-description">
-                    {selectedSyllabus.content_summary || "No content summary provided"}
+                    {selectedSyllabus.content_summary ||
+                      "No content summary provided"}
                   </p>
 
                   <h3 className="section-title">Learning Objectives</h3>
                   <ul className="objectives-list">
                     {selectedSyllabus.learning_objectives ? (
                       selectedSyllabus.learning_objectives
-                        .split('\n')
-                        .filter(obj => obj.trim())
+                        .split("\n")
+                        .filter((obj) => obj.trim())
                         .map((objective, index) => (
                           <li key={index}>{objective.trim()}</li>
                         ))
@@ -469,8 +498,8 @@ export default function Syllabi() {
       </main>
 
       {showUploadModal && (
-        <UploadModal 
-          onClose={() => setShowUploadModal(false)} 
+        <UploadModal
+          onClose={() => setShowUploadModal(false)}
           onSuccess={() => {
             fetchData();
             handleSyllabiClick();
@@ -481,11 +510,11 @@ export default function Syllabi() {
       )}
 
       {showEditModal && editingSyllabus && (
-        <EditModal 
+        <EditModal
           onClose={() => {
             setShowEditModal(false);
             setEditingSyllabus(null);
-          }} 
+          }}
           onSuccess={() => {
             handleSyllabiClick();
             setShowEditModal(false);
@@ -524,12 +553,14 @@ function UploadModal({
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -553,15 +584,18 @@ function UploadModal({
         {
           method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(submitData)
-        }
+          body: JSON.stringify(submitData),
+        },
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(JSON.stringify(errorData.error || errorData) || "Failed to create syllabus");
+        throw new Error(
+          JSON.stringify(errorData.error || errorData) ||
+            "Failed to create syllabus",
+        );
       }
 
       alert("Syllabus created successfully!");
@@ -570,10 +604,10 @@ function UploadModal({
     } catch (error) {
       console.error("Failed to create syllabus:", error);
       alert(
-          error instanceof Error
-            ? `The syllabus could not be created.\n\n${error.message}`
-            : "The syllabus could not be created right now. Please try again in a moment."
-        );
+        error instanceof Error
+          ? `The syllabus could not be created.\n\n${error.message}`
+          : "The syllabus could not be created right now. Please try again in a moment.",
+      );
     } finally {
       setUploading(false);
     }
@@ -585,7 +619,6 @@ function UploadModal({
         className="relative bg-white w-full max-w-2xl mx-4 rounded-2xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-
         {/* ── Top accent bar ─────────────────────────────────────────── */}
         <div className="h-1 w-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500" />
 
@@ -616,12 +649,16 @@ function UploadModal({
         <div className="h-px bg-slate-100 mx-7" />
 
         {/* ── Form ───────────────────────────────────────────────────── */}
-        <form onSubmit={handleSubmit} className="px-7 py-6 space-y-6 overflow-y-auto max-h-[72vh]">
-
+        <form
+          onSubmit={handleSubmit}
+          className="px-7 py-6 space-y-6 overflow-y-auto max-h-[72vh]"
+        >
           {/* Section 1 — Assignment */}
           <fieldset className="space-y-4">
             <legend className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">1</span>
+              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">
+                1
+              </span>
               Assignment
             </legend>
 
@@ -657,7 +694,9 @@ function UploadModal({
               <div className="space-y-1.5">
                 <label className="block text-[12px] font-semibold text-slate-600">
                   Class
-                  <span className="ml-1.5 text-[10px] font-normal text-slate-400">(optional)</span>
+                  <span className="ml-1.5 text-[10px] font-normal text-slate-400">
+                    (optional)
+                  </span>
                 </label>
                 <div className="relative">
                   <select
@@ -685,7 +724,9 @@ function UploadModal({
           {/* Section 2 — Topic */}
           <fieldset className="space-y-4">
             <legend className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">2</span>
+              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">
+                2
+              </span>
               Topic Details
             </legend>
 
@@ -734,7 +775,9 @@ function UploadModal({
           {/* Section 3 — Content */}
           <fieldset className="space-y-4">
             <legend className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">3</span>
+              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">
+                3
+              </span>
               Content
             </legend>
 
@@ -769,7 +812,9 @@ function UploadModal({
                 name="learning_objectives"
                 value={formData.learning_objectives}
                 onChange={handleInputChange}
-                placeholder={"• Students will be able to…\n• Students will understand…"}
+                placeholder={
+                  "• Students will be able to…\n• Students will understand…"
+                }
                 required
                 rows={3}
                 className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all resize-none leading-relaxed"
@@ -832,12 +877,14 @@ function EditModal({
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -861,22 +908,28 @@ function EditModal({
         {
           method: "PATCH",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(submitData)
-        }
+          body: JSON.stringify(submitData),
+        },
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(JSON.stringify(errorData) || "Failed to update syllabus");
+        throw new Error(
+          JSON.stringify(errorData) || "Failed to update syllabus",
+        );
       }
 
       alert("Syllabus updated successfully!");
       onSuccess();
     } catch (error) {
       console.error("Failed to update syllabus:", error);
-      alert(error instanceof Error ? error.message : "Failed to update syllabus. Please try again.");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to update syllabus. Please try again.",
+      );
     } finally {
       setUpdating(false);
     }
@@ -895,15 +948,15 @@ function EditModal({
           <div className="grid-2x">
             <div className="form-group">
               <label>Subject *</label>
-              <select 
+              <select
                 name="subject_id"
-                className="search-box" 
+                className="search-box"
                 value={formData.subject_id}
                 onChange={handleInputChange}
                 required
               >
                 <option value="">Select a Subject</option>
-                {subjects.map(item => (
+                {subjects.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.subject_name}
                   </option>
@@ -913,14 +966,14 @@ function EditModal({
 
             <div className="form-group">
               <label>Class (Optional)</label>
-              <select 
+              <select
                 name="class_id"
-                className="search-box" 
+                className="search-box"
                 value={formData.class_id}
                 onChange={handleInputChange}
               >
                 <option value="">Select a Class</option>
-                {classes.map(item => (
+                {classes.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.class_name}
                   </option>
@@ -932,11 +985,11 @@ function EditModal({
           <div className="grid-2x">
             <div className="form-group">
               <label>Week Number *</label>
-              <input 
+              <input
                 type="number"
                 name="week_number"
                 min="1"
-                placeholder="Week number" 
+                placeholder="Week number"
                 value={formData.week_number}
                 onChange={handleInputChange}
                 required
@@ -945,10 +998,10 @@ function EditModal({
 
             <div className="form-group">
               <label>Topic Title *</label>
-              <input 
+              <input
                 type="text"
                 name="topic_title"
-                placeholder="Topic title" 
+                placeholder="Topic title"
                 value={formData.topic_title}
                 onChange={handleInputChange}
                 required
@@ -984,7 +1037,11 @@ function EditModal({
             <button type="button" className="btn btn-outline" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={updating}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={updating}
+            >
               {updating ? "Updating..." : "Update Syllabus"}
             </button>
           </div>

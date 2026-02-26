@@ -21,7 +21,7 @@ export default function ProfilesList() {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await fetchWithAuth(`${baseUrl}/students/`); 
+        const res = await fetchWithAuth(`${baseUrl}/students/`);
         if (!res.ok) throw new Error("Failed to fetch students");
         const data = await res.json();
         setStudents(Array.isArray(data) ? data : data.results || []);
@@ -40,7 +40,7 @@ export default function ProfilesList() {
   const filteredStudents = students.filter(
     (s) =>
       s.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.admission_number.toLowerCase().includes(searchQuery.toLowerCase())
+      s.admission_number.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -67,7 +67,9 @@ export default function ProfilesList() {
       {/* Students Table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-6 text-center text-gray-500">Loading students...</div>
+          <div className="p-6 text-center text-gray-500">
+            Loading students...
+          </div>
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-gray-100 text-gray-600">
@@ -85,8 +87,12 @@ export default function ProfilesList() {
                   key={student.id}
                   className="border-t hover:bg-gray-50 transition"
                 >
-                  <td className="px-6 py-4 font-medium text-gray-800">{student.full_name}</td>
-                  <td className="px-6 py-4 text-gray-600">{student.admission_number}</td>
+                  <td className="px-6 py-4 font-medium text-gray-800">
+                    {student.full_name}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">
+                    {student.admission_number}
+                  </td>
                   <td className="px-6 py-4 text-gray-600">
                     {student.class_obj?.class_name || "N/A"}
                   </td>
@@ -104,7 +110,9 @@ export default function ProfilesList() {
                   <td className="px-6 py-4 text-right">
                     <button
                       onClick={() =>
-                        router.push(`/Home/finance/invoices/create?student_id=${student.id}`)
+                        router.push(
+                          `/Home/finance/invoices/create?student_id=${student.id}`,
+                        )
                       }
                       className="text-cyan-600 hover:underline font-medium"
                     >
@@ -116,7 +124,10 @@ export default function ProfilesList() {
 
               {filteredStudents.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-400">
+                  <td
+                    colSpan={5}
+                    className="px-6 py-4 text-center text-gray-400"
+                  >
                     No students found
                   </td>
                 </tr>

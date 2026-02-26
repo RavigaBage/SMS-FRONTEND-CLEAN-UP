@@ -46,46 +46,53 @@ export default function InvoiceEntry() {
     dt.setDate(dt.getDate() + 30);
     return dt.toISOString().split("T")[0];
   });
-  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<String | "">("");
+  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<
+    String | ""
+  >("");
   const [term, setTerm] = useState<string>("1");
-  const [paymentTerms, setPaymentTerms] = useState<string>("Bank Transfer / Cheque");
+  const [paymentTerms, setPaymentTerms] = useState<string>(
+    "Bank Transfer / Cheque",
+  );
   const [notes, setNotes] = useState<string>("");
 
   // Items & discount
   const [items, setItems] = useState<FeeItem[]>([
-    { id: Date.now().toString(), description: "First Term Tuition Fees", qty: 1, unitPrice: 1200.0 },
+    {
+      id: Date.now().toString(),
+      description: "First Term Tuition Fees",
+      qty: 1,
+      unitPrice: 1200.0,
+    },
   ]);
-  const [discountType, setDiscountType] = useState<"percentage" | "amount">("percentage");
+  const [discountType, setDiscountType] = useState<"percentage" | "amount">(
+    "percentage",
+  );
   const [discountValue, setDiscountValue] = useState<number>(0);
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-useEffect(() => {
-  const date = new Date().getTime();
-  setInvoiceNumber(`INV-${date}`);
-  const today = new Date().toISOString().split("T")[0];
-  const due = new Date();
-  due.setDate(due.getDate() + 30);
-  setInvoiceDate(today);
-  setDueDate(due.toISOString().split("T")[0]);
-}, []);
+  useEffect(() => {
+    const date = new Date().getTime();
+    setInvoiceNumber(`INV-${date}`);
+    const today = new Date().toISOString().split("T")[0];
+    const due = new Date();
+    due.setDate(due.getDate() + 30);
+    setInvoiceDate(today);
+    setDueDate(due.toISOString().split("T")[0]);
+  }, []);
   /* ---------- Effects: fetch students & years ---------- */
-    const generateAcademicYears = (
-  startYear: number,
-  count: number
-  ): any => {
-  return Array.from({ length: count }, (_, i) => {
+  const generateAcademicYears = (startYear: number, count: number): any => {
+    return Array.from({ length: count }, (_, i) => {
       const year = startYear - i;
       const date_year = new Date().getFullYear();
       const is_current_status = true ? year == date_year : false;
       return {
-        end_date:`${year}-${String(year + 1)}`,
-        start_date:year,
-        id:i,
-        is_current:is_current_status,
+        end_date: `${year}-${String(year + 1)}`,
+        start_date: year,
+        id: i,
+        is_current: is_current_status,
         year_name: `${year}-${String(year + 1)}`,
-
-      }
-  });
+      };
+    });
   };
   useEffect(() => {
     const fetchAll = async () => {
@@ -94,7 +101,7 @@ useEffect(() => {
         const date_now = new Date().getFullYear();
         const [stuRes, yearRes] = await Promise.all([
           fetchWithAuth(`${baseUrl}/students/`),
-          generateAcademicYears(date_now,10),
+          generateAcademicYears(date_now, 10),
         ]);
 
         const stuJson = await stuRes.json();
@@ -103,17 +110,17 @@ useEffect(() => {
         const stuArr = Array.isArray(stuJson)
           ? stuJson
           : Array.isArray(stuJson.results)
-          ? stuJson.results
-          : [];
+            ? stuJson.results
+            : [];
         const yearArr = Array.isArray(yearJson)
           ? yearJson
           : Array.isArray(yearJson)
-          ? yearJson
-          : [];
+            ? yearJson
+            : [];
 
         setStudents(stuArr);
         setAcademicYears(yearArr);
-        console.log(yearJson)
+        console.log(yearJson);
 
         // If student_id present in URL, preselect (find in results)
         if (preselectedStudentId) {
@@ -124,7 +131,9 @@ useEffect(() => {
           } else {
             // try fetch single student endpoint (fallback)
             try {
-              const single = await fetchWithAuth(`${baseUrl}/students/${idNum}/`);
+              const single = await fetchWithAuth(
+                `${baseUrl}/students/${idNum}/`,
+              );
               if (single.ok) {
                 const sd = await single.json();
                 setRecipient(sd);
@@ -149,7 +158,10 @@ useEffect(() => {
   /* ---------- Click outside for dropdown ---------- */
   useEffect(() => {
     const handler = (ev: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(ev.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(ev.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -162,7 +174,10 @@ useEffect(() => {
   const toCents = (n: number) => Math.round((Number(n) || 0) * 100);
   const fromCents = (c: number) => c / 100;
 
-  const subtotalCents = items.reduce((acc, it) => acc + toCents(it.qty * it.unitPrice), 0);
+  const subtotalCents = items.reduce(
+    (acc, it) => acc + toCents(it.qty * it.unitPrice),
+    0,
+  );
   const discountCents =
     discountType === "percentage"
       ? Math.round((subtotalCents * (Number(discountValue) || 0)) / 100)
@@ -175,18 +190,35 @@ useEffect(() => {
 
   /* ---------- Helpers: items ---------- */
   const addItem = () =>
-    setItems(prev => [...prev, { id: Date.now().toString(), description: "", qty: 1, unitPrice: 0 }]);
+    setItems((prev) => [
+      ...prev,
+      { id: Date.now().toString(), description: "", qty: 1, unitPrice: 0 },
+    ]);
 
-  const updateItem = (id: string, field: keyof FeeItem, value: string | number) =>
-    setItems(prev =>
-      prev.map(i => (i.id === id ? { ...i, [field]: field === "description" ? String(value) : Number(value) } : i))
+  const updateItem = (
+    id: string,
+    field: keyof FeeItem,
+    value: string | number,
+  ) =>
+    setItems((prev) =>
+      prev.map((i) =>
+        i.id === id
+          ? {
+              ...i,
+              [field]: field === "description" ? String(value) : Number(value),
+            }
+          : i,
+      ),
     );
 
-  const removeItem = (id: string) => setItems(prev => (prev.length > 1 ? prev.filter(i => i.id !== id) : prev));
+  const removeItem = (id: string) =>
+    setItems((prev) =>
+      prev.length > 1 ? prev.filter((i) => i.id !== id) : prev,
+    );
 
   /* ---------- Helpers: recipient search ---------- */
   const filteredStudents = Array.isArray(students)
-    ? students.filter(s => {
+    ? students.filter((s) => {
         const q = searchQuery.toLowerCase();
         return (
           s.full_name?.toLowerCase().includes(q) ||
@@ -223,9 +255,12 @@ useEffect(() => {
       term,
       invoice_number: invoiceNumber,
       due_date: dueDate,
-      balance:0,
+      balance: 0,
       total_amount: Number(grandTotal.toFixed(2)),
-      items: items.map(i => ({ description: i.description || "Item", amount: (i.qty * i.unitPrice).toFixed(2) })),
+      items: items.map((i) => ({
+        description: i.description || "Item",
+        amount: (i.qty * i.unitPrice).toFixed(2),
+      })),
       notes,
       payment_terms: paymentTerms,
       is_draft: Boolean(isDraft), // backend may ignore it; included for convenience
@@ -246,7 +281,8 @@ useEffect(() => {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const msg = data?.detail || JSON.stringify(data) || "Failed to save invoice";
+        const msg =
+          data?.detail || JSON.stringify(data) || "Failed to save invoice";
         setError(msg);
         setSaving(false);
         return;
@@ -276,25 +312,40 @@ useEffect(() => {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <main className="max-w-7xl mx-auto">
-
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
-            <div className="text-sm text-slate-500">Finance / <strong className="text-slate-800">New Invoice</strong></div>
+            <div className="text-sm text-slate-500">
+              Finance / <strong className="text-slate-800">New Invoice</strong>
+            </div>
             <div className="mt-2 flex items-center gap-3">
-              <h1 className="text-2xl font-extrabold text-slate-800">{invoiceNumber || '...'}</h1>
-              <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">Draft</span>
+              <h1 className="text-2xl font-extrabold text-slate-800">
+                {invoiceNumber || "..."}
+              </h1>
+              <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                Draft
+              </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="flex gap-2 items-center">
               <label className="text-xs text-slate-500">Invoice Date</label>
-              <input className="border rounded px-2 py-1" type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} />
+              <input
+                className="border rounded px-2 py-1"
+                type="date"
+                value={invoiceDate}
+                onChange={(e) => setInvoiceDate(e.target.value)}
+              />
             </div>
             <div className="flex gap-2 items-center">
               <label className="text-xs text-slate-500">Due Date</label>
-              <input className="border rounded px-2 py-1" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+              <input
+                className="border rounded px-2 py-1"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
             </div>
             <div>
               <button
@@ -312,35 +363,54 @@ useEffect(() => {
         <section className="bg-white rounded-lg shadow p-5 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <label className="block text-xs text-slate-500 mb-1">Search Student or Admission No</label>
+              <label className="block text-xs text-slate-500 mb-1">
+                Search Student or Admission No
+              </label>
               <div className="relative" ref={dropdownRef}>
                 <input
                   className="w-full border rounded px-3 py-2"
                   placeholder="Type name or admission number..."
                   value={searchQueryLocal}
-                  onFocus={() => { setShowDropdown(true); setSearchQueryLocal(searchQueryLocal); }}
-                  onChange={e => { setSearchQueryLocal(e.target.value); setShowDropdown(true); }}
+                  onFocus={() => {
+                    setShowDropdown(true);
+                    setSearchQueryLocal(searchQueryLocal);
+                  }}
+                  onChange={(e) => {
+                    setSearchQueryLocal(e.target.value);
+                    setShowDropdown(true);
+                  }}
                 />
                 {showDropdown && (
                   <div className="absolute z-30 w-full mt-1 bg-white border rounded shadow max-h-56 overflow-y-auto">
                     {filteredStudents.length === 0 ? (
-                      <div className="p-3 text-sm text-slate-500">No students found</div>
+                      <div className="p-3 text-sm text-slate-500">
+                        No students found
+                      </div>
                     ) : (
-                      filteredStudents.map(s => (
+                      filteredStudents.map((s) => (
                         <div
                           key={s.id}
                           className="px-3 py-2 hover:bg-slate-50 cursor-pointer flex justify-between items-center"
                           onClick={() => {
                             setRecipient(s);
                             setShowDropdown(false);
-                            setSearchQueryLocal(`${s.full_name} (${s.admission_number})`);
+                            setSearchQueryLocal(
+                              `${s.full_name} (${s.admission_number})`,
+                            );
                           }}
                         >
                           <div>
-                            <div className="font-semibold text-slate-700">{s.full_name}</div>
-                            <div className="text-xs text-slate-400">{s.admission_number} · {s.class_info?.class_name || "No class"}</div>
+                            <div className="font-semibold text-slate-700">
+                              {s.full_name}
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              {s.admission_number} ·{" "}
+                              {s.class_info?.class_name || "No class"}
+                            </div>
                           </div>
-                          <div className="text-xs text-slate-400">{s.status || ""}</div>
+                          <div className="text-xs text-slate-400">
+                            {s.status || ""}
+                          </div>
                         </div>
                       ))
                     )}
@@ -350,15 +420,25 @@ useEffect(() => {
             </div>
 
             <div className="w-80">
-              <div className="text-xs text-slate-500 mb-1">Selected Recipient</div>
+              <div className="text-xs text-slate-500 mb-1">
+                Selected Recipient
+              </div>
               {recipient ? (
                 <div className="border rounded p-3 bg-slate-50">
-                  <div className="text-sm font-semibold">{recipient.full_name}</div>
-                  <div className="text-xs text-slate-500">{recipient.admission_number}</div>
-                  <div className="text-xs text-slate-500">{recipient.class_info?.class_name || "No class assigned"}</div>
+                  <div className="text-sm font-semibold">
+                    {recipient.full_name}
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    {recipient.admission_number}
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    {recipient.class_info?.class_name || "No class assigned"}
+                  </div>
                 </div>
               ) : (
-                <div className="border rounded p-3 text-slate-400">No recipient selected</div>
+                <div className="border rounded p-3 text-slate-400">
+                  No recipient selected
+                </div>
               )}
             </div>
           </div>
@@ -369,17 +449,35 @@ useEffect(() => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-semibold text-lg">Invoice Items</h2>
             <div className="flex items-center gap-3">
-              <select className="border rounded px-2 py-1" value={selectedAcademicYearId as any} onChange={e => setSelectedAcademicYearId(e.target.value ? String(e.target.value) : "")}>
+              <select
+                className="border rounded px-2 py-1"
+                value={selectedAcademicYearId as any}
+                onChange={(e) =>
+                  setSelectedAcademicYearId(
+                    e.target.value ? String(e.target.value) : "",
+                  )
+                }
+              >
                 <option value="">Select Academic Year</option>
-                {academicYears.map(y => <option key={y.id} value={y.year_name}>{y.year_name}</option>)}
+                {academicYears.map((y) => (
+                  <option key={y.id} value={y.year_name}>
+                    {y.year_name}
+                  </option>
+                ))}
               </select>
-              <select className="border rounded px-2 py-1" value={term} onChange={e => setTerm(e.target.value)}>
+              <select
+                className="border rounded px-2 py-1"
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+              >
                 <option value="1">Term 1</option>
                 <option value="2">Term 2</option>
                 <option value="3">Term 3</option>
                 <option value="annual">Annual</option>
               </select>
-              <button className="text-sm text-cyan-600" onClick={addItem}>+ Add Fee Item</button>
+              <button className="text-sm text-cyan-600" onClick={addItem}>
+                + Add Fee Item
+              </button>
             </div>
           </div>
 
@@ -395,14 +493,16 @@ useEffect(() => {
                 </tr>
               </thead>
               <tbody>
-                {items.map(item => (
+                {items.map((item) => (
                   <tr key={item.id} className="border-t">
                     <td className="p-2">
                       <input
                         className="w-full border rounded px-2 py-1"
                         placeholder="Description"
                         value={item.description}
-                        onChange={e => updateItem(item.id, "description", e.target.value)}
+                        onChange={(e) =>
+                          updateItem(item.id, "description", e.target.value)
+                        }
                       />
                     </td>
                     <td className="p-2 w-24">
@@ -411,7 +511,13 @@ useEffect(() => {
                         className="w-full border rounded px-2 py-1"
                         min={1}
                         value={item.qty}
-                        onChange={e => updateItem(item.id, "qty", Number(e.target.value || 0))}
+                        onChange={(e) =>
+                          updateItem(
+                            item.id,
+                            "qty",
+                            Number(e.target.value || 0),
+                          )
+                        }
                       />
                     </td>
                     <td className="p-2 w-40">
@@ -420,19 +526,35 @@ useEffect(() => {
                         className="w-full border rounded px-2 py-1"
                         step="0.01"
                         value={item.unitPrice}
-                        onChange={e => updateItem(item.id, "unitPrice", Number(e.target.value || 0))}
+                        onChange={(e) =>
+                          updateItem(
+                            item.id,
+                            "unitPrice",
+                            Number(e.target.value || 0),
+                          )
+                        }
                       />
                     </td>
-                    <td className="p-2 w-40 font-medium">₵{(item.qty * item.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td className="p-2 w-40 font-medium">
+                      ₵
+                      {(item.qty * item.unitPrice).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
                     <td className="p-2 text-right w-16">
-                      <button className="text-rose-500 font-bold" onClick={() => removeItem(item.id)}>×</button>
+                      <button
+                        className="text-rose-500 font-bold"
+                        onClick={() => removeItem(item.id)}
+                      >
+                        ×
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-
         </section>
 
         {/* Bottom: notes + summary + actions */}
@@ -441,7 +563,11 @@ useEffect(() => {
             <h3 className="font-semibold mb-3">Notes & Payment Terms</h3>
             <div className="mb-3">
               <label className="text-xs text-slate-500">Payment Terms</label>
-              <select className="w-full border rounded px-2 py-2" value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)}>
+              <select
+                className="w-full border rounded px-2 py-2"
+                value={paymentTerms}
+                onChange={(e) => setPaymentTerms(e.target.value)}
+              >
                 <option>Bank Transfer / Cheque</option>
                 <option>Cash only</option>
                 <option>Mobile Money</option>
@@ -449,7 +575,13 @@ useEffect(() => {
             </div>
             <div>
               <label className="text-xs text-slate-500">Notes / Remarks</label>
-              <textarea className="w-full border rounded p-2" rows={6} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Add any specific instructions..."></textarea>
+              <textarea
+                className="w-full border rounded p-2"
+                rows={6}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Add any specific instructions..."
+              ></textarea>
             </div>
           </section>
 
@@ -458,16 +590,35 @@ useEffect(() => {
 
             <div className="flex justify-between py-2">
               <span className="text-slate-500">Subtotal</span>
-              <span className="font-medium">₵{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+              <span className="font-medium">
+                ₵
+                {subtotal.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                })}
+              </span>
             </div>
 
             <div className="flex items-center gap-3 py-2">
-              <select className="border rounded px-2 py-1" value={discountType} onChange={e => setDiscountType(e.target.value as any)}>
+              <select
+                className="border rounded px-2 py-1"
+                value={discountType}
+                onChange={(e) => setDiscountType(e.target.value as any)}
+              >
                 <option value="percentage">Percentage</option>
                 <option value="amount">Amount</option>
               </select>
-              <input className="border rounded px-2 py-1 w-32" type="number" value={discountValue} onChange={e => setDiscountValue(Number(e.target.value || 0))} />
-              <span className="text-slate-500">-{discountType === "percentage" ? `${discountValue}%` : `₵${discountValue.toFixed(2)}`}</span>
+              <input
+                className="border rounded px-2 py-1 w-32"
+                type="number"
+                value={discountValue}
+                onChange={(e) => setDiscountValue(Number(e.target.value || 0))}
+              />
+              <span className="text-slate-500">
+                -
+                {discountType === "percentage"
+                  ? `${discountValue}%`
+                  : `₵${discountValue.toFixed(2)}`}
+              </span>
             </div>
 
             <hr className="my-3" />
@@ -475,7 +626,12 @@ useEffect(() => {
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-xs text-slate-500">GRAND TOTAL</div>
-                <div className="text-2xl font-extrabold">₵{grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                <div className="text-2xl font-extrabold">
+                  ₵
+                  {grandTotal.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
+                </div>
               </div>
               <div className="flex flex-col gap-2">
                 <button
@@ -497,7 +653,9 @@ useEffect(() => {
                 <button
                   onClick={() => {
                     // open simple preview modal or window - fallback to alert
-                    alert("Preview: use the invoice list or created invoice detail for a printable view.");
+                    alert(
+                      "Preview: use the invoice list or created invoice detail for a printable view.",
+                    );
                   }}
                   className="px-4 py-2 text-sm text-slate-600 hover:underline"
                 >

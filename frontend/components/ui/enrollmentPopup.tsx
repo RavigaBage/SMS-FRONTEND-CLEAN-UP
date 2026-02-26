@@ -7,10 +7,9 @@ type PopupProps = {
   togglePopup: () => void;
   formData: Record<string, any>;
   fieldNames: string | string[];
-  selectedIM:number | number[] | null;
-  setFormData:  (field: string, value: any) => void;
-  onSuccess?: () => void; 
-
+  selectedIM: number | number[] | null;
+  setFormData: (field: string, value: any) => void;
+  onSuccess?: () => void;
 };
 
 export default function Popup({
@@ -20,7 +19,7 @@ export default function Popup({
   fieldNames,
   setFormData,
   selectedIM,
-  onSuccess
+  onSuccess,
 }: PopupProps) {
   return (
     <div
@@ -29,9 +28,7 @@ export default function Popup({
     >
       <div
         className={`popup-container ${active ? "active" : ""}`}
-        onClick={(e: React.MouseEvent<HTMLDivElement>) =>
-          e.stopPropagation()
-        }
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
       >
         <EnrollForm
           formData={formData}

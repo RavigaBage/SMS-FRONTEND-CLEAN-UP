@@ -1,6 +1,6 @@
 // The structure DRF uses internally
 export interface PaginatedResponse<T> {
-  count?: number;  
+  count?: number;
   next: string | null;
   previous: string | null;
   results: any[];
@@ -17,7 +17,6 @@ export interface Student {
   status: string;
   profile_image?: string;
 }
-
 
 // Expected student shape from your backend
 export interface StudentRaw {
@@ -36,7 +35,7 @@ export interface StudentRaw {
   religion?: string;
   blood_group?: string;
   medical_conditions?: string;
-  status: 'active' | 'graduated' | 'inactive';
+  status: "active" | "graduated" | "inactive";
   status_display: string;
   admission_date: string;
   photo_url?: string;
@@ -47,14 +46,24 @@ export interface StudentRaw {
 // Update your ApiResponse generic to handle paginated DRF responses
 export interface ApiResponse<T> {
   detail: string;
-  map(arg0: (s: any) => { student_id: any; status: string; remarks: string; }): import("react").SetStateAction<any[]>;
-  id: ApiResponse<{ id: number; first_name: string; last_name: string; email: string; phone: string; date_of_birth: string; gender: string; }>;
+  map(
+    arg0: (s: any) => { student_id: any; status: string; remarks: string },
+  ): import("react").SetStateAction<any[]>;
+  id: ApiResponse<{
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    date_of_birth: string;
+    gender: string;
+  }>;
   responseCode: number;
   responseMessage: string;
   data: T[] | null;
   error: string | null;
   results?: T[];
-  status:number;
+  status: number;
   count?: number;
   next?: string | null;
   previous?: string | null;
@@ -64,14 +73,12 @@ export interface ApiRequestOptions extends RequestInit {
   query?: Record<string, string | number | boolean | null | undefined>;
 }
 
-
-
 export async function fetchWithAuth(url: string, options: any = {}) {
   let accessToken = localStorage.getItem("accessToken");
 
   const headers = {
     ...options.headers,
-    "Authorization": `Bearer ${accessToken}`,
+    Authorization: `Bearer ${accessToken}`,
     "Content-Type": "application/json",
   };
 
@@ -80,22 +87,29 @@ export async function fetchWithAuth(url: string, options: any = {}) {
   if (response.status === 401) {
     try {
       const errorData = await response.clone().json();
-      if (errorData.code === "token_not_valid" || errorData.detail?.includes("token")) {
+      if (
+        errorData.code === "token_not_valid" ||
+        errorData.detail?.includes("token")
+      ) {
         const refreshToken = localStorage.getItem("refreshToken");
 
         if (refreshToken) {
-          const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refresh: refreshToken }),
-          });
+          const refreshRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh/`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refresh: refreshToken }),
+            },
+          );
 
           if (refreshRes.ok) {
             const refreshData = await refreshRes.json();
-            
+
             localStorage.setItem("accessToken", refreshData.access);
-            if (refreshData.refresh) localStorage.setItem("refreshToken", refreshData.refresh);
-            const latestAccess = localStorage.getItem("accessToken"); 
+            if (refreshData.refresh)
+              localStorage.setItem("refreshToken", refreshData.refresh);
+            const latestAccess = localStorage.getItem("accessToken");
             headers["Authorization"] = `Bearer ${latestAccess}`;
 
             response = await fetch(url, { ...options, headers });
@@ -116,18 +130,22 @@ export async function fetchWithAuth(url: string, options: any = {}) {
       const refreshToken = localStorage.getItem("refreshToken");
 
       if (refreshToken) {
-        const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh/`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh: refreshToken }),
-        });
+        const refreshRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh/`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh: refreshToken }),
+          },
+        );
 
         if (refreshRes.ok) {
           const refreshData = await refreshRes.json();
-          
+
           localStorage.setItem("accessToken", refreshData.access);
-          if (refreshData.refresh) localStorage.setItem("refreshToken", refreshData.refresh);
-          const latestAccess = localStorage.getItem("accessToken"); 
+          if (refreshData.refresh)
+            localStorage.setItem("refreshToken", refreshData.refresh);
+          const latestAccess = localStorage.getItem("accessToken");
           headers["Authorization"] = `Bearer ${latestAccess}`;
 
           response = await fetch(url, { ...options, headers });
@@ -149,12 +167,12 @@ export async function fetchWithAuth(url: string, options: any = {}) {
 
 export async function fetchStudentsByClass(
   className: string,
-  academicYear: string
+  academicYear: string,
 ) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const url = `${baseUrl}/students/?classes=${encodeURIComponent(
-    className
+    className,
   )}&academic_year=${encodeURIComponent(academicYear)}`;
 
   const response = await fetchWithAuth(url);
@@ -168,9 +186,10 @@ export async function fetchStudentsByClass(
 
 export async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
   const url = `${baseUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
   const getHeaders = () => ({
@@ -185,43 +204,52 @@ export async function apiRequest<T>(
     response = await fetch(url, { ...options, headers: getHeaders() });
   } catch (error) {
     console.error("Network Error:", error);
-    throw new Error("SERVER_OFFLINE: Unable to connect to the server. Please check your connection or backend status.");
+    throw new Error(
+      "SERVER_OFFLINE: Unable to connect to the server. Please check your connection or backend status.",
+    );
   }
 
   if (response.status === 401) {
     try {
       const errorData = await response.clone().json();
-      
-      if (errorData.code === "token_not_valid" || errorData.detail?.includes("token")) {
+
+      if (
+        errorData.code === "token_not_valid" ||
+        errorData.detail?.includes("token")
+      ) {
         const refreshToken = localStorage.getItem("refreshToken");
 
         if (refreshToken) {
           try {
-            const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh/`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ refresh: refreshToken }),
-            });
+            const refreshRes = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh/`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refresh: refreshToken }),
+              },
+            );
 
             if (refreshRes.ok) {
               const refreshData = await refreshRes.json();
               localStorage.setItem("accessToken", refreshData.access);
-              if (refreshData.refresh) localStorage.setItem("refreshToken", refreshData.refresh);
+              if (refreshData.refresh)
+                localStorage.setItem("refreshToken", refreshData.refresh);
 
-              response = await fetch(url, { 
-                ...options, 
+              response = await fetch(url, {
+                ...options,
                 headers: {
                   ...getHeaders(),
-                  Authorization: `Bearer ${localStorage.getItem("accessToken")}`
-                }
+                  Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                },
               });
             } else {
               throw new Error("Session expired");
             }
           } catch (refreshError) {
-             localStorage.clear();
-             window.location.href = "/auth/login";
-             throw new Error("Session expired or Server unreachable.");
+            localStorage.clear();
+            window.location.href = "/auth/login";
+            throw new Error("Session expired or Server unreachable.");
           }
         } else {
           localStorage.clear();
@@ -240,11 +268,11 @@ export async function apiRequest<T>(
   }
 
   if (response.status === 204) {
-    return { 
-      data: null as any, 
-      status: 204, 
-      responseCode: 0, 
-      responseMessage: 'Success' 
+    return {
+      data: null as any,
+      status: 204,
+      responseCode: 0,
+      responseMessage: "Success",
     } as unknown as ApiResponse<T>;
   }
 
@@ -261,24 +289,26 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
-
     return {
-        data: null,
-        status: response.status,
-        error: raw.detail || raw.error || `Error ${response.status}: ${response.statusText}`
-      }as ApiResponse<T>;
+      data: null,
+      status: response.status,
+      error:
+        raw.detail ||
+        raw.error ||
+        `Error ${response.status}: ${response.statusText}`,
+    } as ApiResponse<T>;
   }
 
   const isPaginated = Array.isArray(raw.results);
 
   return {
     responseCode: 0,
-    responseMessage: 'none',
-    data: isPaginated ? raw.results : raw, 
+    responseMessage: "none",
+    data: isPaginated ? raw.results : raw,
     results: raw.results,
     count: raw.count,
     next: raw.next,
-    error:null,
+    error: null,
     previous: raw.previous,
   } as unknown as ApiResponse<T>;
 }

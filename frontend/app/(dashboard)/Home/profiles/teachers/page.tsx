@@ -1,9 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserPlus, Search, SlidersHorizontal, Download, Loader2, BookOpen } from "lucide-react";
+import {
+  UserPlus,
+  Search,
+  SlidersHorizontal,
+  Download,
+  Loader2,
+  BookOpen,
+} from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
-import { TeacherTable, Teacher } from "@/src/assets/components/management/TeacherTable";
+import {
+  TeacherTable,
+  Teacher,
+} from "@/src/assets/components/management/TeacherTable";
 import { AddTeacherModal } from "@/src/assets/components/management/AddTeacher";
 import { EditTeacherModal } from "@/src/assets/components/management/EditTeacher";
 import { AssignSubjectsModal } from "@/src/assets/components/management/AssignSubject";
@@ -11,7 +21,7 @@ import { TeacherDetailsModal } from "@/src/assets/components/management/TeacherD
 import { Pagination } from "@/src/assets/components/management/Pagination";
 import { FilterModal } from "@/src/assets/components/management/FilterModel";
 import { toast } from "react-hot-toast";
-import '@/styles/Teachers.css';
+import "@/styles/Teachers.css";
 
 interface PaginatedResponse {
   count: number;
@@ -44,7 +54,11 @@ export default function TeachersDirectoryPage() {
   const resultsPerPage = 10;
 
   // Fetch Teachers
-  const fetchTeachers = async (page: number, search: string, filterParams: FilterState = {}) => {
+  const fetchTeachers = async (
+    page: number,
+    search: string,
+    filterParams: FilterState = {},
+  ) => {
     setLoading(true);
     try {
       const query = new URLSearchParams({
@@ -97,7 +111,11 @@ export default function TeachersDirectoryPage() {
 
   // Delete Teacher
   const handleDelete = async (teacherId: number) => {
-    if (!confirm("Are you sure you want to delete this teacher? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this teacher? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
@@ -156,12 +174,26 @@ export default function TeachersDirectoryPage() {
         ...filters,
       });
 
-      const res = await apiRequest<PaginatedResponse>(`/teachers/?${query}&page_size=1000`, {
-        method: "GET",
-      });
+      const res = await apiRequest<PaginatedResponse>(
+        `/teachers/?${query}&page_size=1000`,
+        {
+          method: "GET",
+        },
+      );
 
       // Convert to CSV
-      const headers = ["ID", "Full Name", "Username", "Email", "Specialization", "Subjects", "Qualifications", "Experience", "Phone", "Status"];
+      const headers = [
+        "ID",
+        "Full Name",
+        "Username",
+        "Email",
+        "Specialization",
+        "Subjects",
+        "Qualifications",
+        "Experience",
+        "Phone",
+        "Status",
+      ];
       const csvData = res?.results?.map((t: any) => [
         t.id,
         t.full_name,
@@ -172,12 +204,14 @@ export default function TeachersDirectoryPage() {
         t.qualifications,
         t.years_of_experience,
         t.phone_number,
-        t.is_active ? "Active" : "Inactive"
+        t.is_active ? "Active" : "Inactive",
       ]);
 
-      const csv = [headers.join(","), 
-          ...(csvData ?? []).map((row: any[]) => row.map((cell: any) => `"${cell}"`).join(","))
-        
+      const csv = [
+        headers.join(","),
+        ...(csvData ?? []).map((row: any[]) =>
+          row.map((cell: any) => `"${cell}"`).join(","),
+        ),
       ].join("\n");
 
       // Download
@@ -261,7 +295,7 @@ export default function TeachersDirectoryPage() {
           <div className="stat-content">
             <p className="stat-label">Active Teachers</p>
             <p className="stat-value">
-              {teachers.filter(t => t.isActive).length}
+              {teachers.filter((t) => t.isActive).length}
             </p>
           </div>
           <div className="stat-icon stat-icon-green">
@@ -276,7 +310,7 @@ export default function TeachersDirectoryPage() {
               {teachers.length > 0
                 ? Math.round(
                     teachers.reduce((sum, t) => sum + t.yearsOfExperience, 0) /
-                      teachers.length
+                      teachers.length,
                   )
                 : 0}{" "}
               yrs
@@ -317,7 +351,9 @@ export default function TeachersDirectoryPage() {
             <SlidersHorizontal size={18} />
             Filters
             {Object.keys(filters).length > 0 && (
-              <span className="filter-badge">{Object.keys(filters).length}</span>
+              <span className="filter-badge">
+                {Object.keys(filters).length}
+              </span>
             )}
           </button>
         </div>

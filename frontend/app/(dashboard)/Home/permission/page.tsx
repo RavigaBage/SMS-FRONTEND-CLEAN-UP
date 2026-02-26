@@ -1,26 +1,40 @@
 "use client";
 
-import React, { useState } from 'react';
-import '@/styles/permission.css';
+import React, { useState } from "react";
+import "@/styles/permission.css";
 
 export default function PermissionsManagement() {
   const [isModalOpen, setModalOpen] = useState(false);
 
   const modules = [
-    "Students", "Staff", "Classes", "Attendance", 
-    "Exams", "Finance", "Reports", "Settings"
+    "Students",
+    "Staff",
+    "Classes",
+    "Attendance",
+    "Exams",
+    "Finance",
+    "Reports",
+    "Settings",
   ];
 
   const rolesData = [
-    { role: "Administrator", perms: [true, true, true, true, true, true, true, true] },
-    { role: "Teacher", perms: [true, false, true, true, true, false, false, false] },
-    { role: "Accountant", perms: [false, false, false, false, false, true, false, false] },
+    {
+      role: "Administrator",
+      perms: [true, true, true, true, true, true, true, true],
+    },
+    {
+      role: "Teacher",
+      perms: [true, false, true, true, true, false, false, false],
+    },
+    {
+      role: "Accountant",
+      perms: [false, false, false, false, false, true, false, false],
+    },
   ];
 
   return (
     <div className="dashboardWrapper">
       <div className="dashboard">
-        
         {/* Header */}
         <header className="header">
           <div>
@@ -38,7 +52,9 @@ export default function PermissionsManagement() {
             <thead>
               <tr>
                 <th>Role</th>
-                {modules.map(mod => <th key={mod}>{mod}</th>)}
+                {modules.map((mod) => (
+                  <th key={mod}>{mod}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -64,21 +80,40 @@ export default function PermissionsManagement() {
           <div className="modalOverlay" onClick={() => setModalOpen(false)}>
             <div className="modalContent" onClick={(e) => e.stopPropagation()}>
               <h2>Create Custom Role</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '20px' }}>
+              <p
+                style={{
+                  color: "var(--text-muted)",
+                  fontSize: "14px",
+                  marginBottom: "20px",
+                }}
+              >
                 Define the role name and initial module access.
               </p>
 
-              <label style={{ display: 'block', fontWeight: 500, fontSize: '14px', marginBottom: '8px' }}>
+              <label
+                style={{
+                  display: "block",
+                  fontWeight: 500,
+                  fontSize: "14px",
+                  marginBottom: "8px",
+                }}
+              >
                 Role Name
               </label>
-              <input 
-                type="text" 
-                placeholder="e.g. Librarian" 
-                style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid var(--border)', marginBottom: '20px' }} 
+              <input
+                type="text"
+                placeholder="e.g. Librarian"
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "10px",
+                  border: "1px solid var(--border)",
+                  marginBottom: "20px",
+                }}
               />
 
               <div className="permissionGrid">
-                {modules.map(mod => (
+                {modules.map((mod) => (
                   <div key={mod} className="permissionItem">
                     <span>{mod}</span>
                     <label className="switch">
@@ -89,9 +124,26 @@ export default function PermissionsManagement() {
                 ))}
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
-                <button className="secondaryBtn" onClick={() => setModalOpen(false)}>Cancel</button>
-                <button className="primaryBtn" onClick={() => setModalOpen(false)}>Create Role</button>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  justifyContent: "flex-end",
+                  marginTop: "24px",
+                }}
+              >
+                <button
+                  className="secondaryBtn"
+                  onClick={() => setModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="primaryBtn"
+                  onClick={() => setModalOpen(false)}
+                >
+                  Create Role
+                </button>
               </div>
             </div>
           </div>

@@ -7,7 +7,7 @@
   --text-dark: #0f172a;
   --text-muted: #64748b;
   --border: #e5e7eb;
-  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   --radius: 14px;
   --step-active: #2563eb;
   --step-inactive: #cbd5e1;
@@ -17,7 +17,7 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #eef2ff, #f8fafc);
   padding: 40px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .dashboard {
@@ -83,7 +83,7 @@
 
 /* Connecting line between steps */
 .step:not(:last-child)::after {
-  content: '';
+  content: "";
   position: absolute;
   height: 2px;
   background: var(--step-inactive);
@@ -132,7 +132,8 @@
   transition: border-color 0.2s;
 }
 
-.formInput:focus, .formSelect:focus {
+.formInput:focus,
+.formSelect:focus {
   border-color: var(--step-active);
 }
 
@@ -186,13 +187,13 @@
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
   transition: all 0.25s ease;
 }
 
 .primaryBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 30px rgba(37,99,235,0.35);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
 }
 
 .secondaryBtn {

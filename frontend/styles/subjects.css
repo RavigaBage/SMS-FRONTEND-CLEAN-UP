@@ -7,15 +7,15 @@
   --text-dark: #0f172a;
   --text-muted: #64748b;
   --border: #e5e7eb;
-  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   --radius: 14px;
 }
 
-.dashboardWrapper .SUBJECTDATA{
+.dashboardWrapper .SUBJECTDATA {
   min-height: 100vh;
   background: linear-gradient(135deg, #eef2ff, #f8fafc);
   padding: 40px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .SUBJECTDATA .dashboard {
@@ -53,13 +53,13 @@
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
   transition: all 0.25s ease;
 }
 
 .SUBJECTDATA .primaryBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 30px rgba(37,99,235,0.35);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
 }
 
 /* Table Card */
@@ -78,7 +78,7 @@
   background: #f1f5f9;
 }
 
-.SUBJECTDATA .subjectTable th, 
+.SUBJECTDATA .subjectTable th,
 .SUBJECTDATA .subjectTable td {
   padding: 18px;
   text-align: left;
@@ -140,8 +140,12 @@
   transform: translateY(-1px);
 }
 
-.SUBJECTDATA .btnEdit { color: #2563eb; }
-.SUBJECTDATA .btnAssign { color: var(--emerald); }
+.SUBJECTDATA .btnEdit {
+  color: #2563eb;
+}
+.SUBJECTDATA .btnAssign {
+  color: var(--emerald);
+}
 
 .SUBJECTDATA .footerSpace {
   height: 40px;

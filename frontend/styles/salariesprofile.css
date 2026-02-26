@@ -1,27 +1,49 @@
 :root {
-  --primary-teal: #22D3EE;
-  --primary-blue: #0EA5E9;
-  --bg-light: #F8FAFC;
-  --text-dark: #1E293B;
-  --text-muted: #64748B;
-  --border: #E2E8F0;
-  --white: #FFFFFF;
+  --primary-teal: #22d3ee;
+  --primary-blue: #0ea5e9;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --white: #ffffff;
 }
 
 .payroll-container {
   display: flex;
   min-height: 100vh;
   background-color: var(--bg-light);
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 /* Sidebar */
-.sidebar { width: 260px; background: white; border-right: 1px solid var(--border); padding: 24px; position: fixed; height: 100vh; }
-.nav-item { padding: 12px; color: var(--text-muted); cursor: pointer; border-radius: 8px; margin-top: 5px; transition: 0.2s; }
-.nav-item.active { background: #ECFEFF; color: var(--primary-teal); font-weight: 600; }
+.sidebar {
+  width: 260px;
+  background: white;
+  border-right: 1px solid var(--border);
+  padding: 24px;
+  position: fixed;
+  height: 100vh;
+}
+.nav-item {
+  padding: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  margin-top: 5px;
+  transition: 0.2s;
+}
+.nav-item.active {
+  background: #ecfeff;
+  color: var(--primary-teal);
+  font-weight: 600;
+}
 
 /* Main Content */
-.content { flex: 1; margin-left: 260px; padding: 30px 40px; }
+.content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 30px 40px;
+}
 
 /* Grid System */
 .payroll-grid {
@@ -36,7 +58,7 @@
   border-radius: 16px;
   border: 1px solid var(--border);
   padding: 25px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
 }
 
 .form-grid {
@@ -60,13 +82,22 @@
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  background: #F8FAFC;
+  background: #f8fafc;
 }
 
 /* Summary Styles */
-.summary-card { background: #F8FAFC; }
-.net-value { font-size: 32px; font-weight: 800; color: var(--primary-blue); margin-top: 5px; }
-.red-text { color: #EF4444; }
+.summary-card {
+  background: #f8fafc;
+}
+.net-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary-blue);
+  margin-top: 5px;
+}
+.red-text {
+  color: #ef4444;
+}
 
 .btn-primary {
   background: var(--primary-teal);

@@ -17,7 +17,12 @@ interface Subject {
   subject_code: string;
 }
 
-export function FilterModal({ isOpen, filters, onClose, onApply }: FilterModalProps) {
+export function FilterModal({
+  isOpen,
+  filters,
+  onClose,
+  onApply,
+}: FilterModalProps) {
   const [localFilters, setLocalFilters] = useState(filters);
   const [subjects, setSubjects] = useState<Subject[]>([]);
 
@@ -33,7 +38,7 @@ export function FilterModal({ isOpen, filters, onClose, onApply }: FilterModalPr
       const res = await apiRequest<any>("/subjects/", {
         method: "GET",
       });
-      setSubjects(res.results as any || res);
+      setSubjects((res.results as any) || res);
     } catch (err) {
       console.error("Error fetching subjects:", err);
     }
@@ -41,12 +46,15 @@ export function FilterModal({ isOpen, filters, onClose, onApply }: FilterModalPr
 
   const handleApply = () => {
     // Remove empty filters
-    const cleanedFilters = Object.entries(localFilters).reduce((acc, [key, value]) => {
-      if (value !== "" && value !== undefined) {
-        acc[key] = value;
-      }
-      return acc;
-    }, {} as any);
+    const cleanedFilters = Object.entries(localFilters).reduce(
+      (acc, [key, value]) => {
+        if (value !== "" && value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as any,
+    );
 
     onApply(cleanedFilters);
   };
@@ -60,7 +68,10 @@ export function FilterModal({ isOpen, filters, onClose, onApply }: FilterModalPr
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container modal-sm" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container modal-sm"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div>
             <h2 className="modal-title">
@@ -82,7 +93,10 @@ export function FilterModal({ isOpen, filters, onClose, onApply }: FilterModalPr
                 className="form-select"
                 value={localFilters.is_active || ""}
                 onChange={(e) =>
-                  setLocalFilters({ ...localFilters, is_active: e.target.value })
+                  setLocalFilters({
+                    ...localFilters,
+                    is_active: e.target.value,
+                  })
                 }
               >
                 <option value="">All</option>
@@ -99,7 +113,10 @@ export function FilterModal({ isOpen, filters, onClose, onApply }: FilterModalPr
                 placeholder="e.g., Mathematics"
                 value={localFilters.specialization || ""}
                 onChange={(e) =>
-                  setLocalFilters({ ...localFilters, specialization: e.target.value })
+                  setLocalFilters({
+                    ...localFilters,
+                    specialization: e.target.value,
+                  })
                 }
               />
             </div>
@@ -110,7 +127,10 @@ export function FilterModal({ isOpen, filters, onClose, onApply }: FilterModalPr
                 className="form-select"
                 value={localFilters.subject_id || ""}
                 onChange={(e) =>
-                  setLocalFilters({ ...localFilters, subject_id: e.target.value })
+                  setLocalFilters({
+                    ...localFilters,
+                    subject_id: e.target.value,
+                  })
                 }
               >
                 <option value="">All Subjects</option>

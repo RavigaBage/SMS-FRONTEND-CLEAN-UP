@@ -6,7 +6,7 @@
   --text-dark: #0f172a;
   --text-muted: #64748b;
   --border: #e5e7eb;
-  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   --radius: 14px;
 }
 
@@ -57,7 +57,8 @@
   color: var(--text-dark);
   cursor: pointer;
 }
-.add_subject,.filter{
+.add_subject,
+.filter {
   width: 150px;
   height: 40px;
   border: 1px solid var(--border);
@@ -66,15 +67,15 @@
   color: var(--card);
   box-shadow: 0px 0px 4px var(--border);
   cursor: pointer;
-  gap:10px;
+  gap: 10px;
   padding-left: 10px;
   font-size: 18px;
   display: flex;
   align-items: center;
 }
-.add_subject{
-    width: 200px;
-    margin-left: auto;
+.add_subject {
+  width: 200px;
+  margin-left: auto;
 }
 
 /* Table Card */
@@ -94,7 +95,7 @@
   background: #f1f5f9;
 }
 
-.classTable th, 
+.classTable th,
 .classTable td {
   padding: 18px;
   text-align: left;
@@ -132,21 +133,21 @@
   color: #b91c1c;
 }
 
-.action_tr{
+.action_tr {
   position: relative;
 }
-.actionContainer{
+.actionContainer {
   opacity: 0;
   position: absolute;
   top: 20px;
   right: 130px;
-  width:180px;
+  width: 180px;
   height: fit-content;
   padding: 10px;
   display: flex;
   gap: 8px;
   flex-direction: column;
-  border:1px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: #ffffff;
   z-index: -1;
@@ -156,7 +157,7 @@
   z-index: 1;
 }
 
-.menu-trigger{
+.menu-trigger {
   z-index: 2;
 }
 .actionBtn {
@@ -174,15 +175,26 @@
   border-bottom: 1px solid var(--border);
 }
 
-.actionBtn:hover,.add_subject:hover {
+.actionBtn:hover,
+.add_subject:hover {
   transform: translateY(-1px);
 }
 
-.btnView { color: var(--primary); }
-.btnEdit { color: #2563eb; }
-.btnAssign { color: var(--emerald); }
-.btnManage { color: #9333ea; }
-.btnDelete { color: #ea3f33; }
+.btnView {
+  color: var(--primary);
+}
+.btnEdit {
+  color: #2563eb;
+}
+.btnAssign {
+  color: var(--emerald);
+}
+.btnManage {
+  color: #9333ea;
+}
+.btnDelete {
+  color: #ea3f33;
+}
 
 .footerSpace {
   height: 40px;

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface FeeItem {
   id: string;
@@ -15,32 +15,46 @@ const CreateInvoicePage = () => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    studentId: '',
-    academicYearId: '',
-    term: '1',
-    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 
+    studentId: "",
+    academicYearId: "",
+    term: "1",
+    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0],
   });
 
   const [feeItems, setFeeItems] = useState<FeeItem[]>([
-    { id: crypto.randomUUID(), description: '', amount: 0 }
+    { id: crypto.randomUUID(), description: "", amount: 0 },
   ]);
 
-  const totalAmount = feeItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+  const totalAmount = feeItems.reduce(
+    (sum, item) => sum + (Number(item.amount) || 0),
+    0,
+  );
 
   const addRow = () => {
-    setFeeItems([...feeItems, { id: crypto.randomUUID(), description: '', amount: 0 }]);
+    setFeeItems([
+      ...feeItems,
+      { id: crypto.randomUUID(), description: "", amount: 0 },
+    ]);
   };
 
   const removeRow = (id: string) => {
     if (feeItems.length > 1) {
-      setFeeItems(feeItems.filter(item => item.id !== id));
+      setFeeItems(feeItems.filter((item) => item.id !== id));
     }
   };
 
-  const updateItem = (id: string, field: keyof FeeItem, value: string | number) => {
-    setFeeItems(feeItems.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
-    ));
+  const updateItem = (
+    id: string,
+    field: keyof FeeItem,
+    value: string | number,
+  ) => {
+    setFeeItems(
+      feeItems.map((item) =>
+        item.id === id ? { ...item, [field]: value } : item,
+      ),
+    );
   };
 
   const handleSaveInvoice = async () => {
@@ -60,18 +74,21 @@ const CreateInvoicePage = () => {
         items: feeItems.map(({ description, amount, fee_structure_id }) => ({
           description,
           amount,
-          fee_structure: fee_structure_id || null
-        }))
+          fee_structure: fee_structure_id || null,
+        })),
       };
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/finance/invoices/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` 
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/finance/invoices/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -79,7 +96,7 @@ const CreateInvoicePage = () => {
       }
 
       alert("Invoice Created Successfully!");
-      router.push('/dashboard/finance/invoices');
+      router.push("/dashboard/finance/invoices");
     } catch (err: any) {
       console.error(err);
       alert("Failed to save: " + err.message);
@@ -91,39 +108,53 @@ const CreateInvoicePage = () => {
   return (
     <div className="p-6 max-w-5xl mx-auto bg-white min-h-screen">
       <div className="flex justify-between items-center mb-8 border-b pb-4">
-        <h1 className="text-2xl font-bold text-slate-800">Generate Student Invoice</h1>
+        <h1 className="text-2xl font-bold text-slate-800">
+          Generate Student Invoice
+        </h1>
         <div className="text-right">
-          <p className="text-sm text-slate-500">Date: {new Date().toLocaleDateString()}</p>
+          <p className="text-sm text-slate-500">
+            Date: {new Date().toLocaleDateString()}
+          </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div>
-          <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Student ID</label>
-          <input 
+          <label className="block text-xs font-bold uppercase text-slate-500 mb-1">
+            Student ID
+          </label>
+          <input
             type="number"
             className="w-full p-2 border rounded-md"
             value={formData.studentId}
-            onChange={(e) => setFormData({...formData, studentId: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, studentId: e.target.value })
+            }
             placeholder="e.g. 25"
           />
         </div>
         <div>
-          <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Academic Year ID</label>
-          <input 
+          <label className="block text-xs font-bold uppercase text-slate-500 mb-1">
+            Academic Year ID
+          </label>
+          <input
             type="number"
             className="w-full p-2 border rounded-md"
             value={formData.academicYearId}
-            onChange={(e) => setFormData({...formData, academicYearId: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, academicYearId: e.target.value })
+            }
             placeholder="e.g. 1"
           />
         </div>
         <div>
-          <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Term</label>
-          <select 
+          <label className="block text-xs font-bold uppercase text-slate-500 mb-1">
+            Term
+          </label>
+          <select
             className="w-full p-2 border rounded-md"
             value={formData.term}
-            onChange={(e) => setFormData({...formData, term: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, term: e.target.value })}
           >
             <option value="1">Term 1</option>
             <option value="2">Term 2</option>
@@ -132,12 +163,16 @@ const CreateInvoicePage = () => {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Due Date</label>
-          <input 
+          <label className="block text-xs font-bold uppercase text-slate-500 mb-1">
+            Due Date
+          </label>
+          <input
             type="date"
             className="w-full p-2 border rounded-md"
             value={formData.dueDate}
-            onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, dueDate: e.target.value })
+            }
           />
         </div>
       </div>
@@ -146,8 +181,12 @@ const CreateInvoicePage = () => {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b">
-              <th className="p-3 text-xs font-bold uppercase text-slate-600">Description</th>
-              <th className="p-3 text-xs font-bold uppercase text-slate-600 w-48">Amount</th>
+              <th className="p-3 text-xs font-bold uppercase text-slate-600">
+                Description
+              </th>
+              <th className="p-3 text-xs font-bold uppercase text-slate-600 w-48">
+                Amount
+              </th>
               <th className="p-3 w-16"></th>
             </tr>
           </thead>
@@ -155,25 +194,29 @@ const CreateInvoicePage = () => {
             {feeItems.map((item) => (
               <tr key={item.id} className="border-b hover:bg-slate-50">
                 <td className="p-2">
-                  <input 
+                  <input
                     type="text"
                     placeholder="e.g. Tuition Fee"
                     className="w-full p-2 bg-transparent outline-none focus:ring-1 ring-cyan-500 rounded"
                     value={item.description}
-                    onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                    onChange={(e) =>
+                      updateItem(item.id, "description", e.target.value)
+                    }
                   />
                 </td>
                 <td className="p-2">
-                  <input 
+                  <input
                     type="number"
                     placeholder="0.00"
                     className="w-full p-2 bg-transparent outline-none focus:ring-1 ring-cyan-500 rounded font-mono"
                     value={item.amount}
-                    onChange={(e) => updateItem(item.id, 'amount', parseFloat(e.target.value))}
+                    onChange={(e) =>
+                      updateItem(item.id, "amount", parseFloat(e.target.value))
+                    }
                   />
                 </td>
                 <td className="p-2 text-center">
-                  <button 
+                  <button
                     onClick={() => removeRow(item.id)}
                     className="text-red-400 hover:text-red-600"
                   >
@@ -184,8 +227,8 @@ const CreateInvoicePage = () => {
             ))}
           </tbody>
         </table>
-        
-        <button 
+
+        <button
           onClick={addRow}
           className="mt-4 text-xs font-bold text-cyan-600 hover:text-cyan-700 uppercase tracking-widest"
         >
@@ -201,10 +244,12 @@ const CreateInvoicePage = () => {
           </div>
           <div className="flex justify-between mb-6 text-xl font-bold border-t pt-2">
             <span>Total:</span>
-            <span className="text-cyan-700 font-mono">GHS {totalAmount.toFixed(2)}</span>
+            <span className="text-cyan-700 font-mono">
+              GHS {totalAmount.toFixed(2)}
+            </span>
           </div>
-          
-          <button 
+
+          <button
             onClick={handleSaveInvoice}
             disabled={loading}
             className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold uppercase tracking-widest hover:bg-slate-800 transition-all disabled:opacity-50"

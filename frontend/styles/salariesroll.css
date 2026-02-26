@@ -1,18 +1,18 @@
 :root {
-  --primary-teal: #22D3EE;
-  --primary-blue: #0EA5E9;
-  --bg-light: #F8FAFC;
-  --text-dark: #1E293B;
-  --text-muted: #64748B;
-  --border: #E2E8F0;
-  --white: #FFFFFF;
+  --primary-teal: #22d3ee;
+  --primary-blue: #0ea5e9;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --white: #ffffff;
 }
 
 .payroll-container {
   display: flex;
   min-height: 100vh;
   background: var(--bg-light);
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 /* Sidebar */
@@ -75,7 +75,7 @@
 }
 
 .status-pill {
-  background: #DCFCE7;
+  background: #dcfce7;
   color: #166534;
   padding: 4px 10px;
   border-radius: 20px;
@@ -115,7 +115,9 @@
   margin-top: 8px;
 }
 
-.val.red { color: #EF4444; }
+.val.red {
+  color: #ef4444;
+}
 
 /* Chart Area */
 .chart-container {
@@ -128,9 +130,12 @@
 
 .chart-placeholder {
   height: 120px;
-  background: linear-gradient(transparent 90%, #F1F5F9 90%), 
-              linear-gradient(90deg, transparent 95%, #F1F5F9 95%);
-  background-size: 100% 20px, 40px 100%;
+  background:
+    linear-gradient(transparent 90%, #f1f5f9 90%),
+    linear-gradient(90deg, transparent 95%, #f1f5f9 95%);
+  background-size:
+    100% 20px,
+    40px 100%;
   position: relative;
   margin-top: 15px;
 }
@@ -167,7 +172,7 @@
 
 .history-table th {
   padding: 15px;
-  background: #F8FAFC;
+  background: #f8fafc;
   font-size: 11px;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -180,8 +185,8 @@
 }
 
 .paid-badge {
-  background: #F0FDFA;
-  color: #0D9488;
+  background: #f0fdfa;
+  color: #0d9488;
   padding: 4px 8px;
   border-radius: 6px;
   font-weight: 600;
@@ -196,4 +201,6 @@
   cursor: pointer;
 }
 
-.text-right { text-align: right; }
+.text-right {
+  text-align: right;
+}

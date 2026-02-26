@@ -6,7 +6,7 @@
   --text-dark: #0f172a;
   --text-muted: #64748b;
   --border: #e5e7eb;
-  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   --radius: 14px;
   --toggle-bg: #cbd5e1;
   --toggle-active: #0d9488;
@@ -16,7 +16,7 @@
   min-height: 100vh;
   background: var(--bg);
   padding: 40px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .dashboard {
@@ -59,7 +59,7 @@
   border-collapse: collapse;
 }
 
-.permissionsTable th, 
+.permissionsTable th,
 .permissionsTable td {
   padding: 16px;
   font-size: 14px;

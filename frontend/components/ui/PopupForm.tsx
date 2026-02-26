@@ -8,7 +8,7 @@ import { fetchWithAuth } from "@/src/lib/apiClient";
 type SubjectBase = {
   id: number;
   subject_name: string;
-  subject_code:string;
+  subject_code: string;
 };
 
 type User = {
@@ -43,7 +43,14 @@ type TeachingFormProps = {
 };
 
 // ✅ Fields whose values must be sent as integers not strings
-const INT_FIELDS = ["subject", "subject_id", "teacher", "teacher_id", "class_obj", "class_id"];
+const INT_FIELDS = [
+  "subject",
+  "subject_id",
+  "teacher",
+  "teacher_id",
+  "class_obj",
+  "class_id",
+];
 
 export default function TeachingForm({
   formData,
@@ -51,15 +58,15 @@ export default function TeachingForm({
   setFormData,
   onSuccess,
 }: TeachingFormProps) {
-  const [timeSlots, setTimeSlots]           = useState<TimePoint[]>([]);
-  const [teachers, setTeachers]             = useState<Teacher[]>([]);
-  const [subjects, setSubjects]             = useState<SubjectBase[]>([]);
-  const [responseMsg, setResponseMsg]       = useState<boolean>(false);
-  const [messageMsg, setMessageMsg]         = useState<string>("");
-  const [error, setError]                   = useState<boolean>(false);
+  const [timeSlots, setTimeSlots] = useState<TimePoint[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [subjects, setSubjects] = useState<SubjectBase[]>([]);
+  const [responseMsg, setResponseMsg] = useState<boolean>(false);
+  const [messageMsg, setMessageMsg] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
   const [loadingTeachers, setLoadingTeachers] = useState(true);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
-  const [submitting, setSubmitting]         = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchTeachers();
@@ -71,7 +78,7 @@ export default function TeachingForm({
   function generateTimePoints(
     startHour = 7,
     endHour = 18,
-    intervalMinutes = 30
+    intervalMinutes = 30,
   ): TimePoint[] {
     const points: TimePoint[] = [];
     let id = 1;
@@ -92,7 +99,7 @@ export default function TeachingForm({
     try {
       const res = await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}/teachers/`,
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       const data = await res.json();
       setTeachers(data.results || []);
@@ -108,7 +115,7 @@ export default function TeachingForm({
     try {
       const res = await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}/subjects/`,
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       const data = await res.json();
       setSubjects(data.results || []);
@@ -120,7 +127,9 @@ export default function TeachingForm({
   };
 
   // ✅ Fix #1 & #2 — parse integer fields so select values match and IDs are numbers
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     const parsed = INT_FIELDS.includes(name) ? Number(value) : value;
     setFormData(name, parsed);
@@ -142,9 +151,9 @@ export default function TeachingForm({
     }
 
     const [startHour, startMin] = start_time.split(":").map(Number);
-    const [endHour, endMin]     = end_time.split(":").map(Number);
+    const [endHour, endMin] = end_time.split(":").map(Number);
     const startTotal = startHour * 60 + startMin;
-    const endTotal   = endHour   * 60 + endMin;
+    const endTotal = endHour * 60 + endMin;
 
     if (startTotal >= endTotal) {
       setError(true);
@@ -174,14 +183,19 @@ export default function TeachingForm({
         const errorData = await response.json();
         const error_process = String(errorData).replace(/[{}']/g, "");
 
-
         setError(true);
-        setMessageMsg(`Failed to submit. Check console for details.${error_process}`);
+        setMessageMsg(
+          `Failed to submit. Check console for details.${error_process}`,
+        );
         return;
       }
 
       setError(false);
-      setMessageMsg(isUpdate ? "Assignment updated successfully!" : "Assignment created successfully!");
+      setMessageMsg(
+        isUpdate
+          ? "Assignment updated successfully!"
+          : "Assignment created successfully!",
+      );
       // onSuccess?.();
     } catch (err) {
       console.error("Network error:", err);
@@ -189,7 +203,6 @@ export default function TeachingForm({
       setMessageMsg("Network error. Please try again.");
     } finally {
       setSubmitting(false);
-     
     }
   };
 
@@ -219,7 +232,9 @@ export default function TeachingForm({
               <div className="line"></div>
             </div>
             {messageMsg && (
-              <p className={`status_message ${error ? "red" : "green"}`}>{messageMsg}</p>
+              <p className={`status_message ${error ? "red" : "green"}`}>
+                {messageMsg}
+              </p>
             )}
           </div>
 
@@ -349,7 +364,7 @@ export default function TeachingForm({
                     <option key={day} value={day}>
                       {day}
                     </option>
-                  )
+                  ),
                 )}
               </select>
             </label>
@@ -359,11 +374,15 @@ export default function TeachingForm({
             {submitting ? (
               <span className="submit_btn_content">
                 <span className="submit_spinner" aria-hidden="true"></span>
-                <span>{typeof Update === "number" ? "Updating..." : "Saving..."}</span>
+                <span>
+                  {typeof Update === "number" ? "Updating..." : "Saving..."}
+                </span>
               </span>
             ) : (
               <span className="submit_btn_content">
-                {typeof Update === "number" ? "Update Timetable" : "Create Timetable"}
+                {typeof Update === "number"
+                  ? "Update Timetable"
+                  : "Create Timetable"}
               </span>
             )}
           </button>

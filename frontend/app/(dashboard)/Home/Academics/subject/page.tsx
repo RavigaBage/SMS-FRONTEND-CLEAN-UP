@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import '@/styles/subject-redesign.css';
+import React, { useState, useRef, useEffect } from "react";
+import "@/styles/subject-redesign.css";
 import EnrollPopup from "@/components/ui/subjectPopup";
 import { fetchWithAuth } from "@/src/lib/apiClient";
-import SkeletonTable from '@/components/ui/SkeletonLoader';
-import { Pagination } from '@/src/assets/components/management/Pagination';
-import { ErrorState } from '@/src/assets/components/dashboard/ErrorState';
+import SkeletonTable from "@/components/ui/SkeletonLoader";
+import { Pagination } from "@/src/assets/components/management/Pagination";
+import { ErrorState } from "@/src/assets/components/dashboard/ErrorState";
 
 export interface Subject {
   id: number;
@@ -25,7 +25,10 @@ const PAGE_SIZE = 10;
 
 export default function SubjectsManagement() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [formData, setFormData] = useState({ subject_name: "", subject_code: "" });
+  const [formData, setFormData] = useState({
+    subject_name: "",
+    subject_code: "",
+  });
   const [active, setActive] = useState(false);
   const [clickVelvet, setClickVelvet] = useState<number | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -42,7 +45,7 @@ export default function SubjectsManagement() {
     try {
       const res = await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}/subjects/?page=${pageNumber}`,
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       const data: SubjectApiResponse = await res.json();
       setTotalCount(data.count);
@@ -54,11 +57,15 @@ export default function SubjectsManagement() {
     }
   };
 
-  useEffect(() => { fetchSubjects(page); }, [page]);
+  useEffect(() => {
+    fetchSubjects(page);
+  }, [page]);
 
   const handleDelete = async (id: number) => {
     if (!confirm("Delete this subject?")) return;
-    await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/subjects/${id}/`, { method: "DELETE" });
+    await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/subjects/${id}/`, {
+      method: "DELETE",
+    });
     const newCount = totalCount - 1;
     const newTotalPages = Math.ceil(newCount / PAGE_SIZE);
     if (page > newTotalPages && newTotalPages > 0) setPage(newTotalPages);
@@ -76,12 +83,15 @@ export default function SubjectsManagement() {
 
   const handleStartEdit = (item: Subject) => {
     setSelectedId(item.id);
-    setFormData({ subject_name: item.subject_name, subject_code: item.subject_code });
+    setFormData({
+      subject_name: item.subject_name,
+      subject_code: item.subject_code,
+    });
     setActive(true);
   };
 
   const handleVelvetToggle = (index: number) =>
-    setClickVelvet(prev => (prev === index ? null : index));
+    setClickVelvet((prev) => (prev === index ? null : index));
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
@@ -91,16 +101,21 @@ export default function SubjectsManagement() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (checkVelvetClick.current && !checkVelvetClick.current.contains(event.target as Node))
+      if (
+        checkVelvetClick.current &&
+        !checkVelvetClick.current.contains(event.target as Node)
+      )
         setClickVelvet(null);
     };
-    if (clickVelvet !== null) document.addEventListener("mousedown", handleClickOutside);
+    if (clickVelvet !== null)
+      document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [clickVelvet]);
 
-  const filtered = subjects.filter(s =>
-    s.subject_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.subject_code.toLowerCase().includes(searchTerm.toLowerCase())
+  const filtered = subjects.filter(
+    (s) =>
+      s.subject_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.subject_code.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -112,7 +127,8 @@ export default function SubjectsManagement() {
         fieldNames={["student", "class_obj"]}
         setFormData={updateFormField}
         selectedIM={selectedId}
-        onSuccess={() => {          // 👈 add this
+        onSuccess={() => {
+          // 👈 add this
           fetchSubjects(page);
           handlePopup();
         }}
@@ -123,7 +139,9 @@ export default function SubjectsManagement() {
         <div className="sm-header-left">
           <div className="sm-eyebrow">Academic</div>
           <h1 className="sm-title">Subjects</h1>
-          <p className="sm-subtitle">Manage academic subjects and teacher assignments</p>
+          <p className="sm-subtitle">
+            Manage academic subjects and teacher assignments
+          </p>
         </div>
         <button
           className="sm-add-btn"
@@ -157,8 +175,19 @@ export default function SubjectsManagement() {
 
         <div className="sm-search">
           <svg className="sm-search-icon" viewBox="0 0 20 20" fill="none">
-            <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" strokeWidth="1.5"/>
-            <path d="M13.5 13.5L17 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <circle
+              cx="8.5"
+              cy="8.5"
+              r="5.5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            />
+            <path
+              d="M13.5 13.5L17 17"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
           <input
             className="sm-search-input"
@@ -205,15 +234,29 @@ export default function SubjectsManagement() {
                           onClick={() => handleVelvetToggle(index)}
                           aria-label="Actions"
                         >
-                          <span /><span /><span />
+                          <span />
+                          <span />
+                          <span />
                         </button>
-                        <div className={`sm-dropdown ${clickVelvet === index ? "sm-dropdown--open" : ""}`}>
+                        <div
+                          className={`sm-dropdown ${clickVelvet === index ? "sm-dropdown--open" : ""}`}
+                        >
                           <button
                             className="sm-dropdown-item sm-dropdown-item--edit"
                             onClick={() => handleStartEdit(item)}
                           >
-                            <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
-                              <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
+                            <svg
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              width="14"
+                              height="14"
+                            >
+                              <path
+                                d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z"
+                                stroke="currentColor"
+                                strokeWidth="1.2"
+                                strokeLinejoin="round"
+                              />
                             </svg>
                             Edit
                           </button>
@@ -221,8 +264,19 @@ export default function SubjectsManagement() {
                             className="sm-dropdown-item sm-dropdown-item--delete"
                             onClick={() => handleDelete(item.id)}
                           >
-                            <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
-                              <path d="M3 4h10M6 4V3h4v1M6 7v5M10 7v5M4 4l1 9h6l1-9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <svg
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              width="14"
+                              height="14"
+                            >
+                              <path
+                                d="M3 4h10M6 4V3h4v1M6 7v5M10 7v5M4 4l1 9h6l1-9"
+                                stroke="currentColor"
+                                strokeWidth="1.2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
                             </svg>
                             Delete
                           </button>

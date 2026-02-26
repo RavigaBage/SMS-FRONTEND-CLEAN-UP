@@ -13,7 +13,7 @@
   --text-muted: #64748b;
 
   --border: #e2e8f0;
-  --shadow: 0 15px 40px rgba(0,0,0,0.06);
+  --shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
 
   --radius: 16px;
 }
@@ -23,7 +23,7 @@
   min-height: 100vh;
   background: linear-gradient(to bottom, #f8fafc, #eef2f7);
   padding: 48px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   cursor: pointer;
 }
 
@@ -75,7 +75,7 @@
 .controls input:focus,
 .controls select:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(30,58,138,0.08);
+  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.08);
 }
 
 /* Table Card */
@@ -256,7 +256,7 @@
 
 .modalInput:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(30,58,138,0.08);
+  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.08);
 }
 
 /* Buttons */
@@ -273,7 +273,7 @@
 
 .primaryBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(37,99,235,0.25);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
 }
 
 .secondaryBtn {

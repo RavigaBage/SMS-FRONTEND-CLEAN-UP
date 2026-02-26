@@ -1,5 +1,9 @@
 // frontend/src/app/dashboard/profile/page.tsx
-import { mockStudentProfile, mockValidationError, mockNotFoundError } from "@/src/lib/mock-data";
+import {
+  mockStudentProfile,
+  mockValidationError,
+  mockNotFoundError,
+} from "@/src/lib/mock-data";
 import { StatsCard } from "@/src/assets/components/dashboard/StatsCard";
 import { GradeTable } from "@/src/assets/components/dashboard/GradeTable";
 import { ErrorState } from "@/src/assets/components/dashboard/ErrorState";
@@ -11,9 +15,9 @@ export default function StudentProfilePage() {
   if (response.responseCode !== 0) {
     return (
       <div className="p-20 max-w-xl mx-auto">
-        <ErrorState 
-          code={response.responseCode} 
-          message={response.responseMessage} 
+        <ErrorState
+          code={response.responseCode}
+          message={response.responseMessage}
         />
       </div>
     );
@@ -22,12 +26,16 @@ export default function StudentProfilePage() {
   if (response.dataCount === 0 || !response.data) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh]">
-        <h3 className="text-lg font-medium text-slate-900">No Student Records Found</h3>
-        <p className="text-slate-500">The profile you are looking for is currently empty.</p>
+        <h3 className="text-lg font-medium text-slate-900">
+          No Student Records Found
+        </h3>
+        <p className="text-slate-500">
+          The profile you are looking for is currently empty.
+        </p>
       </div>
     );
   }
-    
+
   const student = response.data;
 
   return (
@@ -36,10 +44,15 @@ export default function StudentProfilePage() {
       <section className="bg-white rounded-2xl border overflow-hidden shadow-sm">
         <div className="h-32 bg-linear-to-r from-blue-400 to-cyan-400" />
         <div className="p-6 flex flex-col md:flex-row gap-6 items-center md:items-end -mt-12">
-          <img src={student.profileImage} className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-white" />
+          <img
+            src={student.profileImage}
+            className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-white"
+          />
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-2xl font-bold">{student.fullName}</h1>
-            <p className="text-slate-500">ID: {student.studentId} • {student.gradeLevel} • {student.stream}</p>
+            <p className="text-slate-500">
+              ID: {student.studentId} • {student.gradeLevel} • {student.stream}
+            </p>
           </div>
           <div className="flex gap-2">
             <button
@@ -47,7 +60,7 @@ export default function StudentProfilePage() {
                 const email = student.personalDetails.email;
                 const subject = encodeURIComponent("Regarding Your Ward");
                 const body = encodeURIComponent(
-                  `Hello,\n\nI would like to discuss matters concerning your child.\n\nThank you.`
+                  `Hello,\n\nI would like to discuss matters concerning your child.\n\nThank you.`,
                 );
 
                 window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
@@ -61,7 +74,7 @@ export default function StudentProfilePage() {
               onClick={() => {
                 const phone = student.personalDetails.phone.replace(/\D/g, "");
                 const message = encodeURIComponent(
-                  "Hello, I would like to discuss matters concerning your child."
+                  "Hello, I would like to discuss matters concerning your child.",
                 );
 
                 window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
@@ -70,7 +83,6 @@ export default function StudentProfilePage() {
             >
               Message Parent (WhatsApp)
             </button>
-
           </div>
         </div>
       </section>
@@ -81,27 +93,49 @@ export default function StudentProfilePage() {
           <div className="bg-white p-6 rounded-2xl border shadow-sm">
             <h3 className="font-bold mb-4">Personal Details</h3>
             <div className="space-y-4">
-              <DetailItem label="DATE OF BIRTH" value={student.personalDetails.dateOfBirth} />
+              <DetailItem
+                label="DATE OF BIRTH"
+                value={student.personalDetails.dateOfBirth}
+              />
               <DetailItem label="PHONE" value={student.personalDetails.phone} />
               <DetailItem label="EMAIL" value={student.personalDetails.email} />
-              <DetailItem label="ADDRESS" value={student.personalDetails.address} />
+              <DetailItem
+                label="ADDRESS"
+                value={student.personalDetails.address}
+              />
             </div>
           </div>
-            <QuickNotes note={student.quickNote} />
+          <QuickNotes note={student.quickNote} />
         </div>
 
         {/* Right Content Area */}
         <div className="lg:col-span-2 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StatsCard label="GPA" value={student.currentGpa} subValue={`${student.gpaTrend} vs last semester`} color="cyan" />
-            <StatsCard label="Attendance" value={`${student.attendancePercentage}%`} subValue="Good" color="blue" />
-            <StatsCard label="Pending Tasks" value={student.pendingTasks} color="orange" />
+            <StatsCard
+              label="GPA"
+              value={student.currentGpa}
+              subValue={`${student.gpaTrend} vs last semester`}
+              color="cyan"
+            />
+            <StatsCard
+              label="Attendance"
+              value={`${student.attendancePercentage}%`}
+              subValue="Good"
+              color="blue"
+            />
+            <StatsCard
+              label="Pending Tasks"
+              value={student.pendingTasks}
+              color="orange"
+            />
           </div>
 
           <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
             <div className="p-6 flex justify-between items-center border-b">
               <h3 className="font-bold">Academic History</h3>
-              <button className="text-cyan-600 text-sm font-bold">Download Report</button>
+              <button className="text-cyan-600 text-sm font-bold">
+                Download Report
+              </button>
             </div>
             <GradeTable grades={student.academicHistory} />
           </div>
@@ -114,7 +148,9 @@ export default function StudentProfilePage() {
 function DetailItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">{label}</p>
+      <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+        {label}
+      </p>
       <p className="text-sm font-medium text-slate-700">{value}</p>
     </div>
   );

@@ -1,7 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Save, Loader2, User, Mail, Briefcase, FileText, Phone, MapPin, HeartPulse } from "lucide-react";
+import {
+  X,
+  Save,
+  Loader2,
+  User,
+  Mail,
+  Briefcase,
+  FileText,
+  Phone,
+  MapPin,
+  HeartPulse,
+} from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
 
 export function EditStaffModal({
@@ -36,19 +47,19 @@ export function EditStaffModal({
   useEffect(() => {
     if (staffData && isOpen) {
       setFormData({
-        first_name:       staffData.first_name       || "",
-        last_name:        staffData.last_name        || "",
-        email:            staffData.email            || "",
-        phone_number:     staffData.phone_number     || "",
-        address:          staffData.address          || "",
-        gender:           staffData.gender           || "male",
-        staff_type:       staffData.staff_type       || "teacher",
-        specialization:   staffData.specialization   || "",
-        date_of_birth:    staffData.date_of_birth    || "",
-        employment_date:  staffData.employment_date  || "",
-        national_id:      staffData.national_id      || "",
-        health_info:      staffData.health_info      || "",
-        photo_url:        staffData.photo_url        || "",
+        first_name: staffData.first_name || "",
+        last_name: staffData.last_name || "",
+        email: staffData.email || "",
+        phone_number: staffData.phone_number || "",
+        address: staffData.address || "",
+        gender: staffData.gender || "male",
+        staff_type: staffData.staff_type || "teacher",
+        specialization: staffData.specialization || "",
+        date_of_birth: staffData.date_of_birth || "",
+        employment_date: staffData.employment_date || "",
+        national_id: staffData.national_id || "",
+        health_info: staffData.health_info || "",
+        photo_url: staffData.photo_url || "",
       });
       setErrorMsg(null);
     }
@@ -63,7 +74,7 @@ export function EditStaffModal({
 
     try {
       const payload = Object.fromEntries(
-        Object.entries(formData).filter(([_, v]) => v !== "")
+        Object.entries(formData).filter(([_, v]) => v !== ""),
       );
 
       const response = await apiRequest(`/staff/${staffData.id}/`, {
@@ -72,7 +83,9 @@ export function EditStaffModal({
       });
 
       if ((response as any)?.error || (response as any)?.status >= 400) {
-        setErrorMsg((response as any)?.error || "Failed to update staff profile.");
+        setErrorMsg(
+          (response as any)?.error || "Failed to update staff profile.",
+        );
         return;
       }
 
@@ -81,7 +94,9 @@ export function EditStaffModal({
     } catch (err: any) {
       if (typeof err === "object" && err !== null) {
         const firstKey = Object.keys(err)[0];
-        const message = Array.isArray(err[firstKey]) ? err[firstKey][0] : err[firstKey];
+        const message = Array.isArray(err[firstKey])
+          ? err[firstKey][0]
+          : err[firstKey];
         setErrorMsg(String(message).replace(/[\[\]']+/g, ""));
       } else {
         setErrorMsg(err.message || "An error occurred");
@@ -257,11 +272,14 @@ export function EditStaffModal({
       `}</style>
 
       {/* ── Backdrop ── */}
-      <div className="esm-backdrop !m-0" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-
+      <div
+        className="esm-backdrop !m-0"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+      >
         {/* ── Modal ── */}
         <div className="esm-modal">
-
           {/* Header */}
           <div className="esm-header">
             <div className="esm-header-left">
@@ -279,82 +297,125 @@ export function EditStaffModal({
           </div>
 
           {/* Error bar */}
-          {errorMsg && (
-            <div className="esm-error">⚠ {errorMsg}</div>
-          )}
+          {errorMsg && <div className="esm-error">⚠ {errorMsg}</div>}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="esm-body">
-
             {/* Personal */}
             <p className="esm-section">Personal Information</p>
             <div className="esm-grid-2">
-              <EsmInput label="First Name" value={formData.first_name} onChange={(v) => setFormData({...formData, first_name: v})} />
-              <EsmInput label="Last Name"  value={formData.last_name}  onChange={(v) => setFormData({...formData, last_name: v})} />
+              <EsmInput
+                label="First Name"
+                value={formData.first_name}
+                onChange={(v) => setFormData({ ...formData, first_name: v })}
+              />
+              <EsmInput
+                label="Last Name"
+                value={formData.last_name}
+                onChange={(v) => setFormData({ ...formData, last_name: v })}
+              />
             </div>
             <div className="esm-grid-2">
-              <EsmInput label="Email Address" icon={<Mail size={10}/>}  value={formData.email}        onChange={(v) => setFormData({...formData, email: v})} />
-              <EsmInput label="Phone Number"  icon={<Phone size={10}/>} value={formData.phone_number} onChange={(v) => setFormData({...formData, phone_number: v})} />
+              <EsmInput
+                label="Email Address"
+                icon={<Mail size={10} />}
+                value={formData.email}
+                onChange={(v) => setFormData({ ...formData, email: v })}
+              />
+              <EsmInput
+                label="Phone Number"
+                icon={<Phone size={10} />}
+                value={formData.phone_number}
+                onChange={(v) => setFormData({ ...formData, phone_number: v })}
+              />
             </div>
             <div className="esm-grid-2">
-              <EsmDate label="Date of Birth"    value={formData.date_of_birth}   onChange={(v) => setFormData({...formData, date_of_birth: v})} />
-              <EsmDate label="Employment Date"  value={formData.employment_date} onChange={(v) => setFormData({...formData, employment_date: v})} />
+              <EsmDate
+                label="Date of Birth"
+                value={formData.date_of_birth}
+                onChange={(v) => setFormData({ ...formData, date_of_birth: v })}
+              />
+              <EsmDate
+                label="Employment Date"
+                value={formData.employment_date}
+                onChange={(v) =>
+                  setFormData({ ...formData, employment_date: v })
+                }
+              />
             </div>
 
             {/* Role */}
             <p className="esm-section">Role & Assignment</p>
             <div className="esm-grid-2">
               <EsmSelect
-                label="Staff Role" icon={<Briefcase size={10}/>}
+                label="Staff Role"
+                icon={<Briefcase size={10} />}
                 value={formData.staff_type}
-                onChange={(v) => setFormData({...formData, staff_type: v})}
+                onChange={(v) => setFormData({ ...formData, staff_type: v })}
                 options={[
-                  { value: "teacher",       label: "Teacher" },
-                  { value: "headmaster",    label: "Headmaster" },
-                  { value: "bursar",        label: "Bursar" },
-                  { value: "admin_staff",   label: "Admin Staff" },
+                  { value: "teacher", label: "Teacher" },
+                  { value: "headmaster", label: "Headmaster" },
+                  { value: "bursar", label: "Bursar" },
+                  { value: "admin_staff", label: "Admin Staff" },
                   { value: "support_staff", label: "Support Staff" },
                 ]}
               />
               <EsmSelect
                 label="Gender"
                 value={formData.gender}
-                onChange={(v) => setFormData({...formData, gender: v})}
+                onChange={(v) => setFormData({ ...formData, gender: v })}
                 options={[
-                  { value: "male",   label: "Male" },
+                  { value: "male", label: "Male" },
                   { value: "female", label: "Female" },
-                  { value: "other",  label: "Other" },
+                  { value: "other", label: "Other" },
                 ]}
               />
             </div>
-            <EsmInput label="Specialization" value={formData.specialization} onChange={(v) => setFormData({...formData, specialization: v})} />
+            <EsmInput
+              label="Specialization"
+              value={formData.specialization}
+              onChange={(v) => setFormData({ ...formData, specialization: v })}
+            />
 
             {/* Other */}
             <p className="esm-section">Additional Details</p>
             <div className="esm-grid">
-              <EsmInput label="National ID" icon={<FileText size={10}/>} value={formData.national_id} onChange={(v) => setFormData({...formData, national_id: v})} />
-              
+              <EsmInput
+                label="National ID"
+                icon={<FileText size={10} />}
+                value={formData.national_id}
+                onChange={(v) => setFormData({ ...formData, national_id: v })}
+              />
             </div>
             <div className="esm-grid-2">
               <div className="esm-field">
-                <label className="esm-label"><MapPin size={10}/> Residential Address</label>
+                <label className="esm-label">
+                  <MapPin size={10} /> Residential Address
+                </label>
                 <textarea
-                  className="esm-textarea" rows={3}
+                  className="esm-textarea"
+                  rows={3}
                   value={formData.address}
-                  onChange={(e) => setFormData({...formData, address: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, address: e.target.value })
+                  }
                 />
               </div>
               <div className="esm-field">
-                <label className="esm-label" style={{ color: '#dc2626' }}><HeartPulse size={10}/> Health / Medical Info</label>
+                <label className="esm-label" style={{ color: "#dc2626" }}>
+                  <HeartPulse size={10} /> Health / Medical Info
+                </label>
                 <textarea
-                  className="esm-textarea" rows={3}
+                  className="esm-textarea"
+                  rows={3}
                   placeholder="Blood group, allergies, conditions…"
                   value={formData.health_info}
-                  onChange={(e) => setFormData({...formData, health_info: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, health_info: e.target.value })
+                  }
                 />
               </div>
             </div>
-
           </form>
 
           {/* Footer */}
@@ -362,12 +423,21 @@ export function EditStaffModal({
             <button type="button" className="esm-btn-cancel" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" form="esm-form" className="esm-btn-save" disabled={loading} onClick={handleSubmit}>
-              {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            <button
+              type="submit"
+              form="esm-form"
+              className="esm-btn-save"
+              disabled={loading}
+              onClick={handleSubmit}
+            >
+              {loading ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Save size={14} />
+              )}
               {loading ? "Saving…" : "Update Staff"}
             </button>
           </div>
-
         </div>
       </div>
     </>
@@ -376,35 +446,84 @@ export function EditStaffModal({
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function EsmInput({ label, value, onChange, icon }: { label: string; value: string; onChange: (v: string) => void; icon?: React.ReactNode }) {
+function EsmInput({
+  label,
+  value,
+  onChange,
+  icon,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  icon?: React.ReactNode;
+}) {
   return (
     <div className="esm-field">
-      <label className="esm-label">{icon}{label}</label>
-      <input className="esm-input" type="text" value={value} onChange={(e) => onChange(e.target.value)} />
+      <label className="esm-label">
+        {icon}
+        {label}
+      </label>
+      <input
+        className="esm-input"
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </div>
   );
 }
 
-function EsmDate({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function EsmDate({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <div className="esm-field">
       <label className="esm-label">{label}</label>
-      <input className="esm-input" type="date" value={value} onChange={(e) => onChange(e.target.value)} />
+      <input
+        className="esm-input"
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </div>
   );
 }
 
-function EsmSelect({ label, value, onChange, options, icon }: {
-  label: string; value: string;
+function EsmSelect({
+  label,
+  value,
+  onChange,
+  options,
+  icon,
+}: {
+  label: string;
+  value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
   icon?: React.ReactNode;
 }) {
   return (
     <div className="esm-field">
-      <label className="esm-label">{icon}{label}</label>
-      <select className="esm-select" value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      <label className="esm-label">
+        {icon}
+        {label}
+      </label>
+      <select
+        className="esm-select"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
       </select>
     </div>
   );

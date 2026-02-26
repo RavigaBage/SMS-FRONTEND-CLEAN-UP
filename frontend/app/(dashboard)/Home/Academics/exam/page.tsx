@@ -1,22 +1,26 @@
-import React from 'react';
-import '@/styles/examSetup.css';
+import React from "react";
+import "@/styles/examSetup.css";
 
 export default function ExamSetup() {
   const steps = [
     { id: 1, label: "Exam Details" },
     { id: 2, label: "Subjects" },
     { id: 3, label: "Grading Scale" },
-    { id: 4, label: "Review" }
+    { id: 4, label: "Review" },
   ];
 
-  const subjects = ["Mathematics", "English Language", "Integrated Science", "Social Studies"];
+  const subjects = [
+    "Mathematics",
+    "English Language",
+    "Integrated Science",
+    "Social Studies",
+  ];
 
   const activeStep = 1;
 
   return (
     <div className="dashboardWrapper">
       <div className="dashboard">
-        
         {/* Header */}
         <header className="header">
           <h1>Exam Setup & Configuration</h1>
@@ -26,9 +30,9 @@ export default function ExamSetup() {
         {/* Steps Progress Bar */}
         <nav className="steps">
           {steps.map((step) => (
-            <div 
-              key={step.id} 
-              className={`step ${step.id <= activeStep ? 'stepActive' : ''}`}
+            <div
+              key={step.id}
+              className={`step ${step.id <= activeStep ? "stepActive" : ""}`}
             >
               <div className="stepCircle">{step.id}</div>
               {step.label}
@@ -39,17 +43,32 @@ export default function ExamSetup() {
         {/* Form Card */}
         <main className="formCard">
           <form>
-            
             {/* Section 1: Exam Details */}
             <div className="formSection">
-              <div style={{ marginBottom: '16px' }}>
-                <label className="formLabel" htmlFor="exam-name">Exam Name</label>
-                <input type="text" id="exam-name" className="formInput" placeholder="Enter exam name" />
+              <div style={{ marginBottom: "16px" }}>
+                <label className="formLabel" htmlFor="exam-name">
+                  Exam Name
+                </label>
+                <input
+                  type="text"
+                  id="exam-name"
+                  className="formInput"
+                  placeholder="Enter exam name"
+                />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "16px",
+                  marginBottom: "16px",
+                }}
+              >
                 <div>
-                  <label className="formLabel" htmlFor="term">Term</label>
+                  <label className="formLabel" htmlFor="term">
+                    Term
+                  </label>
                   <select id="term" className="formSelect">
                     <option>Select Term</option>
                     <option>Term 1</option>
@@ -58,7 +77,9 @@ export default function ExamSetup() {
                   </select>
                 </div>
                 <div>
-                  <label className="formLabel" htmlFor="class">Class</label>
+                  <label className="formLabel" htmlFor="class">
+                    Class
+                  </label>
                   <select id="class" className="formSelect">
                     <option>Select Class</option>
                     <option>Grade 6A</option>
@@ -69,7 +90,9 @@ export default function ExamSetup() {
               </div>
 
               <div>
-                <label className="formLabel" htmlFor="exam-date">Exam Date</label>
+                <label className="formLabel" htmlFor="exam-date">
+                  Exam Date
+                </label>
                 <input type="date" id="exam-date" className="formInput" />
               </div>
             </div>
@@ -99,8 +122,12 @@ export default function ExamSetup() {
 
             {/* Form Actions */}
             <footer className="btnGroup">
-              <button type="button" className="secondaryBtn">Cancel</button>
-              <button type="submit" className="primaryBtn">Save Exam Configuration</button>
+              <button type="button" className="secondaryBtn">
+                Cancel
+              </button>
+              <button type="submit" className="primaryBtn">
+                Save Exam Configuration
+              </button>
             </footer>
           </form>
         </main>

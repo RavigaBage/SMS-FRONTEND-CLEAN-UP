@@ -13,7 +13,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    
     const timer = setInterval(() => {
       setCountdown((prev) => prev - 1);
     }, 1000);
@@ -115,7 +114,10 @@ export default function Home() {
         </div>
 
         {/* Feature highlights */}
-        <div className="mt-20 grid max-w-4xl animate-fade-in-up gap-6 sm:grid-cols-3" style={{ animationDelay: "200ms" }}>
+        <div
+          className="mt-20 grid max-w-4xl animate-fade-in-up gap-6 sm:grid-cols-3"
+          style={{ animationDelay: "200ms" }}
+        >
           {[
             {
               icon: "📊",

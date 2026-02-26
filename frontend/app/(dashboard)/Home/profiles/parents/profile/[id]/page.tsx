@@ -1,12 +1,19 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { apiRequest } from '@/src/lib/apiClient';
-import Link from 'next/link'
-import { 
-  Phone, Mail, MapPin, User, ShieldCheck, 
-  ChevronRight, MessageSquare, Edit3, GraduationCap 
-} from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { apiRequest } from "@/src/lib/apiClient";
+import Link from "next/link";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  User,
+  ShieldCheck,
+  ChevronRight,
+  MessageSquare,
+  Edit3,
+  GraduationCap,
+} from "lucide-react";
 
 type IconProps = {
   className?: string;
@@ -14,7 +21,7 @@ type IconProps = {
 interface Ward {
   id: number;
   full_name: string;
-  age:String;
+  age: String;
   admission_number: string;
   admission_date: string;
   class_info: {
@@ -47,12 +54,16 @@ export default function ParentProfile() {
       setLoading(true);
       try {
         // 1. Fetch Parent Basic Info
-        const parentRes = await apiRequest<ParentProfileData>(`/parents/${id}/`);
+        const parentRes = await apiRequest<ParentProfileData>(
+          `/parents/${id}/`,
+        );
         setParent(parentRes.data as any);
 
         // 2. Fetch Children using the detail action we verified earlier
-        const childrenRes = await apiRequest<Ward[]>(`/parents/${id}/children/`);
-        setWards(childrenRes.data as any || []);
+        const childrenRes = await apiRequest<Ward[]>(
+          `/parents/${id}/children/`,
+        );
+        setWards((childrenRes.data as any) || []);
       } catch (err) {
         console.error("Profile fetch error:", err);
       } finally {
@@ -63,13 +74,18 @@ export default function ParentProfile() {
     if (id) fetchFullProfile();
   }, [id]);
 
-  if (loading) return <div className="p-10 text-center animate-pulse">Loading Profile...</div>;
-  if (!parent) return <div className="p-10 text-center text-red-500">Parent not found.</div>;
+  if (loading)
+    return (
+      <div className="p-10 text-center animate-pulse">Loading Profile...</div>
+    );
+  if (!parent)
+    return (
+      <div className="p-10 text-center text-red-500">Parent not found.</div>
+    );
 
   return (
     <div className="min-h-screen bg-slate-50/50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        
         {/* BREADCRUMB */}
         <nav className="flex items-center gap-2 text-sm text-slate-500">
           <span>Directory</span>
@@ -82,22 +98,29 @@ export default function ParentProfile() {
           <div className="absolute top-0 right-0 p-8 opacity-5">
             <User className="w-32 h-32" />
           </div>
-          
+
           <div className="flex flex-col md:flex-row justify-between items-start gap-6 relative">
             <div className="flex gap-6 items-center">
               <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-blue-200">
                 {parent.full_name.charAt(0)}
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-black text-slate-900 tracking-tight">{parent.full_name}</h1>
+                  <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                    {parent.full_name}
+                  </h1>
                   <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase rounded-full border border-emerald-100">
                     {parent.relationship_display}
                   </span>
                 </div>
-                <p className="text-slate-500 font-medium">#{parent.occupation} at <span className="text-slate-900">{parent.workplace || 'N/A'}</span></p>
-                
+                <p className="text-slate-500 font-medium">
+                  #{parent.occupation} at{" "}
+                  <span className="text-slate-900">
+                    {parent.workplace || "N/A"}
+                  </span>
+                </p>
+
                 <div className="flex flex-wrap gap-4 pt-2">
                   <ContactItem icon={<Phone />} text={parent.phone_number} />
                   <ContactItem icon={<Mail />} text={parent.email} />
@@ -126,7 +149,9 @@ export default function ParentProfile() {
         {/* WARDS SECTION */}
         <section>
           <div className="flex items-center gap-4 mb-6">
-            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Wards / Children</h2>
+            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+              Wards / Children
+            </h2>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
 
@@ -140,16 +165,34 @@ export default function ParentProfile() {
     </div>
   );
 }
-const ContactItem = ({ icon, text }: { icon: React.ReactNode, text: string }) => (
+const ContactItem = ({
+  icon,
+  text,
+}: {
+  icon: React.ReactNode;
+  text: string;
+}) => (
   <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-    {React.cloneElement(icon as React.ReactElement<IconProps>, { className: "w-3.5 h-3.5 text-slate-400" })}
+    {React.cloneElement(icon as React.ReactElement<IconProps>, {
+      className: "w-3.5 h-3.5 text-slate-400",
+    })}
     <span className="font-medium">{text}</span>
   </div>
 );
 
-const StatBox = ({ label, value, sub }: { label: string, value: string | number, sub: string }) => (
+const StatBox = ({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string | number;
+  sub: string;
+}) => (
   <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+      {label}
+    </p>
     <p className="text-2xl font-black text-blue-600">{value}</p>
     <p className="text-xs text-slate-500 font-medium">{sub}</p>
   </div>
@@ -163,13 +206,17 @@ const WardCard = ({ ward }: { ward: Ward }) => (
           <User className="w-6 h-6" />
         </div>
         <div>
-          <h3 className="font-black text-slate-900 text-lg leading-none mb-1">{ward.full_name}</h3>
-          <p className="text-xs font-bold text-slate-400">ADM: {ward.admission_number}</p>
+          <h3 className="font-black text-slate-900 text-lg leading-none mb-1">
+            {ward.full_name}
+          </h3>
+          <p className="text-xs font-bold text-slate-400">
+            ADM: {ward.admission_number}
+          </p>
         </div>
       </div>
       <div className="text-right">
         <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase rounded-lg">
-          { `${ward.age} years`|| 'enrolled'}
+          {`${ward.age} years` || "enrolled"}
         </span>
       </div>
     </div>
@@ -178,11 +225,17 @@ const WardCard = ({ ward }: { ward: Ward }) => (
       <div className="flex items-center gap-3">
         <GraduationCap className="w-5 h-5 text-slate-400" />
         <div>
-          <p className="text-[10px] font-black text-slate-400 uppercase leading-none">Academic Year</p>
-          <p className="text-sm font-bold text-slate-700">{ward.admission_date || 'N/A'}</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase leading-none">
+            Academic Year
+          </p>
+          <p className="text-sm font-bold text-slate-700">
+            {ward.admission_date || "N/A"}
+          </p>
         </div>
       </div>
-      <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${ward.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>
+      <div
+        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${ward.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}`}
+      >
         {ward.status}
       </div>
     </div>

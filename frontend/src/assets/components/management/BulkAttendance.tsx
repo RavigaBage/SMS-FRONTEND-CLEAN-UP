@@ -11,7 +11,11 @@ interface BulkAttendanceModalProps {
   onClose: () => void;
 }
 
-export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAttendanceModalProps) {
+export function BulkAttendanceModal({
+  isOpen,
+  selectedDate,
+  onClose,
+}: BulkAttendanceModalProps) {
   const [loading, setLoading] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
@@ -37,7 +41,7 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
   const fetchClasses = async () => {
     try {
       const res = await apiRequest<any>("/classes/", { method: "GET" });
-      setClasses(res.results as any || res);
+      setClasses((res.results as any) || res);
     } catch (err) {
       console.error("Error fetching classes:", err);
       toast.error("Failed to load classes");
@@ -46,7 +50,9 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
 
   const fetchStudents = async (classId: string) => {
     try {
-      const res = await apiRequest<any>(`/classes/${classId}/students/`, { method: "GET" });
+      const res = await apiRequest<any>(`/classes/${classId}/students/`, {
+        method: "GET",
+      });
       const students = (res.results || res.data || []) as any[];
 
       setStudents(students);
@@ -55,7 +61,7 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
           student_id: s.id,
           status: defaultStatus,
           remarks: "",
-        }))
+        })),
       );
     } catch (err) {
       console.error("Error fetching students:", err);
@@ -64,26 +70,24 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
   };
 
   const updateStudentStatus = (studentId: number, status: string) => {
-    setAttendanceData(prev =>
-      prev.map(item =>
-        item.student_id === studentId ? { ...item, status } : item
-      )
+    setAttendanceData((prev) =>
+      prev.map((item) =>
+        item.student_id === studentId ? { ...item, status } : item,
+      ),
     );
   };
 
   const updateStudentRemarks = (studentId: number, remarks: string) => {
-    setAttendanceData(prev =>
-      prev.map(item =>
-        item.student_id === studentId ? { ...item, remarks } : item
-      )
+    setAttendanceData((prev) =>
+      prev.map((item) =>
+        item.student_id === studentId ? { ...item, remarks } : item,
+      ),
     );
   };
 
   const handleDefaultStatusChange = (status: string) => {
     setDefaultStatus(status);
-    setAttendanceData(prev =>
-      prev.map(item => ({ ...item, status }))
-    );
+    setAttendanceData((prev) => prev.map((item) => ({ ...item, status })));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,12 +98,12 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
       const res = await apiRequest("/attendance/bulk_mark/", {
         method: "POST",
         body: JSON.stringify({
-          class_id:        parseInt(selectedClass),  // ← top level
-          attendance_date: selectedDate,             // ← top level
-          attendance_records: attendanceData.map(item => ({
+          class_id: parseInt(selectedClass), // ← top level
+          attendance_date: selectedDate, // ← top level
+          attendance_records: attendanceData.map((item) => ({
             student_id: item.student_id,
-            status:     item.status,
-            remarks:    item.remarks || "",
+            status: item.status,
+            remarks: item.remarks || "",
           })),
         }),
       });
@@ -113,7 +117,7 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
       toast.success(
         summary
           ? `Created: ${summary.created}, Updated: ${summary.updated}, Failed: ${summary.failed}`
-          : `Attendance marked for ${attendanceData.length} students!`
+          : `Attendance marked for ${attendanceData.length} students!`,
       );
       onClose();
       resetForm();
@@ -135,7 +139,10 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
 
   return (
     <div className="attendance-modal modal-overlay" onClick={onClose}>
-      <div className="modal-container modal-lg" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container modal-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div>
             <h2 className="modal-title">
@@ -143,7 +150,8 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
               Bulk Mark Attendance
             </h2>
             <p className="modal-subtitle">
-              Mark attendance for entire class on {new Date(selectedDate).toLocaleDateString()}
+              Mark attendance for entire class on{" "}
+              {new Date(selectedDate).toLocaleDateString()}
             </p>
           </div>
           <button className="modal-close" onClick={onClose}>
@@ -195,13 +203,18 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
                   <span className="status-col-header">Status</span>
                 </div>
                 {students.map((student, index) => {
-                  const attendance = attendanceData.find(a => a.student_id === student.id);
+                  const attendance = attendanceData.find(
+                    (a) => a.student_id === student.id,
+                  );
                   return (
                     <div key={student.id} className="bulk-attendance-item">
                       <div className="student-info">
                         <span className="student-number">{index + 1}.</span>
                         <img
-                          src={student.photo_url || `https://ui-avatars.com/api/?name=${student.first_name}+${student.last_name}&background=0D9488&color=fff`}
+                          src={
+                            student.photo_url ||
+                            `https://ui-avatars.com/api/?name=${student.first_name}+${student.last_name}&background=0D9488&color=fff`
+                          }
                           alt={`${student.first_name} ${student.last_name}`}
                           className="student-avatar-sm"
                         />
@@ -217,7 +230,9 @@ export function BulkAttendanceModal({ isOpen, selectedDate, onClose }: BulkAtten
                       <select
                         className="status-select-sm"
                         value={attendance?.status || defaultStatus}
-                        onChange={(e) => updateStudentStatus(student.id, e.target.value)}
+                        onChange={(e) =>
+                          updateStudentStatus(student.id, e.target.value)
+                        }
                       >
                         <option value="present">Present</option>
                         <option value="absent">Absent</option>

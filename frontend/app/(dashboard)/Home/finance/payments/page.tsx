@@ -2,10 +2,22 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  Plus, Search, Download, Eye, RefreshCcw,
-  CheckCircle2, Clock, AlertCircle, X, Check,
-  Banknote, Landmark, CreditCard, Loader2,
-  Edit3, Trash2
+  Plus,
+  Search,
+  Download,
+  Eye,
+  RefreshCcw,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  X,
+  Check,
+  Banknote,
+  Landmark,
+  CreditCard,
+  Loader2,
+  Edit3,
+  Trash2,
 } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
 
@@ -37,7 +49,10 @@ function unwrap<T>(raw: unknown): T | null {
 }
 
 function RecordPaymentModal({
-  isOpen, onClose, onSuccess, initialPayment,
+  isOpen,
+  onClose,
+  onSuccess,
+  initialPayment,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -74,7 +89,12 @@ function RecordPaymentModal({
       });
       // still fetch invoices in case user wants to change invoice when editing (optional)
     } else {
-      setFormData({ invoice_id: "", amount_paid: "", payment_method: "cash", transaction_reference: "" });
+      setFormData({
+        invoice_id: "",
+        amount_paid: "",
+        payment_method: "cash",
+        transaction_reference: "",
+      });
     }
 
     setInvoices([]);
@@ -83,14 +103,20 @@ function RecordPaymentModal({
         // Only load unpaid invoices for creation flow; for edit it's okay to fetch too
         const raw = await apiRequest<any>("/invoices/?status=unpaid");
         const payload = unwrap<Invoice[] | Invoice>(raw);
-        const arr = Array.isArray(payload) ? (payload as Invoice[]) : payload ? [payload as Invoice] : [];
+        const arr = Array.isArray(payload)
+          ? (payload as Invoice[])
+          : payload
+            ? [payload as Invoice]
+            : [];
         if (!cancelled) setInvoices(arr);
       } catch {
         if (!cancelled) setError("Could not load invoices. Please try again.");
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, isEdit, initialPayment]);
 
   const handleInvoiceChange = (id: string) => {
@@ -106,7 +132,10 @@ function RecordPaymentModal({
     e.preventDefault();
     setError(null);
 
-    if (!isEdit && !formData.invoice_id) { setError("Please select an invoice."); return; }
+    if (!isEdit && !formData.invoice_id) {
+      setError("Please select an invoice.");
+      return;
+    }
     if (!formData.amount_paid || Number(formData.amount_paid) <= 0) {
       setError("Please enter a valid amount greater than zero.");
       return;
@@ -147,7 +176,14 @@ function RecordPaymentModal({
           .join(" · ");
         setError(msgs);
       } else {
-        setError(String(detail || (isEdit ? "Failed to update payment. Please try again." : "Failed to record payment. Please try again.")));
+        setError(
+          String(
+            detail ||
+              (isEdit
+                ? "Failed to update payment. Please try again."
+                : "Failed to record payment. Please try again."),
+          ),
+        );
       }
     } finally {
       setLoading(false);
@@ -169,13 +205,23 @@ function RecordPaymentModal({
         {/* Header */}
         <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-slate-100">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">{isEdit ? "Edit Payment" : "Record Payment"}</h2>
+            <h2 className="text-lg font-bold text-slate-900">
+              {isEdit ? "Edit Payment" : "Record Payment"}
+            </h2>
             <p className="text-sm text-slate-500 mt-0.5">
-              {isEdit ? "Update payment details" : "Log a new fee transaction against an invoice"}
+              {isEdit
+                ? "Update payment details"
+                : "Log a new fee transaction against an invoice"}
             </p>
             {isEdit && initialPayment && (
               <div className="mt-2 text-xs text-slate-500">
-                <strong className="text-slate-800">{initialPayment.student_name}</strong> · <span className="font-mono text-xs">{initialPayment.invoice_number}</span>
+                <strong className="text-slate-800">
+                  {initialPayment.student_name}
+                </strong>{" "}
+                ·{" "}
+                <span className="font-mono text-xs">
+                  {initialPayment.invoice_number}
+                </span>
               </div>
             )}
           </div>
@@ -189,7 +235,6 @@ function RecordPaymentModal({
 
         {/* Body */}
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
-
           {/* Error banner */}
           {error && (
             <div className="flex items-start gap-3 px-4 py-3 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700">
@@ -221,7 +266,8 @@ function RecordPaymentModal({
                 <option value="">— Select an unpaid invoice —</option>
                 {invoices.map((inv) => (
                   <option key={inv.id} value={inv.id}>
-                    {inv.invoice_number} · {inv.student?.full_name} · GHS {parseFloat(inv.balance).toFixed(2)} due
+                    {inv.invoice_number} · {inv.student?.full_name} · GHS{" "}
+                    {parseFloat(inv.balance).toFixed(2)} due
                   </option>
                 ))}
               </select>
@@ -234,14 +280,18 @@ function RecordPaymentModal({
               Amount (GHS) *
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₵</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
+                ₵
+              </span>
               <input
                 required
                 type="number"
                 step="0.01"
                 min="0.01"
                 value={formData.amount_paid}
-                onChange={(e) => setFormData({ ...formData, amount_paid: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount_paid: e.target.value })
+                }
                 className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"
                 placeholder="0.00"
               />
@@ -258,17 +308,21 @@ function RecordPaymentModal({
                 <button
                   key={m}
                   type="button"
-                  onClick={() => setFormData({ ...formData, payment_method: m })}
+                  onClick={() =>
+                    setFormData({ ...formData, payment_method: m })
+                  }
                   className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
                     formData.payment_method === m
                       ? "border-blue-500 bg-blue-50 text-blue-600"
                       : "border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
                   }`}
                 >
-                  {m === "cash"     && <Banknote size={20} />}
+                  {m === "cash" && <Banknote size={20} />}
                   {m === "transfer" && <Landmark size={20} />}
-                  {m === "card"     && <CreditCard size={20} />}
-                  <span className="text-xs font-bold uppercase tracking-wide capitalize">{m}</span>
+                  {m === "card" && <CreditCard size={20} />}
+                  <span className="text-xs font-bold uppercase tracking-wide capitalize">
+                    {m}
+                  </span>
                   {formData.payment_method === m && (
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                   )}
@@ -280,12 +334,20 @@ function RecordPaymentModal({
           {/* Reference (optional) */}
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              Transaction Reference <span className="normal-case font-normal text-slate-400">(optional)</span>
+              Transaction Reference{" "}
+              <span className="normal-case font-normal text-slate-400">
+                (optional)
+              </span>
             </label>
             <input
               type="text"
               value={formData.transaction_reference}
-              onChange={(e) => setFormData({ ...formData, transaction_reference: e.target.value })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  transaction_reference: e.target.value,
+                })
+              }
               className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"
               placeholder="e.g. TXN-2026-00123"
             />
@@ -306,9 +368,22 @@ function RecordPaymentModal({
               disabled={loading || success}
               className="flex-1 py-2.5 bg-slate-900 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-slate-800 transition disabled:opacity-60"
             >
-              {loading ? <><Loader2 className="animate-spin" size={15} /> Processing…</> : null}
-              {success ? <><CheckCircle2 size={15} /> Done!</> : null}
-              {!loading && !success ? <><Check size={15} /> {isEdit ? "Save Changes" : "Confirm Payment"}</> : null}
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={15} /> Processing…
+                </>
+              ) : null}
+              {success ? (
+                <>
+                  <CheckCircle2 size={15} /> Done!
+                </>
+              ) : null}
+              {!loading && !success ? (
+                <>
+                  <Check size={15} />{" "}
+                  {isEdit ? "Save Changes" : "Confirm Payment"}
+                </>
+              ) : null}
             </button>
           </div>
         </form>
@@ -326,23 +401,35 @@ function RecordPaymentModal({
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 
-function StatCard({ icon, label, value, color }: {
-  icon: React.ReactNode; label: string; value: string; color: "blue" | "emerald" | "rose";
+function StatCard({
+  icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  color: "blue" | "emerald" | "rose";
 }) {
   const map = {
-    blue:    { bg: "bg-blue-50",    text: "text-blue-600"    },
+    blue: { bg: "bg-blue-50", text: "text-blue-600" },
     emerald: { bg: "bg-emerald-50", text: "text-emerald-600" },
-    rose:    { bg: "bg-rose-50",    text: "text-rose-600"    },
+    rose: { bg: "bg-rose-50", text: "text-rose-600" },
   };
   const cls = map[color];
   return (
     <div className="bg-white p-5 rounded-2xl border border-slate-200 flex items-center gap-4 shadow-sm">
-      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${cls.bg} ${cls.text}`}>
+      <div
+        className={`w-12 h-12 rounded-full flex items-center justify-center ${cls.bg} ${cls.text}`}
+      >
         {icon}
       </div>
       <div>
         <p className="text-2xl font-bold text-slate-900">{value}</p>
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+          {label}
+        </p>
       </div>
     </div>
   );
@@ -364,20 +451,22 @@ export default function PaymentsPage() {
       const res = await apiRequest<any>("/payments/");
       const rows: any[] = Array.isArray(res.results)
         ? res.results
-        : Array.isArray(res.data) ? res.data : [];
+        : Array.isArray(res.data)
+          ? res.data
+          : [];
 
       setPayments(
         rows.map((p) => ({
-          id:             p.id,
-          student_name:   p.student_name,
+          id: p.id,
+          student_name: p.student_name,
           invoice_number: p.invoice_number,
-          amount:         Number(p.amount_paid),
-          method:         p.payment_method,
+          amount: Number(p.amount_paid),
+          method: p.payment_method,
           method_display: p.payment_method_display,
-          reference:      p.transaction_reference,
-          date:           p.payment_date,
-          status:         "paid" as const,
-        }))
+          reference: p.transaction_reference,
+          date: p.payment_date,
+          status: "paid" as const,
+        })),
       );
     } catch (err) {
       console.error("Failed to load payments", err);
@@ -386,11 +475,14 @@ export default function PaymentsPage() {
     }
   };
 
-  useEffect(() => { fetchPayments(); }, []);
+  useEffect(() => {
+    fetchPayments();
+  }, []);
 
-  const filtered = payments.filter((p) =>
-    p.student_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.invoice_number?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filtered = payments.filter(
+    (p) =>
+      p.student_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.invoice_number?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const totalRevenue = payments.reduce((s, p) => s + p.amount, 0);
@@ -406,7 +498,9 @@ export default function PaymentsPage() {
   };
 
   const deletePayment = async (id: number) => {
-    const ok = window.confirm("Delete this payment? This action cannot be undone.");
+    const ok = window.confirm(
+      "Delete this payment? This action cannot be undone.",
+    );
     if (!ok) return;
     setDeletingId(id);
     try {
@@ -422,12 +516,13 @@ export default function PaymentsPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
-
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Payments</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Track and manage student fee transactions.</p>
+          <p className="text-slate-500 text-sm mt-0.5">
+            Track and manage student fee transactions.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -448,18 +543,35 @@ export default function PaymentsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <StatCard icon={<Clock size={22} />}        label="Revenue (shown)"   value={`GHS ${totalRevenue.toLocaleString("en-GH", { minimumFractionDigits: 2 })}`} color="blue"    />
-        <StatCard icon={<CheckCircle2 size={22} />} label="Transactions"       value={String(payments.length)} color="emerald" />
-        <StatCard icon={<AlertCircle size={22} />}  label="Pending Invoices"   value="—"                      color="rose"    />
+        <StatCard
+          icon={<Clock size={22} />}
+          label="Revenue (shown)"
+          value={`GHS ${totalRevenue.toLocaleString("en-GH", { minimumFractionDigits: 2 })}`}
+          color="blue"
+        />
+        <StatCard
+          icon={<CheckCircle2 size={22} />}
+          label="Transactions"
+          value={String(payments.length)}
+          color="emerald"
+        />
+        <StatCard
+          icon={<AlertCircle size={22} />}
+          label="Pending Invoices"
+          value="—"
+          color="rose"
+        />
       </div>
 
       {/* Table card */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-
         {/* Toolbar */}
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60 flex justify-between items-center">
           <div className="relative w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={15}
+            />
             <input
               className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition"
               placeholder="Search by student or invoice…"
@@ -491,7 +603,10 @@ export default function PaymentsPage() {
                 <tr key={i}>
                   {[...Array(7)].map((_, j) => (
                     <td key={j} className="px-6 py-4">
-                      <div className="h-3 bg-slate-100 rounded animate-pulse" style={{ width: `${60 + j * 10}%` }} />
+                      <div
+                        className="h-3 bg-slate-100 rounded animate-pulse"
+                        style={{ width: `${60 + j * 10}%` }}
+                      />
                     </td>
                   ))}
                 </tr>
@@ -505,34 +620,59 @@ export default function PaymentsPage() {
               </tr>
             ) : (
               filtered.map((p) => (
-                <tr key={p.id} className="hover:bg-slate-50/60 group transition-colors">
-                  <td className="px-6 py-4 font-semibold text-slate-800">{p.student_name}</td>
-                  <td className="px-6 py-4 font-mono text-xs text-slate-500 bg-slate-50/40">{p.invoice_number}</td>
+                <tr
+                  key={p.id}
+                  className="hover:bg-slate-50/60 group transition-colors"
+                >
+                  <td className="px-6 py-4 font-semibold text-slate-800">
+                    {p.student_name}
+                  </td>
+                  <td className="px-6 py-4 font-mono text-xs text-slate-500 bg-slate-50/40">
+                    {p.invoice_number}
+                  </td>
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full capitalize">
-                      {p.method === "cash"     && <Banknote size={11} />}
+                      {p.method === "cash" && <Banknote size={11} />}
                       {p.method === "transfer" && <Landmark size={11} />}
-                      {p.method === "card"     && <CreditCard size={11} />}
+                      {p.method === "card" && <CreditCard size={11} />}
                       {p.method_display || p.method}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-500 text-xs">
-                    {p.date ? new Date(p.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+                    {p.date
+                      ? new Date(p.date).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "—"}
                   </td>
                   <td className="px-6 py-4 font-bold text-slate-900 font-mono">
-                    GHS {p.amount.toLocaleString("en-GH", { minimumFractionDigits: 2 })}
+                    GHS{" "}
+                    {p.amount.toLocaleString("en-GH", {
+                      minimumFractionDigits: 2,
+                    })}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                      p.status === "paid" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${p.status === "paid" ? "bg-emerald-500" : "bg-amber-500"}`} />
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                        p.status === "paid"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-amber-100 text-amber-700"
+                      }`}
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${p.status === "paid" ? "bg-emerald-500" : "bg-amber-500"}`}
+                      />
                       {p.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                      <button className="p-1.5 hover:bg-blue-50 text-blue-600 rounded-lg transition" title="View">
+                      <button
+                        className="p-1.5 hover:bg-blue-50 text-blue-600 rounded-lg transition"
+                        title="View"
+                      >
                         <Eye size={15} />
                       </button>
 
@@ -550,7 +690,11 @@ export default function PaymentsPage() {
                         className="p-1.5 hover:bg-rose-50 text-rose-600 rounded-lg transition"
                         title="Delete"
                       >
-                        {deletingId === p.id ? <Loader2 className="animate-spin" size={15} /> : <Trash2 size={15} />}
+                        {deletingId === p.id ? (
+                          <Loader2 className="animate-spin" size={15} />
+                        ) : (
+                          <Trash2 size={15} />
+                        )}
                       </button>
                     </div>
                   </td>
@@ -563,16 +707,31 @@ export default function PaymentsPage() {
         {/* Footer */}
         {!loading && filtered.length > 0 && (
           <div className="px-6 py-3 border-t border-slate-100 bg-slate-50/50 text-xs text-slate-400 flex justify-between">
-            <span>Showing {filtered.length} of {payments.length} transactions</span>
-            <span>Total: <strong className="text-slate-600">GHS {totalRevenue.toLocaleString("en-GH", { minimumFractionDigits: 2 })}</strong></span>
+            <span>
+              Showing {filtered.length} of {payments.length} transactions
+            </span>
+            <span>
+              Total:{" "}
+              <strong className="text-slate-600">
+                GHS{" "}
+                {totalRevenue.toLocaleString("en-GH", {
+                  minimumFractionDigits: 2,
+                })}
+              </strong>
+            </span>
           </div>
         )}
       </div>
 
       <RecordPaymentModal
         isOpen={isModalOpen}
-        onClose={() => { setIsModalOpen(false); setModalPayment(null); }}
-        onSuccess={() => { fetchPayments(); }}
+        onClose={() => {
+          setIsModalOpen(false);
+          setModalPayment(null);
+        }}
+        onSuccess={() => {
+          fetchPayments();
+        }}
         initialPayment={modalPayment}
       />
     </div>
