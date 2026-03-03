@@ -6,15 +6,14 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({ code, message }: ErrorStateProps) {
-  // Map our official codes to visual styles
   const getErrorType = (code: number) => {
     switch (code) {
       case 2:
-        return "Database Error"; //
+        return "Database Error"; 
       case 4:
-        return "Authentication Failed"; //
+        return "Authentication Failed"; 
       case 6:
-        return "Not Found"; //
+        return "Not Found"; 
       default:
         return "Error";
     }

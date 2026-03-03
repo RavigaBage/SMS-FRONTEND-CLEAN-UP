@@ -142,7 +142,6 @@ export function EditStaffModal({
           overflow: hidden;
         }
 
-        /* ── header ── */
         .esm-header {
           display: flex; align-items: center; justify-content: space-between;
           padding: 20px 28px;
@@ -174,7 +173,6 @@ export function EditStaffModal({
         }
         .esm-close:hover { color: #f51313; background: #f1f5f9; }
 
-        /* ── error bar ── */
         .esm-error {
           margin: 0 28px 0;
           padding: 10px 14px;
@@ -185,14 +183,12 @@ export function EditStaffModal({
           flex-shrink: 0;
         }
 
-        /* ── form body ── */
         .esm-body {
           overflow-y: auto; padding: 24px 28px;
           display: flex; flex-direction: column; gap: 20px;
           flex: 1;
         }
 
-        /* ── section label ── */
         .esm-section {
           font-family: 'Sora', sans-serif;
           font-size: 9px; font-weight: 700;
@@ -202,11 +198,9 @@ export function EditStaffModal({
           margin-bottom: 4px;
         }
 
-        /* ── grid ── */
         .esm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .esm-grid-1 { display: grid; grid-template-columns: 1fr; gap: 16px; }
 
-        /* ── field ── */
         .esm-field { display: flex; flex-direction: column; gap: 6px; }
         .esm-label {
           font-size: 10px; font-weight: 600;
@@ -234,7 +228,6 @@ export function EditStaffModal({
           padding-right: 32px;
         }
 
-        /* ── footer ── */
         .esm-footer {
           padding: 16px 28px;
           border-top: 1px solid #f1f5f9;
@@ -271,16 +264,13 @@ export function EditStaffModal({
         }
       `}</style>
 
-      {/* ── Backdrop ── */}
       <div
         className="esm-backdrop !m-0"
         onClick={(e) => {
           if (e.target === e.currentTarget) onClose();
         }}
       >
-        {/* ── Modal ── */}
         <div className="esm-modal">
-          {/* Header */}
           <div className="esm-header">
             <div className="esm-header-left">
               <div className="esm-icon-wrap">
@@ -296,12 +286,9 @@ export function EditStaffModal({
             </button>
           </div>
 
-          {/* Error bar */}
           {errorMsg && <div className="esm-error">⚠ {errorMsg}</div>}
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="esm-body">
-            {/* Personal */}
             <p className="esm-section">Personal Information</p>
             <div className="esm-grid-2">
               <EsmInput
@@ -344,7 +331,6 @@ export function EditStaffModal({
               />
             </div>
 
-            {/* Role */}
             <p className="esm-section">Role & Assignment</p>
             <div className="esm-grid-2">
               <EsmSelect
@@ -377,7 +363,6 @@ export function EditStaffModal({
               onChange={(v) => setFormData({ ...formData, specialization: v })}
             />
 
-            {/* Other */}
             <p className="esm-section">Additional Details</p>
             <div className="esm-grid">
               <EsmInput
@@ -418,7 +403,6 @@ export function EditStaffModal({
             </div>
           </form>
 
-          {/* Footer */}
           <div className="esm-footer">
             <button type="button" className="esm-btn-cancel" onClick={onClose}>
               Cancel
@@ -444,7 +428,6 @@ export function EditStaffModal({
   );
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
 
 function EsmInput({
   label,

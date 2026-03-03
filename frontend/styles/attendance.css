@@ -14,7 +14,6 @@
   padding: 30px 40px;
 }
 
-/* Header */
 .main-header {
   display: flex;
   justify-content: space-between;
@@ -46,7 +45,6 @@
   margin: 0;
 }
 
-/* Action Bar */
 .action-bar {
   display: flex;
   justify-content: space-between;
@@ -61,7 +59,6 @@
   outline: none;
 }
 
-/* Table */
 .table-card {
   background: white;
   border-radius: 16px;
@@ -87,7 +84,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* Interaction Design */
 .status-toggle {
   cursor: pointer;
 }
@@ -107,7 +103,6 @@
   transition: all 0.2s;
 }
 
-/* Present State */
 .status-toggle input:checked + .tick {
   background: #dcfce7;
   color: #166534;
@@ -117,7 +112,6 @@
   background-color: #f0fdfa;
 }
 
-/* Absent State */
 .status-toggle input:checked + .dash {
   background: #fee2e2;
   color: var(--absent-red);
@@ -151,7 +145,6 @@
   outline: none;
 }
 
-/* Buttons */
 .btn-primary {
   background: var(--primary-teal);
   color: white;
@@ -180,9 +173,7 @@
   cursor: pointer;
 }
 
-/* Additional Attendance Styles */
 
-/* Bulk Attendance List */
 .bulk-attendance-header {
   display: flex;
   justify-content: space-between;
@@ -290,7 +281,6 @@
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
 }
 
-/* Empty State Small */
 .empty-state-small {
   text-align: center;
   padding: 2rem;
@@ -306,7 +296,6 @@
   font-size: 0.95rem;
 }
 
-/* Filter Modal Specific Styles */
 .form-group-inline {
   flex: 1;
   display: flex;
@@ -322,7 +311,6 @@
   letter-spacing: 0.025em;
 }
 
-/* Scrollbar for Bulk List */
 .bulk-attendance-list::-webkit-scrollbar {
   width: 8px;
 }
@@ -341,7 +329,6 @@
   background: #94a3b8;
 }
 
-/* Status Colors in Select */
 .status-select-sm option[value="present"] {
   color: #047857;
 }
@@ -358,7 +345,6 @@
   color: #2563eb;
 }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
   .bulk-attendance-header {
     display: none; /* Hide header on mobile, items are self-explanatory */
@@ -389,13 +375,11 @@
   }
 }
 
-/* Loading State for Bulk List */
 .bulk-attendance-list.loading {
   opacity: 0.6;
   pointer-events: none;
 }
 
-/* Success Message in Bulk */
 .bulk-success-message {
   background: #ecfdf5;
   color: #047857;
@@ -409,7 +393,6 @@
   font-weight: 500;
 }
 
-/* Remarks Input for Bulk (if needed) */
 .remarks-input-sm {
   padding: 0.375rem 0.5rem;
   border: 1px solid #d1d5db;

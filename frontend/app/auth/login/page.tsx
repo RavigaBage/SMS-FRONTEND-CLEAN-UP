@@ -34,6 +34,13 @@ export default function LoginPage() {
         localStorage.setItem("refreshToken", data.refresh);
         localStorage.setItem("userRole", data.user.role);
         localStorage.setItem("userName", data.user.username);
+        sessionStorage.setItem("tab_alive", "true");
+        if (data.user?.id !== undefined && data.user?.id !== null) {
+          localStorage.setItem("userId", String(data.user.id));
+        }
+        if (data.user?.email) {
+          localStorage.setItem("userEmail", data.user.email);
+        }
 
         document.cookie = `token=${data.access}; path=/; max-age=3600; SameSite=Lax`;
 
@@ -43,7 +50,14 @@ export default function LoginPage() {
         });
 
         setTimeout(() => {
-          router.push("/Home/");
+          if(data.user.role =='teacher'){
+              const lowerRole = data.user.role.toLowerCase();
+              if (lowerRole !== "admin" && lowerRole !== "headmaster") {
+                router.push("/Home/teacher_auth/");
+              }
+          }else{
+            router.push("/Home/");
+          }
         }, 1500);
       } else {
         setResponse({

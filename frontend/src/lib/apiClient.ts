@@ -1,4 +1,3 @@
-// The structure DRF uses internally
 export interface PaginatedResponse<T> {
   count?: number;
   next: string | null;
@@ -18,7 +17,6 @@ export interface Student {
   profile_image?: string;
 }
 
-// Expected student shape from your backend
 export interface StudentRaw {
   id: number;
   admission_number: string;
@@ -43,7 +41,6 @@ export interface StudentRaw {
   updated_at: string;
 }
 
-// Update your ApiResponse generic to handle paginated DRF responses
 export interface ApiResponse<T> {
   detail: string;
   map(
@@ -87,6 +84,10 @@ export async function fetchWithAuth(url: string, options: any = {}) {
   if (response.status === 401) {
     try {
       const errorData = await response.clone().json();
+      if(errorData.code === "user_not_found"){
+        window.location.href = "/auth/login";
+        throw new Error("Session expired. Please login again.");
+      }
       if (
         errorData.code === "token_not_valid" ||
         errorData.detail?.includes("token")
@@ -119,14 +120,12 @@ export async function fetchWithAuth(url: string, options: any = {}) {
             throw new Error("Session expired. Please login again.");
           }
         } else {
-          // No refresh token available
           localStorage.clear();
           window.location.href = "/auth/login";
           throw new Error("Session expired. Please login again.");
         }
       }
     } catch (error) {
-      // If we can't parse the error, still try to refresh
       const refreshToken = localStorage.getItem("refreshToken");
 
       if (refreshToken) {
@@ -202,6 +201,7 @@ export async function apiRequest<T>(
 
   try {
     response = await fetch(url, { ...options, headers: getHeaders() });
+    
   } catch (error) {
     console.error("Network Error:", error);
     throw new Error(

@@ -21,13 +21,11 @@ export default function ExamSetup() {
   return (
     <div className="dashboardWrapper">
       <div className="dashboard">
-        {/* Header */}
         <header className="header">
           <h1>Exam Setup & Configuration</h1>
           <p>Create exams, assign subjects, and configure grading scales</p>
         </header>
 
-        {/* Steps Progress Bar */}
         <nav className="steps">
           {steps.map((step) => (
             <div
@@ -40,10 +38,8 @@ export default function ExamSetup() {
           ))}
         </nav>
 
-        {/* Form Card */}
         <main className="formCard">
           <form>
-            {/* Section 1: Exam Details */}
             <div className="formSection">
               <div style={{ marginBottom: "16px" }}>
                 <label className="formLabel" htmlFor="exam-name">
@@ -97,7 +93,6 @@ export default function ExamSetup() {
               </div>
             </div>
 
-            {/* Section 2: Subjects */}
             <div className="formSection">
               <label className="formLabel">Select Subjects</label>
               <div className="subjectsSelect">
@@ -109,7 +104,6 @@ export default function ExamSetup() {
               </div>
             </div>
 
-            {/* Section 3: Grading Scale */}
             <div className="formSection">
               <label className="formLabel">Grading Scale</label>
               <select className="formSelect">
@@ -120,7 +114,6 @@ export default function ExamSetup() {
               </select>
             </div>
 
-            {/* Form Actions */}
             <footer className="btnGroup">
               <button type="button" className="secondaryBtn">
                 Cancel

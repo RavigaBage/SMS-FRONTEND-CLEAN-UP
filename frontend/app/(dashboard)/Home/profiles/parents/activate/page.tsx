@@ -32,7 +32,6 @@ type FormState = {
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
 
-// ── helpers ───────────────────────────────────────────────────────────────────
 function formatExpiry(iso: string | null | undefined) {
   if (!iso) return "N/A";
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -42,7 +41,6 @@ function formatExpiry(iso: string | null | undefined) {
   });
 }
 
-// ── Shell — OUTSIDE main component so it never remounts on re-render ──────────
 function Shell({ children }: { children: ReactNode }) {
   return (
     <div
@@ -78,7 +76,6 @@ function Shell({ children }: { children: ReactNode }) {
   );
 }
 
-// ── PasswordStrength — OUTSIDE main component ─────────────────────────────────
 function PasswordStrength({ password }: { password: string }) {
   const checks = [
     { label: "8+ characters", ok: password.length >= 8 },
@@ -126,7 +123,6 @@ function PasswordStrength({ password }: { password: string }) {
   );
 }
 
-// ── InputField — OUTSIDE main component ──────────────────────────────────────
 function InputField({
   label,
   type = "text",
@@ -218,7 +214,6 @@ function InputField({
   );
 }
 
-// ── MAIN PAGE ─────────────────────────────────────────────────────────────────
 export default function ParentActivatePage() {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
@@ -234,11 +229,10 @@ export default function ParentActivatePage() {
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // ✅ Ref guard — prevents fetch running more than once
   const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (hasFetched.current) return; // ← already ran, bail out
+    if (hasFetched.current) return; 
     hasFetched.current = true;
 
     if (!code) {
@@ -257,7 +251,6 @@ export default function ParentActivatePage() {
       .catch(() => setStage("invalid"));
   }, [code]);
 
-  // ── validation ────────────────────────────────────────────────────────────
   function validate(): FormErrors {
     const e: FormErrors = {};
     if (!form.username.trim()) e.username = "Username is required";
@@ -273,7 +266,6 @@ export default function ParentActivatePage() {
     return e;
   }
 
-  // ── submit ────────────────────────────────────────────────────────────────
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const errs = validate();
@@ -309,7 +301,6 @@ export default function ParentActivatePage() {
     }
   }
 
-  // ── field setter — stable, no re-renders beyond form state ───────────────
   function set(field: keyof FormState) {
     return (e: ChangeEvent<HTMLInputElement>) => {
       setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -319,7 +310,6 @@ export default function ParentActivatePage() {
 
   const wards = inviteData?.wards ?? [];
 
-  // ── CHECKING ──────────────────────────────────────────────────────────────
   if (stage === "checking") {
     return (
       <Shell>
@@ -343,7 +333,6 @@ export default function ParentActivatePage() {
     );
   }
 
-  // ── INVALID ───────────────────────────────────────────────────────────────
   if (stage === "invalid") {
     return (
       <Shell>
@@ -394,7 +383,6 @@ export default function ParentActivatePage() {
     );
   }
 
-  // ── SUCCESS ───────────────────────────────────────────────────────────────
   if (stage === "success") {
     return (
       <Shell>
@@ -466,7 +454,6 @@ export default function ParentActivatePage() {
     );
   }
 
-  // ── ERROR ─────────────────────────────────────────────────────────────────
   if (stage === "error") {
     return (
       <Shell>
@@ -512,7 +499,6 @@ export default function ParentActivatePage() {
     );
   }
 
-  // ── FORM ──────────────────────────────────────────────────────────────────
   return (
     <Shell>
       <div
@@ -524,7 +510,6 @@ export default function ParentActivatePage() {
       />
 
       <div style={{ background: "#fff", padding: "44px 48px 48px" }}>
-        {/* Header */}
         <div
           className="fade-up"
           style={{ marginBottom: 36, textAlign: "center" }}
@@ -583,7 +568,6 @@ export default function ParentActivatePage() {
           </p>
         </div>
 
-        {/* Wards strip */}
         {wards.length > 0 && (
           <div
             className="fade-up-2"
@@ -672,7 +656,6 @@ export default function ParentActivatePage() {
           </div>
         )}
 
-        {/* Form */}
         <form className="fade-up-3" onSubmit={handleSubmit} noValidate>
           <InputField
             label="Username"

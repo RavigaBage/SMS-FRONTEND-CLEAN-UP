@@ -42,7 +42,6 @@ export function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProps) {
     emergency_contact: "",
   });
 
-  // Fetch users with teacher role
   useEffect(() => {
     if (isOpen) {
       fetchTeacherUsers();
@@ -56,7 +55,6 @@ export function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProps) {
         method: "GET",
       });
 
-      // Filter out users who already have teacher profiles
       const availableUsers = res.results || [];
       setUsers(availableUsers);
     } catch (err: any) {

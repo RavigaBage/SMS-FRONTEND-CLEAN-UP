@@ -6,21 +6,22 @@ import Sidebar from "@/components/Sidebar";
 import { TopNav } from "@/src/assets/components/dashboard/TopNav";
 import PageTransition from "@/src/assets/components/dashboard/PagnationTransition";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("accessToken")
-        : null;
+    const token = localStorage.getItem("accessToken");
 
     if (!token) {
+      router.replace("/auth/login");
+      return;
+    }
+    const tabAlive = sessionStorage.getItem("tab_alive");
+
+    if (!tabAlive) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       router.replace("/auth/login");
       return;
     }
@@ -28,17 +29,19 @@ export default function DashboardLayout({
     setIsChecking(false);
   }, [router]);
 
+  useEffect(() => {
+    if (!isChecking) {
+      sessionStorage.setItem("tab_alive", "true");
+    }
+  }, [isChecking]);
+
   if (isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white shadow-xl rounded-2xl px-10 py-8 flex flex-col items-center gap-4">
           <div className="h-10 w-10 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
-          <h2 className="text-lg font-semibold text-gray-800">
-            Verifying your session
-          </h2>
-          <p className="text-sm text-gray-500">
-            Please wait while we prepare your dashboard.
-          </p>
+          <h2 className="text-lg font-semibold text-gray-800">Verifying your session</h2>
+          <p className="text-sm text-gray-500">Please wait while we prepare your dashboard.</p>
         </div>
       </div>
     );
@@ -47,7 +50,6 @@ export default function DashboardLayout({
   return (
     <div className="app-shell">
       <Sidebar />
-
       <div className="content-shell">
         <TopNav />
         <main className="page-content">

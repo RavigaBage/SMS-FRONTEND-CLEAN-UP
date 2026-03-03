@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import "@/styles/transcripts.css";
 import { fetchWithAuth } from "@/src/lib/apiClient";
 import html2canvas from "html2canvas";
@@ -65,23 +65,31 @@ export default function StudentTranscript() {
   const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
-    if (!id) return;
-    const fetchTranscript = async () => {
-      try {
-        const res = await fetchWithAuth(
-          `${process.env.NEXT_PUBLIC_API_URL}/transcripts/${id}/`,
-        );
-        const data = await res.json();
-        setStudent(data);
-        setRecords(data.grades || []);
-      } catch (error) {
-        console.error("Failed to load transcript", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchTranscript();
   }, [id]);
+  const params = useSearchParams();
+  const class_param = params.get('class');
+  const year_param = params.get('year');
+
+  const query = new URLSearchParams();
+  const fetchTranscript = async () => {
+    if (!id) return;
+    try {
+    if (class_param) query.set('class_id', class_param);
+    if (year_param) query.set('academic_year', year_param);
+
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}/transcripts/${id}?${query.toString()}`,
+    );
+      const data = await res.json();
+      setStudent(data);
+      setRecords(data.grades || []);
+    } catch (error) {
+      console.error("Failed to load transcript", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDownloadPDF = async () => {
     if (!transcriptRef.current) return;
@@ -105,8 +113,6 @@ export default function StudentTranscript() {
     }
   };
 
-  // ── after all hooks and data fetching ────────────────────────────
-
   if (loading)
     return <div className="dashboardWrapper">Loading transcript...</div>;
   if (!student)
@@ -114,11 +120,10 @@ export default function StudentTranscript() {
 
   const terms = Array.from(new Set(records.map((r) => r.term))).sort();
 
-  // ── single return with correct structure ─────────────────────────
   return (
-    <div className="dashboardWrapper TRANSCRIPTDATA">
+    <div className="dashboardWrapper TRANSCRIPTDATA print-area">
       <div className="dashboard">
-        <header className="header no-print">
+        <header className="header">
           <div>
             <h1>Official Academic Transcript</h1>
             <p>
@@ -144,7 +149,6 @@ export default function StudentTranscript() {
           ref={transcriptRef}
           style={{ padding: "40px", background: "white" }}
         >
-          {/* PDF header — renders once */}
           <div
             className="pdf-header"
             style={{
@@ -156,10 +160,74 @@ export default function StudentTranscript() {
               alignItems: "flex-end",
             }}
           >
-            <div>
-              <h2 style={{ margin: 0, fontSize: "24px" }}>
-                OFFICIAL REPORT CARD
-              </h2>
+            <div style={{
+                display:"grid",
+                placeItems:"center",
+                width:"100%"
+            }}>
+              <div style={{
+                textAlign: "center",
+                padding: "24px 32px 20px",
+                marginBottom: "24px",
+                position: "relative",
+              }}>
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  marginBottom: "16px",
+                }}>
+                  <div style={{ flex: 1, height: "1px", background: "#1a3a5c" }} />
+                  <span style={{ fontSize: "10px", letterSpacing: "4px", color: "#1a3a5c", fontWeight: 600 }}>
+                    ✦ OFFICIAL DOCUMENT ✦
+                  </span>
+                  <div style={{ flex: 1, height: "1px", background: "#1a3a5c" }} />
+                </div>
+
+                <h1 style={{
+                  margin: "0 0 6px",
+                  fontSize: "28px",
+                  fontFamily: "'Georgia', serif",
+                  fontWeight: 700,
+                  letterSpacing: "3px",
+                  textTransform: "uppercase",
+                  color: "#0f2744",
+                }}>
+                  Academic Report Card
+                </h1>
+
+                <div style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "16px",
+                  marginTop: "10px",
+                  flexWrap: "wrap",
+                }}>
+                  <span style={{
+                    fontSize: "12px",
+                    letterSpacing: "2px",
+                    textTransform: "uppercase",
+                    color: "#4a6580",
+                    fontWeight: 600,
+                  }}>
+                    {student.summary?.class_name}
+                  </span>
+
+                  <span style={{ color: "#1a3a5c", fontSize: "14px" }}>·</span>
+
+                  <span style={{
+                    fontSize: "12px",
+                    letterSpacing: "2px",
+                    textTransform: "uppercase",
+                    color: "#4a6580",
+                    fontWeight: 600,
+                  }}>
+                    Academic Year {student.summary?.academic_year}
+                  </span>
+                </div>
+              </div>
+
               <p style={{ margin: 0, color: "#666" }}>
                 {student.current_class?.class_name} |{" "}
                 {student.current_class?.academic_year}
@@ -172,7 +240,6 @@ export default function StudentTranscript() {
             </div>
           </div>
 
-          {/* ✅ Terms — conditional here, inside return */}
           {terms.length <= 0 ? (
             <NoTermsCard />
           ) : (
@@ -254,12 +321,12 @@ export default function StudentTranscript() {
                       </tr>
                     </thead>
                     <tbody>
-                      {termRecords.map((rec) => {
+                      {termRecords.map((rec,index) => {
                         const isTopSubject = [1, 2, 3].includes(
                           rec.subject_rank,
                         );
                         return (
-                          <tr key={rec.id}>
+                          <tr key={rec.id - index}>
                             <td style={{ fontWeight: "500" }}>
                               {rec.subject.subject_name}
                             </td>
@@ -301,7 +368,6 @@ export default function StudentTranscript() {
             })
           )}
 
-          {/* Footer — renders once */}
           <footer
             style={{
               marginTop: "30px",
@@ -406,9 +472,9 @@ function NoTermsCard() {
         }
       `}</style>
 
-      <div className="no-terms-wrap">
+      <div className="no-terms-wrap print-area">
         <div className="no-terms-card">
-          {/* Icon */}
+
           <div className="no-terms-icon-wrap">
             <svg
               className="no-terms-icon"
@@ -430,7 +496,6 @@ function NoTermsCard() {
             </svg>
           </div>
 
-          {/* Text */}
           <p className="no-terms-label">Academic Terms</p>
           <h3 className="no-terms-title">No Terms Configured</h3>
           <p className="no-terms-body">
@@ -438,7 +503,6 @@ function NoTermsCard() {
             be created before results can be displayed.
           </p>
 
-          {/* Hint strip */}
           <div className="no-terms-hint">
             <svg
               width="14"

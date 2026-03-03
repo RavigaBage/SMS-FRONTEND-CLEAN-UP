@@ -1,11 +1,6 @@
-/* =============================================
-   subjects-redesign.css
-   Save to: @/styles/subjects-redesign.css
-   ============================================= */
 
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap");
 
-/* ── Root Variables ── */
 :root {
   --sm-bg: #f5f5f0;
   --sm-surface: #ffffff;
@@ -25,7 +20,6 @@
   --sm-shadow-up: 0 -1px 3px rgba(0, 0, 0, 0.04), 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-/* ── Wrapper ── */
 .sm-wrapper {
   font-family: "DM Sans", sans-serif;
   background: var(--sm-bg);
@@ -38,7 +32,6 @@
   margin: 0 auto;
 }
 
-/* ── Header ── */
 .sm-header {
   display: flex;
   align-items: flex-end;
@@ -106,7 +99,6 @@
   font-weight: 300;
 }
 
-/* ── Stats Bar ── */
 .sm-stats-bar {
   display: flex;
   align-items: center;
@@ -149,7 +141,6 @@
   flex-shrink: 0;
 }
 
-/* Search pushed to the right */
 .sm-search {
   margin-left: auto;
   display: flex;
@@ -190,7 +181,6 @@
   color: var(--sm-ink-muted);
 }
 
-/* ── Table Card ── */
 .sm-card {
   background: var(--sm-surface);
   border: 1px solid var(--sm-border);
@@ -204,7 +194,6 @@
   border-collapse: collapse;
 }
 
-/* Head */
 .sm-th {
   padding: 14px 20px;
   text-align: left;
@@ -221,7 +210,6 @@
   text-align: right;
 }
 
-/* Rows */
 .sm-row {
   border-bottom: 1px solid var(--sm-border);
   transition: background 0.1s;
@@ -253,7 +241,6 @@
   font-weight: 500;
 }
 
-/* Code Badge */
 .sm-code-badge {
   display: inline-flex;
   align-items: center;
@@ -267,7 +254,6 @@
   letter-spacing: 0.04em;
 }
 
-/* ── Action Dropdown ── */
 .sm-td-actions {
   text-align: right;
   width: 80px;
@@ -313,7 +299,6 @@
   background: var(--sm-ink);
 }
 
-/* Dropdown menu */
 .sm-dropdown {
   position: absolute;
   right: 0;
@@ -376,19 +361,16 @@
   color: var(--sm-danger);
 }
 
-/* ── Empty State ── */
 .sm-empty {
   padding: 60px 20px;
   text-align: center;
 }
 
-/* ── Footer / Pagination ── */
 .sm-footer {
   border-top: 1px solid var(--sm-border);
   background: var(--sm-bg);
 }
 
-/* ── Responsive ── */
 @media (max-width: 640px) {
   .sm-wrapper {
     padding: 20px 16px;

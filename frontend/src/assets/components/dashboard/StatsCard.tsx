@@ -10,8 +10,8 @@ export function StatsCard({ label, value, subValue, color }: StatsCardProps) {
     cyan: "bg-cyan-50 text-cyan-600",
     blue: "bg-blue-50 text-blue-600",
     orange: "bg-orange-50 text-orange-600",
-    emerald: "bg-emerald-50 text-emerald-600", // For 'Active'
-    slate: "bg-slate-50 text-slate-600", // For 'Inactive'
+    emerald: "bg-emerald-50 text-emerald-600",
+    slate: "bg-slate-50 text-slate-600", 
   };
 
   return (
@@ -27,7 +27,6 @@ export function StatsCard({ label, value, subValue, color }: StatsCardProps) {
           </span>
         )}
       </div>
-      {/* Visual indicator bar or icon using the color */}
       <div className={`h-1 w-8 mt-3 rounded-full ${colorClasses[color]}`} />
     </div>
   );

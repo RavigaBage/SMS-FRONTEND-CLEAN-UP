@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchWithAuth } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 type FeeItem = {
   id: string;
   description: string;
@@ -55,7 +56,6 @@ export default function InvoiceEntry() {
   );
   const [notes, setNotes] = useState<string>("");
 
-  // Items & discount
   const [items, setItems] = useState<FeeItem[]>([
     {
       id: Date.now().toString(),
@@ -79,7 +79,6 @@ export default function InvoiceEntry() {
     setInvoiceDate(today);
     setDueDate(due.toISOString().split("T")[0]);
   }, []);
-  /* ---------- Effects: fetch students & years ---------- */
   const generateAcademicYears = (startYear: number, count: number): any => {
     return Array.from({ length: count }, (_, i) => {
       const year = startYear - i;
@@ -120,16 +119,13 @@ export default function InvoiceEntry() {
 
         setStudents(stuArr);
         setAcademicYears(yearArr);
-        console.log(yearJson);
 
-        // If student_id present in URL, preselect (find in results)
         if (preselectedStudentId) {
           const idNum = Number(preselectedStudentId);
           const found = stuArr.find((s: Student) => s.id === idNum);
           if (found) {
             setRecipient(found);
           } else {
-            // try fetch single student endpoint (fallback)
             try {
               const single = await fetchWithAuth(
                 `${baseUrl}/students/${idNum}/`,
@@ -139,23 +135,19 @@ export default function InvoiceEntry() {
                 setRecipient(sd);
               }
             } catch (e) {
-              // ignore
             }
           }
         }
       } catch (e) {
-        console.error(e);
-        setError("Failed to load students or academic years.");
+        setError(extractErrorDetail(e) || "Failed to load students or academic years.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preselectedStudentId]);
 
-  /* ---------- Click outside for dropdown ---------- */
   useEffect(() => {
     const handler = (ev: MouseEvent) => {
       if (
@@ -169,8 +161,6 @@ export default function InvoiceEntry() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  /* ---------- Derived values: totals ---------- */
-  // Use integer cents to avoid float pitfalls
   const toCents = (n: number) => Math.round((Number(n) || 0) * 100);
   const fromCents = (c: number) => c / 100;
 
@@ -188,7 +178,6 @@ export default function InvoiceEntry() {
   const discountAmt = fromCents(discountCents);
   const grandTotal = fromCents(totalCents);
 
-  /* ---------- Helpers: items ---------- */
   const addItem = () =>
     setItems((prev) => [
       ...prev,
@@ -216,7 +205,6 @@ export default function InvoiceEntry() {
       prev.length > 1 ? prev.filter((i) => i.id !== id) : prev,
     );
 
-  /* ---------- Helpers: recipient search ---------- */
   const filteredStudents = Array.isArray(students)
     ? students.filter((s) => {
         const q = searchQuery.toLowerCase();
@@ -228,7 +216,6 @@ export default function InvoiceEntry() {
       })
     : [];
 
-  /* ---------- Save / Issue invoice ---------- */
   const validateBeforeSave = () => {
     if (!recipient) {
       setError("Please select a student/recipient.");
@@ -247,7 +234,6 @@ export default function InvoiceEntry() {
   };
 
   const makePayload = (isDraft = false) => {
-    // Build payload according to previously discussed serializer expectations
     return {
       student_id: recipient?.id,
       student: recipient?.id,
@@ -263,7 +249,7 @@ export default function InvoiceEntry() {
       })),
       notes,
       payment_terms: paymentTerms,
-      is_draft: Boolean(isDraft), // backend may ignore it; included for convenience
+      is_draft: Boolean(isDraft), 
     };
   };
 
@@ -281,38 +267,30 @@ export default function InvoiceEntry() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const msg =
-          data?.detail || JSON.stringify(data) || "Failed to save invoice";
+        const msg = extractErrorDetail(data) || "Failed to save invoice";
         setError(msg);
         setSaving(false);
         return;
       }
 
-      // success: navigate to invoice list or show preview
-      // If backend returns created invoice id, try to go to its page
       const createdId = data?.id || data?.invoice_id || null;
       alert(isDraft ? "Draft saved." : "Invoice issued.");
       if (createdId) {
-        // navigate to invoice detail if you have such a route
         router.push(`/Home/finance/invoices/${createdId}`);
       } else {
-        // otherwise go back to list
         router.push("/Home/finance/invoices");
       }
     } catch (e) {
-      console.error(e);
-      setError("Network or server error when saving invoice.");
+      setError(extractErrorDetail(e) || "Network or server error when saving invoice.");
     } finally {
       setSaving(false);
     }
   };
 
-  /* ---------- UI ---------- */
   const [searchQueryLocal, setSearchQueryLocal] = useState("");
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <main className="max-w-7xl mx-auto">
-        {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
             <div className="text-sm text-slate-500">
@@ -359,7 +337,6 @@ export default function InvoiceEntry() {
           </div>
         </header>
 
-        {/* Recipient / Search */}
         <section className="bg-white rounded-lg shadow p-5 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
@@ -444,7 +421,6 @@ export default function InvoiceEntry() {
           </div>
         </section>
 
-        {/* Items table */}
         <section className="bg-white rounded-lg shadow p-5 mb-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-semibold text-lg">Invoice Items</h2>
@@ -557,7 +533,6 @@ export default function InvoiceEntry() {
           </div>
         </section>
 
-        {/* Bottom: notes + summary + actions */}
         <div className="grid lg:grid-cols-2 gap-6">
           <section className="bg-white rounded-lg shadow p-5">
             <h3 className="font-semibold mb-3">Notes & Payment Terms</h3>
@@ -652,7 +627,6 @@ export default function InvoiceEntry() {
 
                 <button
                   onClick={() => {
-                    // open simple preview modal or window - fallback to alert
                     alert(
                       "Preview: use the invoice list or created invoice detail for a printable view.",
                     );
@@ -664,7 +638,7 @@ export default function InvoiceEntry() {
               </div>
             </div>
 
-            {error && <div className="mt-3 text-sm text-rose-600">{error}</div>}
+            {error && <ErrorMessage errorDetail={error} className="mt-3" />}
           </section>
         </div>
       </main>

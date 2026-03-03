@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X, Loader2, Save, UserCheck } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
 import { toast } from "react-hot-toast";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 
 interface MarkAttendanceModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export function MarkAttendanceModal({
     remarks: "",
   });
   const [errors, setErrors] = useState<any>({});
+  const [errorDetail, setErrorDetail] = useState<any>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -47,8 +49,7 @@ export function MarkAttendanceModal({
       const res = await apiRequest<any>("/classes/", { method: "GET" });
       setClasses((res.results as any) || res);
     } catch (err) {
-      console.error("Error fetching classes:", err);
-      toast.error("Failed to load classes");
+      setErrorDetail(extractErrorDetail(err) || "Failed to load classes");
     }
   };
 
@@ -57,14 +58,12 @@ export function MarkAttendanceModal({
       const res = await apiRequest<any>(`/classes/${classId}/students/`, {
         method: "GET",
       });
-      // This endpoint returns a plain array, not a paginated response
       const list = Array.isArray(res.data)
         ? res.data
         : res.results || res.data || [];
       setStudents(list);
     } catch (err) {
-      console.error("Error fetching students:", err);
-      toast.error("Failed to load students");
+      setErrorDetail(extractErrorDetail(err) || "Failed to load students");
     }
   };
 
@@ -72,13 +71,13 @@ export function MarkAttendanceModal({
     e.preventDefault();
     setLoading(true);
     setErrors({});
+    setErrorDetail(null);
 
     try {
       const res = await apiRequest("/attendance/", {
         method: "POST",
         body: JSON.stringify({
-          student_id: formData.student_id, // serializer expects 'student' not 'student_id'
-          // class_obj:       selectedClass,          // serializer expects 'class_obj' not 'class_id'
+          student_id: formData.student_id, 
           attendance_date: formData.attendance_date,
           status: formData.status,
           remarks: formData.remarks,
@@ -89,7 +88,6 @@ export function MarkAttendanceModal({
         }),
       });
 
-      // apiRequest returns ApiResponse, not throws — check error field
       if (res.error) {
         toast.error(res.error);
         setErrors({ general: res.error });
@@ -100,7 +98,7 @@ export function MarkAttendanceModal({
       onClose();
       resetForm();
     } catch (err: any) {
-      toast.error("Failed to mark attendance. Please try again.");
+      setErrorDetail(extractErrorDetail(err) || "Failed to mark attendance. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -116,6 +114,7 @@ export function MarkAttendanceModal({
     });
     setSelectedClass("");
     setErrors({});
+    setErrorDetail(null);
   };
 
   if (!isOpen) return null;
@@ -143,6 +142,9 @@ export function MarkAttendanceModal({
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
+          {errorDetail && (
+            <ErrorMessage errorDetail={errorDetail} className="mb-3" />
+          )}
           {errors.general && (
             <div className="error-alert">{errors.general}</div>
           )}

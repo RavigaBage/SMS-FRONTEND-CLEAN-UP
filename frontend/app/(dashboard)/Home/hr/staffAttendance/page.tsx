@@ -21,9 +21,10 @@ import {
 } from "lucide-react";
 import "@/styles/staffAttendance.css";
 import { apiRequest } from "@/src/lib/apiClient";
+import { Pagination } from "@/src/assets/components/management/Pagination";
 import { StaffMember } from "@/src/assets/components/management/StaffTable";
 
-/* ---------------- TYPES ---------------- */
+const PAGE_SIZE = 20;
 
 export interface ApiResponse<T> {
   count?: number;
@@ -113,8 +114,6 @@ interface StaffApiData {
   assigned_subjects: [];
 }
 
-/* ---------------- HELPERS ---------------- */
-
 const normalizeAttendance = (raw: StaffAttendanceRaw): StaffAttendance => ({
   id: raw.id,
   staffId: raw.staff,
@@ -143,6 +142,7 @@ function unwrapArray<T>(payload: ApiResponse<T> | T[] | null | undefined): T[] {
   return [];
 }
 
+
 const buildQuery = (opts?: FetchOptions) => {
   const params = new URLSearchParams();
   if (opts?.search) params.append("search", opts.search);
@@ -154,7 +154,9 @@ const buildQuery = (opts?: FetchOptions) => {
   if (opts?.status && opts.status !== "All Statuses") {
     params.append("status", opts.status);
   }
+
   if (opts?.page && opts.page > 1) params.append("page", String(opts.page));
+  params.append("page_size", String(PAGE_SIZE));
   return params.toString();
 };
 
@@ -207,8 +209,6 @@ const getTodayDate = (): string => {
   return today.toISOString().split("T")[0];
 };
 
-/* ---------------- COMPONENT ---------------- */
-
 export default function StaffAttendancePage() {
   const [attendanceRecords, setAttendanceRecords] = useState<StaffAttendance[]>(
     [],
@@ -221,8 +221,15 @@ export default function StaffAttendancePage() {
   const [departmentFilter, setDepartmentFilter] =
     useState<string>("All Departments");
   const [statusFilter, setStatusFilter] = useState<string>("All Statuses");
+
+
   const [page, setPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const totalPages = useMemo(
+    () => Math.ceil((totalCount || 0) / PAGE_SIZE),
+    [totalCount],
+  );
+
   const [error, setError] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -242,11 +249,11 @@ export default function StaffAttendancePage() {
     status: "",
   });
 
-  const fetchStaff = async (page: number, search: string) => {
+  const fetchStaff = async (pageNum: number, search: string) => {
     setLoading(true);
     try {
       const queryParams = new URLSearchParams({
-        page: page.toString(),
+        page: pageNum.toString(),
         search: search,
         ...(filters.role && { role: filters.dept }),
         ...(filters.dept && { department: filters.dept }),
@@ -258,10 +265,8 @@ export default function StaffAttendancePage() {
           method: "GET",
         });
 
-      // Extract the results array from the normalized response
       const results = (response.results || []) as StaffApiData[];
 
-      // Map backend data to our StaffMember interface
       const formattedStaff: StaffMember[] = results.map((s) => ({
         id: String(s.user_id || s.id),
         fullName: `${s.first_name} ${s.last_name}`,
@@ -274,7 +279,6 @@ export default function StaffAttendancePage() {
         profileImage:
           s.profile_image ||
           `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}`,
-        // Add these to match the new interface
         specialization: s.specialization ? String(s.specialization) : undefined,
         managed_classes: s.managed_classes || [],
         assigned_subjects: s.assigned_subjects || [],
@@ -291,7 +295,6 @@ export default function StaffAttendancePage() {
     }
   };
 
-  // Trigger fetch on page or search change
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchStaff(currentPage, searchTerm);
@@ -333,13 +336,12 @@ export default function StaffAttendancePage() {
     try {
       await apiRequest(`/staff-attendance/${id}/`, { method: "DELETE" });
       setAttendanceRecords((prev) => prev.filter((r) => r.id !== id));
-      // Refresh summary
-      fetchAttendanceData({ date: selectedDate });
+      fetchAttendanceData({ date: selectedDate, page });
     } catch (err) {
       setError("Failed to delete record");
     }
   };
-  // Form State
+
   const [formData, setFormData] = useState({
     staffId: "",
     status: "present",
@@ -349,25 +351,24 @@ export default function StaffAttendancePage() {
     remarks: "",
   });
 
-  /* ---------------- EFFECTS ---------------- */
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setPage(newPage);
+  };
 
-  // ── Replace your three separate useEffects with these two ──────────────────
-
-  // 1. Staff fetch — debounced
   useEffect(() => {
     const t = setTimeout(() => fetchStaff(currentPage, searchTerm), 300);
     return () => clearTimeout(t);
   }, [currentPage, searchTerm, filters]);
 
-  // 2. Attendance fetch — single consolidated effect
+
   useEffect(() => {
-    // Skip if a fetch is already in flight
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
 
-    setPage(1); // reset page when filters change
-    setError(null); // clear previous error before new fetch
+    setPage(1);
+    setError(null);
 
     const t = setTimeout(() => {
       fetchAttendanceData({
@@ -378,14 +379,14 @@ export default function StaffAttendancePage() {
         status: statusFilter,
         page: 1,
       });
-    }, 400); // debounce attendance fetch too
+    }, 400);
 
     return () => clearTimeout(t);
   }, [searchTerm, selectedDate, departmentFilter, statusFilter]);
 
-  // 3. Separate effect only for page changes (not filter changes)
+
   useEffect(() => {
-    if (page === 1) return; // avoid double-fetch on filter reset
+    if (page === 1) return;
     fetchAttendanceData({
       search: searchTerm.trim(),
       date: selectedDate,
@@ -396,10 +397,7 @@ export default function StaffAttendancePage() {
     });
   }, [page]);
 
-  /* ---------------- API ---------------- */
-
   const fetchAttendanceData = useCallback(async (opts?: FetchOptions) => {
-    // Cancel any in-flight request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -407,7 +405,6 @@ export default function StaffAttendancePage() {
     const signal = abortControllerRef.current.signal;
 
     setLoading(true);
-    // Don't clear error here — cleared before fetch starts in the effect
 
     try {
       const query = buildQuery(opts ?? {});
@@ -429,13 +426,10 @@ export default function StaffAttendancePage() {
         setSummary(calculateSummary(normalized as any));
         setTotalCount(listResult.value?.count ?? rawList.length);
       } else if (listResult.reason?.name !== "AbortError") {
-        // ✅ Set error ONCE — don't re-throw
         setError("Failed to fetch attendance records. Please try again.");
         setAttendanceRecords([]);
         setTotalCount(0);
       }
-
-      // Summary failure is non-critical — log but don't show error to user
       if (
         summaryResult.status === "rejected" &&
         summaryResult.reason?.name !== "AbortError"
@@ -444,7 +438,6 @@ export default function StaffAttendancePage() {
       }
     } catch (err) {
       if ((err as Error)?.name === "AbortError") return;
-      // ✅ Only reaches here for truly unexpected errors
       setError("Something went wrong. Please refresh the page.");
       setAttendanceRecords([]);
       setSummary({});
@@ -497,8 +490,6 @@ export default function StaffAttendancePage() {
     };
   };
 
-  /* ---------------- HANDLERS ---------------- */
-
   const handleExport = async () => {
     try {
       const qs = buildQuery({
@@ -507,6 +498,7 @@ export default function StaffAttendancePage() {
         role: departmentFilter,
         department: departmentFilter,
         status: statusFilter,
+        page,
       });
       window.open(
         `${process.env.NEXT_PUBLIC_API_URL || ""}/staff/?${qs}`,
@@ -514,18 +506,9 @@ export default function StaffAttendancePage() {
       );
     } catch (err) {
       console.error("Export failed:", err);
-      alert("Failed to export data. Please try again.");
+      setError("Failed to export data. Please try again.");
     }
   };
-
-  const totalPages = useMemo(
-    () => Math.ceil((totalCount || 0) / 20),
-    [totalCount],
-  );
-
-  // Inside StaffAttendancePage component
-
-  /* ---------------- CRUD HANDLERS ---------------- */
 
   const toTimeInput = (isoString: string | null): string => {
     if (!isoString) return "";
@@ -565,7 +548,7 @@ export default function StaffAttendancePage() {
         });
       }
       setIsModalOpen(false);
-      fetchAttendanceData({ date: selectedDate });
+      fetchAttendanceData({ date: selectedDate, page });
 
       const updatedRecords = editingRecord
         ? attendanceRecords.map((r) =>
@@ -575,8 +558,6 @@ export default function StaffAttendancePage() {
 
       setAttendanceRecords(updatedRecords as any);
       setSummary(calculateSummary(updatedRecords as any));
-
-      console.log(summary);
     } catch (err) {
       setError("Failed to save attendance record.");
     } finally {
@@ -586,17 +567,13 @@ export default function StaffAttendancePage() {
 
   return (
     <div className="container staffAttendance">
-      {/* Error Banner */}
       {error && (
         <div className="error-banner">
-          {" "}
-          {/* style this in your CSS */}
           <span>{error}</span>
           <button onClick={() => setError(null)}>×</button>
         </div>
       )}
 
-      {/* Header */}
       <header className="page-header">
         <div className="header-left">
           <h1>Staff Attendance</h1>
@@ -770,7 +747,7 @@ export default function StaffAttendancePage() {
                     style={{ textAlign: "center", padding: "3rem" }}
                   >
                     <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>
-                      📋
+                      " "
                     </div>
                     <p style={{ color: "#94a3b8" }}>
                       {debouncedSearch ||
@@ -817,8 +794,7 @@ export default function StaffAttendancePage() {
           </table>
         </div>
 
-        {/* Pagination */}
-        {!loading && attendanceRecords.length > 0 && totalPages > 1 && (
+        {!loading && attendanceRecords.length > 0 && (
           <div
             style={{
               padding: "1rem",
@@ -827,37 +803,33 @@ export default function StaffAttendancePage() {
               alignItems: "center",
               background: "#f8fafc",
               borderTop: "1px solid #e2e8f0",
+              fontSize: "0.875rem",
+              color: "#64748b",
             }}
           >
-            <div style={{ fontSize: "0.875rem", color: "#64748b" }}>
-              Showing {attendanceRecords.length} of {totalCount}
+            <div>
+              Showing {attendanceRecords.length} of {totalCount} records
             </div>
-            <div
-              style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
-            >
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="btn btn-outline"
-                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
-              >
-                Prev
-              </button>
-              <span style={{ fontSize: "0.875rem", fontWeight: 600 }}>
-                {page} / {totalPages}
-              </span>
-              <button
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="btn btn-outline"
-                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
-              >
-                Next
-              </button>
+            <div>
+              Page {page} of {totalPages}
             </div>
           </div>
         )}
+
+  
+        {!loading && attendanceRecords.length > 0 && totalPages > 1 && (
+          <div style={{ padding: "1rem", borderTop: "1px solid #e2e8f0" }}>
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalResults={totalCount}
+              resultsPerPage={PAGE_SIZE}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </main>
+
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content animate-in">
@@ -972,8 +944,6 @@ export default function StaffAttendancePage() {
     </div>
   );
 }
-
-/* ---------------- SUBCOMPONENTS ---------------- */
 
 function SummaryCard({
   label,

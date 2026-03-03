@@ -7,6 +7,8 @@ import { StudentTable } from "@/src/assets/components/management/StudentTable";
 import { AddStudentModal } from "@/src/assets/components/management/AddStudentModal";
 import { Student } from "@/src/assets/types/api";
 import { FilterBar } from "@/src/assets/components/management/FilterBar";
+import { Pagination } from "@/src/assets/components/management/Pagination";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 
 export default function StudentsManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,10 +18,16 @@ export default function StudentsManagementPage() {
     {},
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [pageError, setPageError] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+
+  const PAGE_SIZE = 20;
 
   const handleReset = () => {
     setSearchTerm("");
     setFilters({});
+    setCurrentPage(1);
   };
   const handleDeleteStudent = async (id: number) => {
     const confirmed = window.confirm(
@@ -29,35 +37,58 @@ export default function StudentsManagementPage() {
     if (!confirmed) return;
 
     try {
-      console.log(`Attempting to delete student ID: ${id}`);
+      setPageError(null);
 
       await apiRequest(`/students/${id}/`, {
         method: "DELETE",
       });
       setStudents((prev) => prev.filter((student) => student.id !== id));
 
-      console.log("Delete successful");
 
       fetchStudents();
     } catch (err: any) {
       console.error("Delete failed:", err);
-
-      const errorMsg =
-        err.response?.data?.error || err.message || "Unknown error";
-      alert(`Failed to delete student: ${errorMsg}`);
+      setPageError(extractErrorDetail(err) || "Failed to delete student.");
     }
   };
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (page = 1, search = "") => {
     setIsLoading(true);
     try {
       const query = new URLSearchParams();
+      query.append("page", String(page));
+      query.append("page_size", String(PAGE_SIZE));
       if (filters.classId) query.append("class_id", filters.classId);
       if (filters.status) query.append("status", filters.status);
+      if (search.trim()) query.append("search", search.trim());
 
       const res = await apiRequest<any>(`/students/?${query.toString()}`);
 
-      const rawList = res.data || [];
+      const hasServerPagination = Array.isArray(res.results);
+      let rawList = hasServerPagination
+        ? (res.results || [])
+        : Array.isArray(res.data)
+          ? res.data
+          : [];
+
+      if (!hasServerPagination && search.trim()) {
+        const s = search.toLowerCase();
+        rawList = rawList.filter((item: any) => {
+          const fullName = String(item.full_name || "").toLowerCase();
+          const admissionNo = String(item.admission_number || "").toLowerCase();
+          return fullName.includes(s) || admissionNo.includes(s);
+        });
+      }
+
+      const effectiveTotal = hasServerPagination
+        ? (res.count ?? rawList.length)
+        : rawList.length;
+
+      if (!hasServerPagination) {
+        const start = (page - 1) * PAGE_SIZE;
+        rawList = rawList.slice(start, start + PAGE_SIZE);
+      }
+
       const formattedData: Student[] = rawList.map((s: any) => ({
         id: s.id,
         user: s.id,
@@ -79,26 +110,25 @@ export default function StudentsManagementPage() {
       }));
 
       setStudents(formattedData);
+      setTotalResults(effectiveTotal);
     } catch (err: any) {
       console.error("Failed to load students:", err.message || err);
       setStudents([]);
+      setTotalResults(0);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStudents();
-  }, [filters]);
+    fetchStudents(currentPage, searchTerm);
+  }, [filters, currentPage, searchTerm]);
 
-  const filteredStudents = students.filter(
-    (s) =>
-      s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.id.toString().toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const totalPages = Math.max(1, Math.ceil(totalResults / PAGE_SIZE));
 
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
+      {pageError && <ErrorMessage errorDetail={pageError} className="mb-4" />}
       <FilterBar onFilterChange={(newFilters) => setFilters(newFilters)} />
 
       <div className="bg-white border-x border-t rounded-t-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between mt-4">
@@ -111,7 +141,10 @@ export default function StudentsManagementPage() {
             type="text"
             placeholder="Search by name or ID..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-cyan-100 transition-all text-sm"
           />
         </div>
@@ -139,11 +172,22 @@ export default function StudentsManagementPage() {
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-600"></div>
           <p className="mt-4 text-slate-500 text-sm">Fetching students...</p>
         </div>
-      ) : filteredStudents.length > 0 ? (
-        <StudentTable
-          students={filteredStudents}
-          onDelete={handleDeleteStudent}
-        />
+      ) : students.length > 0 ? (
+        <>
+          <StudentTable students={students} onDelete={handleDeleteStudent} />
+          <div className="bg-white border-x border-b rounded-b-2xl">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(p) => {
+                if (p < 1 || p > totalPages) return;
+                setCurrentPage(p);
+              }}
+              totalResults={totalResults}
+              resultsPerPage={PAGE_SIZE}
+            />
+          </div>
+        </>
       ) : (
         <div className="bg-white border-x border-b rounded-b-2xl p-20 flex flex-col items-center justify-center text-center">
           <div className="bg-slate-100 p-4 rounded-full mb-4">

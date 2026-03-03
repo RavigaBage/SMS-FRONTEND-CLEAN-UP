@@ -12,7 +12,6 @@ body {
   color: #0f172a;
 }
 
-/* TOP NAV */
 .top-nav {
   background: white;
   padding: 14px 28px;
@@ -56,7 +55,6 @@ nav a.active {
   background: #cbd5f5;
 }
 
-/* PAGE */
 .page {
   padding: 28px;
 }
@@ -66,7 +64,6 @@ nav a.active {
   color: #64748b;
 }
 
-/* HEADER */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -95,7 +92,6 @@ nav a.active {
   border: 1px solid #e2e8f0;
 }
 
-/* STATS */
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -113,14 +109,12 @@ nav a.active {
   color: #16a34a;
 }
 
-/* LAYOUT */
 .layout {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 24px;
 }
 
-/* CARDS */
 .card {
   background: white;
   padding: 20px;
@@ -156,7 +150,6 @@ select {
   border-bottom: 1px solid #f1f5f9;
 }
 
-/* TABLE */
 .table-card {
   background: white;
   border-radius: 16px;

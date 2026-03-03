@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 
 export function EditStudentModal({ student, isOpen, onClose, onSave }: any) {
-  console.log(student);
   const [formData, setFormData] = useState({ ...student });
   React.useEffect(() => {
     if (isOpen && student) {
@@ -40,7 +39,6 @@ export function EditStudentModal({ student, isOpen, onClose, onSave }: any) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-md p-4 overflow-y-auto">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl my-auto animate-in zoom-in-95 duration-200">
-        {/* Header */}
         <div className="p-6 border-b flex justify-between items-center bg-slate-50 rounded-t-3xl">
           <div>
             <h2 className="text-xl font-bold text-slate-800">
@@ -59,12 +57,10 @@ export function EditStudentModal({ student, isOpen, onClose, onSave }: any) {
           </button>
         </div>
 
-        {/* Form Body */}
         <form
           onSubmit={handleSubmit}
           className="p-8 space-y-8 max-h-[75vh] overflow-y-auto"
         >
-          {/* Section 1: Core Identity */}
           <div className="space-y-4">
             <h3 className="text-[10px] font-black text-cyan-600 tracking-[0.2em] uppercase flex items-center gap-2">
               <User size={14} /> Basic Information
@@ -111,7 +107,6 @@ export function EditStudentModal({ student, isOpen, onClose, onSave }: any) {
             </div>
           </div>
 
-          {/* Section 2: Demographic & Religion */}
           <div className="space-y-4 pt-4 border-t border-slate-100">
             <h3 className="text-[10px] font-black text-cyan-600 tracking-[0.2em] uppercase flex items-center gap-2">
               <Globe size={14} /> Background & Details
@@ -149,7 +144,6 @@ export function EditStudentModal({ student, isOpen, onClose, onSave }: any) {
             </div>
           </div>
 
-          {/* Section 3: Status & Medical */}
           <div className="space-y-4 pt-4 border-t border-slate-100">
             <h3 className="text-[10px] font-black text-rose-500 tracking-[0.2em] uppercase flex items-center gap-2">
               <ShieldAlert size={14} /> Status & Medical Notes
@@ -191,7 +185,6 @@ export function EditStudentModal({ student, isOpen, onClose, onSave }: any) {
           </div>
         </form>
 
-        {/* Footer */}
         <div className="p-6 bg-slate-50 border-t rounded-b-3xl flex justify-end gap-3">
           <button
             onClick={onClose}
@@ -211,7 +204,6 @@ export function EditStudentModal({ student, isOpen, onClose, onSave }: any) {
   );
 }
 
-// Internal Helper Components for cleaner code
 function InputField({ label, name, value, onChange, type = "text" }: any) {
   return (
     <div className="space-y-1">

@@ -32,7 +32,6 @@ export function Sidebar() {
 
   return (
     <aside className="w-64 border-r bg-white flex flex-col h-screen sticky top-0 shrink-0">
-      {/* Persistent EduManager Logo Section */}
       <div className="p-6 flex items-center gap-3">
         <div className="bg-slate-900 p-2 rounded-lg text-white shadow-lg shadow-slate-200">
           <School size={24} />
@@ -47,7 +46,6 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Navigation Links */}
       <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
           const isActive =
@@ -71,7 +69,6 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom Action Section */}
       <div className="p-4 border-t bg-slate-50/50">
         <button className="flex items-center gap-3 px-4 py-3 w-full text-slate-500 hover:text-red-600 transition-colors text-sm font-bold rounded-xl hover:bg-red-50">
           <LogOut size={20} />

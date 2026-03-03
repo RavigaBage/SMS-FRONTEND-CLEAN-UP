@@ -15,14 +15,13 @@ export function Pagination({
   totalPages,
   onPageChange,
   totalResults,
-  resultsPerPage,
+  resultsPerPage = 20,
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const startResult = (currentPage - 1) * resultsPerPage + 1;
   const endResult = Math.min(currentPage * resultsPerPage, totalResults);
 
-  // Show a window of max 5 page buttons around the current page
   const getPageNumbers = () => {
     const delta = 2;
     const range: number[] = [];
@@ -31,7 +30,6 @@ export function Pagination({
 
     for (let i = left; i <= right; i++) range.push(i);
 
-    // Always include first and last, with ellipsis gaps
     const pages: (number | "...")[] = [];
     if (left > 1) {
       pages.push(1);

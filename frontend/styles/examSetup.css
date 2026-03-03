@@ -26,7 +26,6 @@
   padding: 0 24px;
 }
 
-/* Header */
 .header {
   margin-bottom: 24px;
 }
@@ -42,7 +41,6 @@
   margin-top: 4px;
 }
 
-/* Steps Progress */
 .steps {
   display: flex;
   align-items: center;
@@ -81,7 +79,6 @@
   background: var(--step-active);
 }
 
-/* Connecting line between steps */
 .step:not(:last-child)::after {
   content: "";
   position: absolute;
@@ -98,7 +95,6 @@
   background: var(--step-active);
 }
 
-/* Card */
 .formCard {
   background: var(--card);
   border-radius: var(--radius);
@@ -106,7 +102,6 @@
   padding: 32px;
 }
 
-/* Form Styling */
 .formGroup {
   display: flex;
   flex-direction: column;
@@ -137,7 +132,6 @@
   border-color: var(--step-active);
 }
 
-/* Multi-select Pills */
 .subjectsSelect {
   display: flex;
   flex-wrap: wrap;
@@ -160,7 +154,6 @@
   color: white;
 }
 
-/* Sections */
 .formSection {
   border-bottom: 1px solid var(--border);
   padding-bottom: 24px;
@@ -171,7 +164,6 @@
   border-bottom: none;
 }
 
-/* Buttons */
 .btnGroup {
   display: flex;
   gap: 12px;

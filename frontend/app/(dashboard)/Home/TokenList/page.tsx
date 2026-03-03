@@ -53,7 +53,6 @@ export default function SecurityManagement() {
           <p>View and manage invalidated tokens and sessions</p>
         </header>
 
-        {/* Summary Statistics */}
         <section className="cardsRow">
           <div className="cardSummary">
             <h3>Active Sessions</h3>
@@ -69,7 +68,6 @@ export default function SecurityManagement() {
           </div>
         </section>
 
-        {/* Filter Controls */}
         <div className="controls">
           <input
             type="text"
@@ -89,7 +87,6 @@ export default function SecurityManagement() {
           <button className="primaryBtn">Bulk Revoke</button>
         </div>
 
-        {/* Main Data Table */}
         <main className="tableCard">
           <table className="tokenTable">
             <thead>

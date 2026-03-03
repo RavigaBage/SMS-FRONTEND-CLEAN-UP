@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Plus, Loader2, Edit, Trash2, Search, Filter } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 import "@/styles/fees.css";
 import Pagination from "@/src/assets/components/dashboard/Pagnation";
 
-/* ---------- Types ---------- */
 interface Class_obj {
   id: 1;
   class_name: String;
@@ -84,8 +84,26 @@ function normalizeFeeStructure(raw: any): FeeStructure {
     due_date: raw.due_date ?? "",
   };
 }
+const extractErrorMessage = (detail: string): string => {
+  if (!detail) return "Something went wrong.";
+  try {
+    const matches = [...detail.matchAll(/string='([^']+)'/g)];
+    if (matches.length > 0) return matches.map((m) => m[1]).join(", ");
 
-/* ---------- Add/Edit Modal ---------- */
+    const jsonString = detail
+      .replace(/'/g, '"')
+      .replace(/\bNone\b/g, "null")
+      .replace(/\bTrue\b/g, "true")
+      .replace(/\bFalse\b/g, "false");
+
+    const parsed = JSON.parse(jsonString);
+    const firstKey = Object.keys(parsed)[0];
+    const firstVal = parsed[firstKey];
+    return Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
+  } catch {
+    return detail;
+  }
+};
 function AddEditModal({
   open,
   record,
@@ -103,7 +121,7 @@ function AddEditModal({
 }) {
   const isEdit = !!record;
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any>(null);
 
   const [form, setForm] = useState({
     academic_year_id: record?.academic_year_id ?? "",
@@ -156,7 +174,7 @@ function AddEditModal({
     }
     const payload = {
       academic_year_id: Number(form.academic_year_id),
-      academic_year: form.academic_year_id,
+      academic_year: form.academic_year,
       class_obj_id: form.class_obj_id ? Number(form.class_obj_id) : null,
       term: form.term,
       category_name: form.category_name,
@@ -169,22 +187,25 @@ function AddEditModal({
     setLoading(true);
     try {
       if (isEdit && record) {
-        await apiRequest(`${ENDPOINT}${record.id}/`, {
+        var response = await apiRequest(`${ENDPOINT}${record.id}/`, {
           method: "PATCH",
           body: JSON.stringify(payload),
         });
       } else {
-        await apiRequest(ENDPOINT, {
+        var response = await apiRequest(ENDPOINT, {
           method: "POST",
           body: JSON.stringify(payload),
         });
+      }
+      if(response?.data === null){
+        setError(extractErrorMessage(response?.error as any));
+        return
       }
       onSaved();
       onClose();
     } catch (err: any) {
       console.error("Save fee structure error:", err);
-      const msg = err?.message ?? err?.detail ?? "Failed to save fee structure";
-      setError(String(msg));
+      setError(extractErrorDetail(err) || "Failed to save fee structure");
     } finally {
       setLoading(false);
     }
@@ -202,7 +223,7 @@ function AddEditModal({
           </button>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && <ErrorMessage errorDetail={error} className="error-message" />}
 
         <form onSubmit={handleSubmit} className="modal-form">
           <label>
@@ -335,8 +356,6 @@ function AddEditModal({
     </div>
   );
 }
-
-/* ---------- Confirm Delete Dialog ---------- */
 function ConfirmDelete({
   open,
   onCancel,
@@ -385,14 +404,13 @@ function ConfirmDelete({
   );
 }
 
-/* ---------- Main Fee Structure Page ---------- */
 export default function FinancePage() {
   const [feeStructures, setFeeStructures] = useState<FeeStructure[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [classes, setClasses] = useState<ClassOption[]>([]);
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editRecord, setEditRecord] = useState<FeeStructure | null>(null);
@@ -401,7 +419,6 @@ export default function FinancePage() {
   const [toDeleteId, setToDeleteId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Filter states - MATCHES BACKEND EXACTLY
   const [academicYearFilter, setAcademicYearFilter] = useState("");
   const [classFilter, setClassFilter] = useState("");
   const [termFilter, setTermFilter] = useState("");
@@ -412,7 +429,6 @@ export default function FinancePage() {
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  // Fetch fee structures with server-side filtering
   const fetchFeeStructures = async () => {
     setLoading(true);
     setError(null);
@@ -441,14 +457,12 @@ export default function FinancePage() {
       setFeeStructures(normalized);
     } catch (err: any) {
       console.error("Fetch fee structures failed:", err);
-      setError("Failed to load fee structures.");
+      setError(extractErrorDetail(err) || "Failed to load fee structures.");
       setFeeStructures([]);
     } finally {
       setLoading(false);
     }
   };
-
-  // Fetch academic years for dropdown
   const generateAcademicYears = (): any => {
     const currentYear = new Date().getFullYear();
     const startYear = 2000;
@@ -465,7 +479,6 @@ export default function FinancePage() {
     });
   };
 
-  // Fetch classes for dropdown
   const fetchClasses = async () => {
     try {
       const raw = await apiRequest<any>(CLASSES_ENDPOINT);
@@ -527,7 +540,7 @@ export default function FinancePage() {
       await fetchFeeStructures();
     } catch (err: any) {
       console.error("Delete failed:", err);
-      setError("Failed to delete fee structure.");
+      setError(extractErrorDetail(err) || "Failed to delete fee structure.");
     } finally {
       setDeleting(false);
     }
@@ -550,7 +563,6 @@ export default function FinancePage() {
     termFilter,
   ].filter(Boolean).length;
 
-  // Calculate stats
   const totalRevenue = feeStructures.reduce((sum, fee) => sum + fee.amount, 0);
   const mandatoryFees = feeStructures.filter((f) => f.is_mandatory).length;
 
@@ -582,6 +594,8 @@ export default function FinancePage() {
             </button>
           </div>
         </div>
+
+        {error && <ErrorMessage errorDetail={error} className="error-message" />}
 
         <div className="stats">
           <div className="stat-card">

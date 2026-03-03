@@ -1,4 +1,3 @@
-// frontend/src/types/profiles.ts
 
 export interface User {
   id: string;

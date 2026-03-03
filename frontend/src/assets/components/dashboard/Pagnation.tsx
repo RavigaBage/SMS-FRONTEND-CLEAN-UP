@@ -26,7 +26,6 @@ const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className={styles.pagination}>
-      {/* Previous */}
       {previous ? (
         <button
           className={styles.navBtn}
@@ -38,12 +37,10 @@ const Pagination: React.FC<PaginationProps> = ({
         <span className={styles.disabled}>← Previous</span>
       )}
 
-      {/* Page info */}
       <span className={styles.pageInfo}>
         Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
       </span>
 
-      {/* Next */}
       {next ? (
         <button
           className={styles.navBtn}

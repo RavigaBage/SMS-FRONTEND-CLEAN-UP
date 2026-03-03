@@ -45,7 +45,6 @@ body {
   pointer-events: auto;
 }
 
-/* Popup container */
 .popup-container {
   background: transparent;
   border-radius: 12px;
@@ -65,7 +64,6 @@ body {
   opacity: 1;
 }
 
-/* Close button */
 .close-btn {
   margin-top: 16px;
   padding: 8px 16px;
@@ -142,4 +140,18 @@ body {
   border-radius: 999px;
   height: 1.5rem;
   width: 60px;
+}
+@media print {
+
+  aside, nav, footer, button,
+  .sidebar, .navbar, .no-print {
+    display: none !important;
+  }
+  .print-area {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
 }

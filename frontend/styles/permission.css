@@ -25,7 +25,6 @@
   padding: 0 24px;
 }
 
-/* Header */
 .header {
   display: flex;
   justify-content: space-between;
@@ -44,7 +43,6 @@
   margin-top: 4px;
 }
 
-/* Table Card */
 .card {
   background: var(--card);
   border-radius: var(--radius);
@@ -79,7 +77,6 @@
   border-top: 1px solid var(--border);
 }
 
-/* Toggle Switch Styling */
 .switch {
   position: relative;
   display: inline-block;
@@ -125,7 +122,6 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
-/* Modal Styling */
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -164,7 +160,6 @@ input:checked + .slider:before {
   font-weight: 500;
 }
 
-/* Standard Buttons */
 .primaryBtn {
   background: linear-gradient(135deg, var(--primary), #2563eb);
   color: white;

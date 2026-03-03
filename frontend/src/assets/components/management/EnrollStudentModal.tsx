@@ -13,6 +13,7 @@ import {
   Check,
 } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 
 interface EnrollModalProps {
   isOpen: boolean;
@@ -36,9 +37,9 @@ export function EnrollStudentModal({
 }: EnrollModalProps) {
   const [loading, setLoading] = useState(false);
   const [classes, setClasses] = useState<any[]>([]);
+  const [errorDetail, setErrorDetail] = useState<any>(null);
 
   const [formData, setFormData] = useState({
-    // Student Profile Details
     first_name: "",
     last_name: "",
     email: "",
@@ -46,7 +47,6 @@ export function EnrollStudentModal({
     date_of_birth: "",
     gender: "male",
 
-    // Enrollment Details
     class_id: "",
     enrollment_date: new Date().toISOString().split("T")[0],
   });
@@ -68,8 +68,8 @@ export function EnrollStudentModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorDetail(null);
     try {
-      // 1. Create the Student first
       const student = await apiRequest<StudentResponse>("/students/", {
         method: "POST",
         body: JSON.stringify({
@@ -82,7 +82,6 @@ export function EnrollStudentModal({
         }),
       });
 
-      // 2. Use the returned student ID to create the enrollment
       if (student && student?.id) {
         await apiRequest("/enrollments/", {
           method: "POST",
@@ -98,7 +97,10 @@ export function EnrollStudentModal({
       onSuccess();
       onClose();
     } catch (err) {
-      alert("Error: Ensure email is unique and all fields are valid.");
+      setErrorDetail(
+        extractErrorDetail(err) ||
+          "Error: Ensure email is unique and all fields are valid.",
+      );
     } finally {
       setLoading(false);
     }
@@ -109,7 +111,6 @@ export function EnrollStudentModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden transform animate-in zoom-in-95 duration-200">
-        {/* Header */}
         <div className="px-10 py-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
           <div>
             <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">
@@ -128,7 +129,7 @@ export function EnrollStudentModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-10 space-y-8">
-          {/* Section 1: Personal Details */}
+          {errorDetail && <ErrorMessage errorDetail={errorDetail} />}
           <div className="space-y-4">
             <h3 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] flex items-center gap-2">
               <User size={14} /> Personal Information
@@ -170,7 +171,6 @@ export function EnrollStudentModal({
             </div>
           </div>
 
-          {/* Section 2: Academic Placement */}
           <div className="space-y-4 pt-4 border-t border-slate-50">
             <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-2">
               <GraduationCap size={14} /> Academic Placement
@@ -207,7 +207,6 @@ export function EnrollStudentModal({
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3 pt-6">
             <button
               type="button"
@@ -236,7 +235,6 @@ export function EnrollStudentModal({
   );
 }
 
-// Internal Helper
 function FormInput({
   label,
   type = "text",

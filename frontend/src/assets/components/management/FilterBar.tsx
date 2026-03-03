@@ -44,7 +44,6 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
     fetchClassData();
   }, []);
 
-  // Notify parent when filters change
   useEffect(() => {
     onFilterChange({ classId: selectedClass, status: selectedStatus });
   }, [selectedClass, selectedStatus]);
@@ -55,9 +54,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
         className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6 w-full"
         style={{ width: "100%" }}
       >
-        {/* Filters */}
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Grade/Class */}
           <div className="flex flex-col space-y-1">
             <label className="text-xs font-semibold text-slate-500 uppercase">
               Grade / Class
@@ -82,7 +79,6 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
             </div>
           </div>
 
-          {/* Status */}
           <div className="flex flex-col space-y-1">
             <label className="text-xs font-semibold text-slate-500 uppercase">
               Status
@@ -108,7 +104,6 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
           </div>
         </div>
 
-        {/* Add Student Button */}
         <button
           onClick={() => setIsModalOpen(true)}
           className="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-sm transition"
@@ -117,7 +112,6 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
         </button>
       </div>
 
-      {/* Add Student Modal */}
       <AddStudentModal
         isOpen={isModalOpen}
         onSuccess={() => setIsModalOpen(false)}

@@ -32,7 +32,6 @@ export function AssignSubjectsModal({
   useEffect(() => {
     if (isOpen) {
       fetchSubjects();
-      // Set initially selected subjects
       setSelectedSubjects(teacher.subjects.map((s: any) => s.id));
     }
   }, [isOpen, teacher]);

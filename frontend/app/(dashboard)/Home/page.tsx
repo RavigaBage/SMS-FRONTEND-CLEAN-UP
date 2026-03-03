@@ -70,7 +70,6 @@ export default function HomePage() {
     setError(null);
     try {
       const res: any = await apiRequest("/api/dashboard-summary/");
-      console.log(res);
       setStats(res.data);
       setTransactions(res.data.recent_transactions || []);
       setActivities(res.data.recent_activities || []);
@@ -207,9 +206,7 @@ export default function HomePage() {
       {showGuide ? <FirstTimeGuide onFinish={handleGuideComplete} /> : ""}
 
       <div className="dashboard-grid p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Left Column */}
         <section className="left-column lg:col-span-1 space-y-8">
-          {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             {loading ? (
               [1, 2, 3, 4].map((i) => (
@@ -241,7 +238,6 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Charts */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
             {loading ? (
               [1, 2].map((i) => <SkeletonBox key={i} className="h-80 w-full" />)
@@ -334,7 +330,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Right Panel */}
         <aside className="lg:col-span-1 space-y-8">
           <div>
             <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">

@@ -1,6 +1,3 @@
-/* =========================
-   Design Tokens
-========================= */
 
 :root {
   --bg-page: #f8fafc;
@@ -15,9 +12,6 @@
   --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* =========================
-   Page Layout
-========================= */
 
 .students-page {
   min-height: 100vh;
@@ -32,9 +26,6 @@
     sans-serif;
 }
 
-/* =========================
-   Header
-========================= */
 
 .page-header {
   display: flex;
@@ -67,9 +58,6 @@
   gap: 0.75rem;
 }
 
-/* =========================
-   Buttons
-========================= */
 
 .primary-button {
   background: var(--primary);
@@ -120,9 +108,6 @@
   background: #f1f5f9;
 }
 
-/* =========================
-   Control Bar
-========================= */
 
 .control-bar {
   background: var(--bg-card);
@@ -140,9 +125,6 @@
   box-shadow: var(--shadow-soft);
 }
 
-/* =========================
-   Search
-========================= */
 
 .search-wrapper {
   position: relative;
@@ -177,9 +159,6 @@
   box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
 }
 
-/* =========================
-   Control Actions
-========================= */
 
 .control-actions {
   display: flex;
@@ -187,9 +166,6 @@
   align-items: center;
 }
 
-/* =========================
-   Table Card
-========================= */
 
 .table-card {
   background: var(--bg-card);

@@ -25,14 +25,20 @@ import ParentForm, {
 } from "@/src/assets/components/management/ParentForm";
 import LinkParentModal from "@/src/assets/components/management/LinkParentModal";
 import { apiRequest } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
+import { Pagination } from "@/src/assets/components/management/Pagination";
 
-/* ---------- Types ---------- */
 type ApiResponse<T> = {
   data: T;
   message: string;
   success: boolean;
 };
-
+interface PaginatedResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: any[];
+}
 interface Parent extends MyFormData {
   id: number;
   full_name: string;
@@ -67,7 +73,6 @@ interface SchoolClass {
   class_name: string;
 }
 
-/* ---------- Component ---------- */
 
 export default function ParentEntry() {
   const [parents, setParents] = useState<Parent[]>([]);
@@ -78,7 +83,8 @@ export default function ParentEntry() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeView, setActiveView] = useState<"all" | "linking">("all");
   const [selectedParent, setSelectedParent] = useState<Parent | null>(null);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
   const [openForm, setOpenForm] = useState(false);
   const [editParent, setEditParent] = useState<Parent | null>(null);
   const [linkingInProgress, setLinkingInProgress] = useState<number | null>(
@@ -91,10 +97,11 @@ export default function ParentEntry() {
     studentId: null,
   });
   const [showFilters, setShowFilters] = useState(false);
-
-  /* ---------- Unified Fetcher ---------- */
+  const [pageError, setPageError] = useState<any>(null);
+  const resultsPerPage = 20;
   const handleApplyFilters = () => {
-    fetchParents();
+    setCurrentPage(1); 
+    fetchParents(1, classId, yearId);
     fetchStudents(classId ? Number(classId) : null);
     setShowFilters(false);
   };
@@ -103,29 +110,25 @@ export default function ParentEntry() {
     setClassId("");
     setYearId("");
     setSearchQuery("");
-    fetchParents();
+    fetchParents(currentPage, "", ""); 
     fetchStudents(null);
   };
 
-  /* ---------- Data loaders ---------- */
   const handleDirectLink = async (studentId: number) => {
-    // If no parent selected, open modal to choose one
+   
     if (!selectedParent) {
       setLinkModal({ open: true, studentId });
       return;
     }
 
-    // Show loading state
     setLinkingInProgress(studentId);
 
-    // Get CSRF token
     const csrfToken =
       document.cookie
         .split("; ")
         .find((c) => c.startsWith("csrftoken="))
         ?.split("=")[1] || "";
 
-    // Create the link payload
     const payload = {
       student: studentId,
       parent: selectedParent.id,
@@ -134,7 +137,6 @@ export default function ParentEntry() {
     };
 
     try {
-      // Make API request to link them
       await apiRequest(`/student-parents/`, {
         method: "POST",
         headers: {
@@ -144,29 +146,41 @@ export default function ParentEntry() {
         body: JSON.stringify(payload),
       });
 
-      // Refresh data to show new link
-      await fetchParents();
+      await fetchParents(currentPage,classId,yearId);
       await fetchStudents();
 
       alert(`✅ ${selectedParent.full_name} linked to student successfully!`);
     } catch (err) {
       console.error("Direct link error", err);
-      alert("Could not link. This connection may already exist.");
+      setPageError(extractErrorDetail(err) || "Could not link. This connection may already exist.");
     } finally {
-      // Clear loading state
       setLinkingInProgress(null);
     }
   };
-  const fetchParents = async () => {
+
+  const fetchParents = async (
+    page:number,
+    classId:string,
+    yearId:string
+  ) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (classId) params.append("class_id", classId.toString());
       if (yearId) params.append("academic_year_id", yearId.toString());
+      params.append('page',page.toString());
 
       const url = `/parents/${params.toString() ? `?${params.toString()}` : ""}`;
-      const response = await apiRequest<Parent[]>(url);
-      setParents((response.data as any) || []);
+
+      const response = await apiRequest<PaginatedResponse>(url);
+      const data: PaginatedResponse = {
+        count: response.count ?? 0,
+        next: response.next ?? null,
+        previous: response.previous ?? null,
+        results: response.results ?? [],
+      };
+      setTotalResults(data.count);
+      setParents((data.results as any) || []);
     } catch (err) {
       console.error("fetchParents error", err);
     } finally {
@@ -174,16 +188,16 @@ export default function ParentEntry() {
     }
   };
 
-  const fetchStudents = async (classId: number | null = null) => {
+  const fetchStudents = async (classId_st: number | null = null) => {
     setLoading(true);
     try {
-      const url = classId ? `/students/?class_id=${classId}` : "/students/";
+      const url = classId_st ? `/students/?class_id=${classId_st}` : "/students/";
       const response = await apiRequest<Student[]>(url, { method: "GET" });
       setStudents((response.data as any) || []);
-      fetchParents();
+      fetchParents(currentPage,classId,yearId);
     } catch (err) {
       console.error("fetchStudents error", err);
-      alert("Failed to load students.");
+      setPageError(extractErrorDetail(err) || "Failed to load students.");
       setStudents([]);
     } finally {
       setLoading(false);
@@ -211,18 +225,20 @@ export default function ParentEntry() {
       console.error("fetchAcademicYears error", err);
     }
   };
+  const totalPages = Math.ceil(totalResults / resultsPerPage);
 
   useEffect(() => {
-    fetchClasses();
-    fetchAcademicYears();
-  }, []);
+    fetchParents(currentPage, classId, yearId);
+  }, [currentPage]);
 
   useEffect(() => {
-    fetchParents();
     fetchStudents();
   }, []);
 
-  /* ---------- CRUD handlers ---------- */
+  useEffect(() => {
+    fetchParents(currentPage,classId,yearId);
+    fetchStudents();
+  }, []);
 
   const handleCreateParent = async (payload: MyFormData) => {
     try {
@@ -237,7 +253,7 @@ export default function ParentEntry() {
       alert("Parent created ✅");
     } catch (err) {
       console.error("create parent", err);
-      alert("Could not create parent.");
+      setPageError(extractErrorDetail(err) || "Could not create parent.");
     }
   };
 
@@ -261,7 +277,7 @@ export default function ParentEntry() {
       alert("Parent updated ✅");
     } catch (err) {
       console.error("update parent", err);
-      alert("Could not update parent.");
+      setPageError(extractErrorDetail(err) || "Could not update parent.");
     }
   };
 
@@ -273,21 +289,18 @@ export default function ParentEntry() {
       alert("Deleted");
     } catch (err) {
       console.error("delete parent", err);
-      alert("Failed to delete.");
+      setPageError(extractErrorDetail(err) || "Failed to delete.");
     }
   };
-
-  // Filter parents by search
   const filteredParents = parents.filter(
     (p) =>
       p.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.email?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  /* ---------- Render ---------- */
-
   return (
     <div className="min-h-screen bg-stone-50">
+      {pageError && <ErrorMessage errorDetail={pageError} className="m-4" />}
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap");
 
@@ -374,7 +387,6 @@ export default function ParentEntry() {
         }
       `}</style>
 
-      {/* HERO HEADER */}
       <header className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-stone-100 border-b border-amber-200/50">
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
@@ -415,7 +427,6 @@ export default function ParentEntry() {
             </div>
           </div>
 
-          {/* View Toggle */}
           <div className="mt-8 flex items-center gap-3">
             <button
               onClick={() => setActiveView("all")}
@@ -444,9 +455,9 @@ export default function ParentEntry() {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         {activeView === "all" ? (
-          // ALL PARENTS VIEW
+         
           <div className="space-y-6 animate-slide-in-up">
-            {/* SEARCH & ACTIONS */}
+
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-5 h-5" />
@@ -480,7 +491,6 @@ export default function ParentEntry() {
               </button>
             </div>
 
-            {/* FILTER PANEL */}
             {showFilters && (
               <div className="bg-white border-2 border-stone-200 rounded-2xl p-6 animate-slide-in-up">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -538,7 +548,6 @@ export default function ParentEntry() {
               </div>
             )}
 
-            {/* PARENTS GRID */}
             {loading ? (
               <div className="flex justify-center items-center py-20">
                 <div className="w-8 h-8 border-3 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
@@ -558,7 +567,6 @@ export default function ParentEntry() {
                     className="group bg-white border-2 border-stone-200 rounded-2xl p-6 hover:border-amber-500 hover:shadow-xl transition-all duration-300 animate-slide-in-up"
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
-                    {/* Avatar & Name */}
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-display text-xl font-bold shadow-lg">
                         {parent.full_name.charAt(0)}
@@ -581,7 +589,6 @@ export default function ParentEntry() {
                       </div>
                     </div>
 
-                    {/* Contact Info */}
                     <div className="space-y-2 mb-4 pb-4 border-b border-stone-100">
                       <div className="flex items-center gap-2 text-sm text-stone-600">
                         <Phone className="w-4 h-4 text-stone-400" />
@@ -593,7 +600,6 @@ export default function ParentEntry() {
                       </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex items-center gap-2">
                       <a
                         href={`/Home/profiles/parents/profile/${parent.id}`}
@@ -624,7 +630,6 @@ export default function ParentEntry() {
             )}
           </div>
         ) : (
-          // LINKING VIEW
           <div className="animate-slide-in-up">
             <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 mb-6">
               <div className="flex items-start gap-4">
@@ -649,7 +654,7 @@ export default function ParentEntry() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* PARENTS COLUMN */}
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-display text-2xl font-bold text-stone-900 flex items-center gap-2">
@@ -708,7 +713,6 @@ export default function ParentEntry() {
                 </div>
               </div>
 
-              {/* STUDENTS COLUMN */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-display text-2xl font-bold text-stone-900 flex items-center gap-2">
@@ -753,7 +757,7 @@ export default function ParentEntry() {
                               {student.full_name}
                             </div>
                             <div className="text-sm text-stone-500">
-                              {student.admission_number} •{" "}
+                              {student.admission_number} {" "}
                               {student.class_info?.class_name}
                             </div>
                             {isLinked && selectedParent && (
@@ -812,7 +816,16 @@ export default function ParentEntry() {
           </div>
         )}
 
-        {/* MODALS */}
+        {totalResults > resultsPerPage && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalResults={totalResults}
+            resultsPerPage={resultsPerPage}
+          />
+        )}
+
         {openForm && (
           <ParentForm
             open={openForm}
@@ -836,7 +849,7 @@ export default function ParentEntry() {
             parentsList={parents}
             onClose={() => setLinkModal({ open: false, studentId: null })}
             onLinked={async () => {
-              await fetchParents();
+              await fetchParents(currentPage,classId,yearId);
               await fetchStudents();
               setLinkModal({ open: false, studentId: null });
               alert("✅ Parent linked successfully!");

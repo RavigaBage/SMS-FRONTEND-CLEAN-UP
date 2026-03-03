@@ -1,4 +1,3 @@
-// frontend/src/assets/components/management/StaffFilters.tsx
 "use client";
 
 import { ChevronDown } from "lucide-react";
@@ -17,12 +16,7 @@ export function StaffFilters({
       label: "All Roles",
       key: "role",
       options: ["Teacher", "Administrator", "Support"],
-    },
-    {
-      label: "Status: All",
-      key: "status",
-      options: ["active", "On Leave", "Inactive"],
-    },
+    }
   ];
 
   const hasActiveFilters = Object.values(filters).some((val) => val !== "");
@@ -32,7 +26,7 @@ export function StaffFilters({
       {filterOptions.map((filter) => (
         <div key={filter.key} className="relative">
           <select
-            value={filters[filter.key]} // Now controlled by parent state
+            value={filters[filter.key]} 
             onChange={(e) => onFilterChange({ [filter.key]: e.target.value })}
             className="appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2 pr-10 text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-cyan-100 transition-all cursor-pointer"
           >

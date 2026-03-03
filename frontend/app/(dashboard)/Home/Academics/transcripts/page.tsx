@@ -6,7 +6,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fetchWithAuth } from "@/src/lib/apiClient";
 import { Pagination } from "@/src/assets/components/management/Pagination";
 
-/* ── Types (unchanged) ────────────────────────────────────────────────────── */
 type StudentRow = {
   id: number;
   full_name: string;
@@ -52,7 +51,6 @@ const generateAcademicYears = (startYear: number, count: number): string[] =>
 
 const DEFAULT_RESULTS_PER_PAGE = 10;
 
-/* ── Styles ───────────────────────────────────────────────────────────────── */
 const css = `
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inconsolata:wght@400;500;600&display=swap');
 
@@ -75,7 +73,6 @@ const css = `
   color: var(--th-ink);
 }
 
-/* HEADER */
 .th-header {
   background: #0f172a;
   padding: 0 44px;
@@ -121,7 +118,6 @@ const css = `
 }
 .th-header-chip.lit { background: rgba(37,99,235,.3); border-color: #3b82f6; color: #93c5fd; }
 
-/* FILTER BAR */
 .th-filters {
   background: var(--th-surface);
   border-bottom: 1px solid var(--th-border);
@@ -156,10 +152,8 @@ const css = `
 .th-search:focus { outline: none; border-color: var(--th-accent); box-shadow: 0 0 0 3px #2563eb18; }
 .th-search::placeholder { color: var(--th-ghost); }
 
-/* BODY */
 .th-body { padding: 24px 44px 48px; display: flex; flex-direction: column; gap: 20px; }
 
-/* STAT CARDS */
 .th-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .th-stat {
   background: var(--th-surface); border: 1.5px solid var(--th-border);
@@ -178,7 +172,6 @@ const css = `
 .th-stat-value { font-family: var(--th-head); font-size: 1.7rem; font-weight: 800; color: var(--th-ink); line-height: 1; }
 .th-stat-sub { font-size: 11px; color: var(--th-amber); margin-top: 2px; }
 
-/* TABLE CARD */
 .th-card { background: var(--th-surface); border: 1.5px solid var(--th-border); border-radius: 16px; overflow: hidden; }
 .th-card-head {
   padding: 16px 22px; border-bottom: 1px solid var(--th-border);
@@ -191,7 +184,6 @@ const css = `
   background: var(--th-bg); border: 1px solid var(--th-border); color: var(--th-ghost);
 }
 
-/* TABLE */
 .th-scroll { overflow-x: auto; }
 .th-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px; }
 .th-table thead tr { background: #f8fafc; border-bottom: 1.5px solid var(--th-border); }
@@ -208,12 +200,10 @@ const css = `
 .th-table td:last-child { text-align: right; }
 .th-mono { font-family: var(--th-mono); font-size: 12px; color: var(--th-soft); }
 
-/* avatar */
 .th-av-wrap { display: flex; align-items: center; gap: 11px; }
 .th-av { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 2px solid var(--th-border); }
 .th-name { font-weight: 600; color: var(--th-ink); }
 
-/* status */
 .th-badge {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 4px 10px; border-radius: 99px;
@@ -225,7 +215,6 @@ const css = `
 .th-badge.on_leave { background: #fef3c7; color: #92400e; }
 .th-badge.on_leave::before { background: #d97706; }
 
-/* action btn */
 .th-btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 7px 16px; border-radius: 9px;
@@ -236,14 +225,12 @@ const css = `
 }
 .th-btn:hover { opacity: .85; transform: translateY(-1px); }
 
-/* empty / loading */
 .th-center-msg {
   padding: 56px; text-align: center; color: var(--th-ghost); font-size: 14px;
 }
 .th-center-msg .icon { font-size: 2rem; margin-bottom: 10px; }
 .th-error { color: #dc2626; }
 
-/* footer */
 .th-table-foot {
   padding: 14px 22px; border-top: 1px solid var(--th-border); background: var(--th-bg);
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
@@ -251,7 +238,6 @@ const css = `
 .th-foot-info { font-family: var(--th-mono); font-size: 11px; color: var(--th-ghost); }
 `;
 
-/* ── Icon helpers ─────────────────────────────────────────────────────────── */
 const Down = () => (
   <svg
     className="th-sel-caret"
@@ -270,7 +256,6 @@ const Down = () => (
   </svg>
 );
 
-/* ── COMPONENT ────────────────────────────────────────────────────────────── */
 export default function TranscriptHome() {
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<ClassData[]>([]);
@@ -437,7 +422,6 @@ export default function TranscriptHome() {
     <div className="th-root">
       <style>{css}</style>
 
-      {/* ── HEADER ── */}
       <header className="th-header">
         <div className="th-header-stripe" />
         <div className="th-header-noise" />
@@ -457,10 +441,8 @@ export default function TranscriptHome() {
           </div>
         </div>
       </header>
-
-      {/* ── FILTERS ── */}
       <div className="th-filters">
-        {/* Class */}
+    
         <div className="th-filter-block">
           <span className="th-filter-label">Class</span>
           <div className="th-sel-wrap">
@@ -508,7 +490,6 @@ export default function TranscriptHome() {
 
         <div className="th-divider" />
 
-        {/* Year */}
         <div className="th-filter-block">
           <span className="th-filter-label">Academic Year</span>
           <div className="th-sel-wrap">
@@ -551,7 +532,6 @@ export default function TranscriptHome() {
           </div>
         </div>
 
-        {/* Search */}
         <div className="th-search-wrap">
           <svg
             className="th-search-icon"
@@ -583,9 +563,8 @@ export default function TranscriptHome() {
         </div>
       </div>
 
-      {/* ── BODY ── */}
       <div className="th-body">
-        {/* Stats */}
+  
         <div className="th-stats">
           <div className="th-stat">
             <div className="th-stat-icon blue">👥</div>
@@ -615,7 +594,6 @@ export default function TranscriptHome() {
           </div>
         </div>
 
-        {/* Table */}
         <div className="th-card">
           <div className="th-card-head">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
@@ -661,7 +639,7 @@ export default function TranscriptHome() {
                   <tr>
                     <td colSpan={5}>
                       <div className="th-center-msg">
-                        <div className="icon">📋</div>
+                        <div className="icon">" "</div>
                         No students found for this selection.
                       </div>
                     </td>
@@ -670,9 +648,11 @@ export default function TranscriptHome() {
                   students.map((enrollment: any) => {
                     const s = enrollment.student ?? enrollment;
                     const status = s.status || enrollment.status;
+                    const class_info = enrollment.class_obj?.class_name;
+                    console.log(class_info);                    
                     return (
                       <tr key={enrollment.id ?? s.id}>
-                        {/* name + avatar */}
+         
                         <td>
                           <div className="th-av-wrap">
                             <div className="th-av">
@@ -701,11 +681,11 @@ export default function TranscriptHome() {
                         </td>
                         <td>
                           <span className="th-mono">
-                            {findClassName(selectedClassId)}
+                            {class_info}
                           </span>
                         </td>
 
-                        {/* status */}
+              
                         <td>
                           <span
                             className={`th-badge ${status === "active" ? "active" : "on_leave"}`}
@@ -714,10 +694,9 @@ export default function TranscriptHome() {
                           </span>
                         </td>
 
-                        {/* action */}
                         <td>
                           <Link
-                            href={`/Home/Academics/transcripts/student/${s.id}`}
+                            href={`/Home/Academics/transcripts/student/${s.id}?class=${selectedClassId}&&year=${selectedYear}`}
                             className="th-btn"
                           >
                             <svg
@@ -745,7 +724,6 @@ export default function TranscriptHome() {
             </table>
           </div>
 
-          {/* Pagination footer */}
           <div className="th-table-foot">
             <span className="th-foot-info">
               {totalResults > 0

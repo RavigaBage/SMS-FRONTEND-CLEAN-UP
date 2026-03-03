@@ -28,7 +28,6 @@ export default function StaffManagement() {
     },
   ];
 
-  // Helper to determine status class
   const getStatusClass = (status: string) => {
     switch (status) {
       case "active":
@@ -45,7 +44,7 @@ export default function StaffManagement() {
   return (
     <div className="dashboardWrapper">
       <div className="dashboard">
-        {/* Header */}
+
         <header className="header">
           <div>
             <h1>Staff Management</h1>
@@ -53,8 +52,6 @@ export default function StaffManagement() {
           </div>
           <button className="primaryBtn">Enroll Student</button>
         </header>
-
-        {/* Controls */}
         <section className="controls">
           <div className="searchBox">
             <input
@@ -81,7 +78,6 @@ export default function StaffManagement() {
           </div>
         </section>
 
-        {/* Table */}
         <main className="tableCard">
           <table className="enrollmentTable">
             <thead>

@@ -14,7 +14,6 @@
   --font-main: "Inter", system-ui, -apple-system, sans-serif;
 }
 
-/* ---------------- Reset & Base ---------------- */
 * {
   margin: 0;
   padding: 0;
@@ -32,7 +31,6 @@ body {
   padding: 2rem;
 }
 
-/* ---------------- Header ---------------- */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -97,7 +95,6 @@ body {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* ---------------- Summary Grid ---------------- */
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -150,7 +147,6 @@ body {
   transition: width 0.4s ease;
 }
 
-/* ---------------- Content Cards ---------------- */
 .content-card {
   background: var(--bg-white);
   border-radius: var(--radius-lg);
@@ -176,7 +172,6 @@ body {
   font-size: 0.9rem;
 }
 
-/* ---------------- Table Styling ---------------- */
 .attendance-table {
   width: 100%;
   border-collapse: collapse;
@@ -259,7 +254,6 @@ body {
   white-space: nowrap;
 }
 
-/* ---------------- Modal ---------------- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -365,7 +359,6 @@ textarea {
   color: #fff;
 }
 
-/* ---------------- Animations ---------------- */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -377,7 +370,6 @@ textarea {
   }
 }
 
-/* ---------------- Misc Grids & Search ---------------- */
 .grid {
   display: grid;
   gap: 1rem;

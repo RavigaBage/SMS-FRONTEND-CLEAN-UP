@@ -103,7 +103,6 @@ export function AttendanceTable({
         <tbody>
           {records.map((record) => (
             <tr key={record.id}>
-              {/* Student */}
               <td>
                 <div className="user-cell">
                   <Image
@@ -119,19 +118,16 @@ export function AttendanceTable({
                 </div>
               </td>
 
-              {/* Class */}
               <td>
                 <span className="badge badge-blue">{record.className}</span>
               </td>
 
-              {/* Date */}
               <td>
                 <span className="text-secondary">
                   {new Date(record.attendanceDate).toLocaleDateString()}
                 </span>
               </td>
 
-              {/* Status */}
               <td>
                 {editingId === record.id ? (
                   <select
@@ -155,7 +151,6 @@ export function AttendanceTable({
                 )}
               </td>
 
-              {/* Remarks */}
               <td>
                 {editingId === record.id ? (
                   <input
@@ -172,12 +167,10 @@ export function AttendanceTable({
                 )}
               </td>
 
-              {/* Marked By */}
               <td>
                 <span className="text-secondary">{record.markedBy}</span>
               </td>
 
-              {/* Actions */}
               <td>
                 {editingId === record.id ? (
                   <div className="action-buttons">

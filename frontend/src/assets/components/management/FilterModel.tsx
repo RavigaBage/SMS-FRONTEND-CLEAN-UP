@@ -45,7 +45,6 @@ export function FilterModal({
   };
 
   const handleApply = () => {
-    // Remove empty filters
     const cleanedFilters = Object.entries(localFilters).reduce(
       (acc, [key, value]) => {
         if (value !== "" && value !== undefined) {

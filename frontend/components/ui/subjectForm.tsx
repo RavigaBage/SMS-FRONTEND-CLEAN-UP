@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
-import "@/styles/formStyles.css";
 import { fetchWithAuth } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 
 type SubjectFormProps = {
   formData: Record<string, any>;
@@ -19,12 +19,12 @@ export default function SubjectForm({
   onSuccess,
 }: SubjectFormProps) {
   const [messageMsg, setMessageMsg] = useState("");
-  const [error, setError] = useState(false);
+  const [errorDetail, setErrorDetail] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setMessageMsg("");
-    setError(false);
+    setErrorDetail(null);
   }, [selectedIM]);
 
   const handleChange = (
@@ -49,6 +49,7 @@ export default function SubjectForm({
 
     setIsLoading(true);
     setMessageMsg("");
+    setErrorDetail(null);
 
     try {
       const response = await fetchWithAuth(url, {
@@ -59,125 +60,100 @@ export default function SubjectForm({
 
       if (!response.ok) {
         const err = await response.json();
-        throw err; // throws the parsed JSON object
+        throw err; 
       }
 
-      setError(false);
       setMessageMsg(
         `Subject successfully ${isEditing ? "updated" : "created"}`,
       );
       onSuccess?.();
     } catch (err: any) {
-      setError(true);
-
-      // Extract the most useful message from the backend error shape
-      const detail = err?.detail;
-      const message =
-        typeof detail === "string"
-          ? detail
-          : (detail?.non_field_errors?.[0] ??
-            Object.values(detail ?? {})
-              .flat()
-              .find((m) => typeof m === "string") ??
-            "Operation failed. Please try again.");
-
-      setMessageMsg(message);
+      setErrorDetail(extractErrorDetail(err));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="form-page">
-      <div className="form-wrapper">
-        <h2 className="text-2xl font-extrabold tracking-tight text-slate-800 mb-6">
-          Subject Form
-        </h2>
+  <div className="min-h-auto bg-slate-100 flex items-center justify-center px-4">
+    <div className="w-full max-w-2xl bg-transparent shadow-xl rounded-2xl p-8">
+      
+      <h2 className="text-3xl font-bold text-slate-800 mb-6">
+        Subject Form
+      </h2>
 
-        <form onSubmit={handleSubmit} className="teaching-form">
-          {/* ── Loader ── */}
-          {isLoading && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "10px 14px",
-                background: "#eff6ff",
-                border: "1px solid #bfdbfe",
-                marginBottom: 16,
-              }}
-            >
-              {/* Spinning ring */}
-              <div
-                style={{
-                  width: 18,
-                  height: 18,
-                  flexShrink: 0,
-                  border: "2px solid #bfdbfe",
-                  borderTopColor: "#1a56db",
-                  borderRadius: "50%",
-                  animation: "spin 0.7s linear infinite",
-                }}
-              />
-              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-              <span style={{ fontSize: 13, color: "#1a56db", fontWeight: 500 }}>
-                {selectedIM ? "Updating subject…" : "Creating subject…"}
-              </span>
-            </div>
-          )}
+      <form onSubmit={handleSubmit} className="space-y-6">
 
-          {!isLoading && messageMsg && (
-            <p className={error ? "statusError" : "statusSuccess"}>
-              {messageMsg}
-            </p>
-          )}
+        {isLoading && (
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200">
+            <div className="w-5 h-5 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+            <span className="text-sm font-medium text-blue-700">
+              {selectedIM ? "Updating subject…" : "Creating subject…"}
+            </span>
+          </div>
+        )}
+        {errorDetail && <ErrorMessage errorDetail={errorDetail} />}
+        {messageMsg && !errorDetail && (
+          <div className="p-3 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">
+            {messageMsg}
+          </div>
+        )}
 
-          <div className="feild_x">
-            <div className="feild">
-              <label>
-                Subject Name:
-                <input
-                  name="subject_name"
-                  type="text"
-                  value={formData.subject_name || ""}
-                  onChange={handleChange}
-                  placeholder="Subject name"
-                  required
-                  disabled={isLoading}
-                />
-              </label>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <div className="feild">
-              <label>
-                Subject Code:
-                <input
-                  name="subject_code"
-                  type="text"
-                  value={formData.subject_code || ""}
-                  onChange={handleChange}
-                  placeholder="SUB-101"
-                  required
-                  disabled={isLoading}
-                />
-              </label>
-            </div>
+          <div className="flex flex-col space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              Subject Name
+            </label>
+            <input
+              name="subject_name"
+              type="text"
+              value={formData.subject_name || ""}
+              onChange={handleChange}
+              placeholder="Subject name"
+              required
+              disabled={isLoading}
+              className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:bg-slate-100 disabled:cursor-not-allowed"
+            />
           </div>
 
+          <div className="flex flex-col space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              Subject Code
+            </label>
+            <input
+              name="subject_code"
+              type="text"
+              value={formData.subject_code || ""}
+              onChange={handleChange}
+              placeholder="SUB-101"
+              required
+              disabled={isLoading}
+              className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:bg-slate-100 disabled:cursor-not-allowed"
+            />
+          </div>
+
+        </div>
+
+        <div>
           <button
             type="submit"
             disabled={isLoading}
-            style={{
-              opacity: isLoading ? 0.6 : 1,
-              cursor: isLoading ? "not-allowed" : "pointer",
-              transition: "opacity 0.2s",
-            }}
+            className="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {isLoading ? (selectedIM ? "Updating…" : "Creating…") : "Submit"}
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                {selectedIM ? "Updating…" : "Creating…"}
+              </span>
+            ) : (
+              "Submit"
+            )}
           </button>
-        </form>
-      </div>
+        </div>
+
+      </form>
     </div>
-  );
+  </div>
+);
 }

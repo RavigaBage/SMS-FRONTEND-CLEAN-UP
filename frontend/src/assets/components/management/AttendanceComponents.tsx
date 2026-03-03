@@ -330,7 +330,6 @@ export function MarkAttendanceModal({
   );
 }
 
-// ============= BulkAttendance.tsx =============
 export function BulkAttendanceModal({
   isOpen,
   selectedDate,
@@ -542,7 +541,6 @@ export function BulkAttendanceModal({
   );
 }
 
-// ============= AttendanceFilter.tsx =============
 import { Filter, RotateCcw } from "lucide-react";
 
 interface FilterModalProps {

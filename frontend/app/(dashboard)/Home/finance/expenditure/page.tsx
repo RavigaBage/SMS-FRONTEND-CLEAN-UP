@@ -17,11 +17,11 @@ import {
   Download,
   Loader2,
   Filter,
+  TrendingUp
 } from "lucide-react";
 import { apiRequest, fetchWithAuth } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 import { RecordExpenseModal } from "@/src/assets/components/management/RecordExpenseModal";
-
-/* ---------------- TYPES ---------------- */
 
 export interface ApiResponse<T> {
   count?: number;
@@ -82,7 +82,6 @@ interface ApiError {
   details?: unknown;
 }
 
-/* ---------------- HELPERS ---------------- */
 
 const normalizeExpenditure = (raw: ExpenditureRaw): Expenditure => ({
   id: raw.id,
@@ -134,7 +133,7 @@ const createApiError = (
 ): ApiError => {
   if (err instanceof Error) {
     return {
-      message: err.message || defaultMessage,
+      message: String(extractErrorDetail(err) || err.message || defaultMessage),
       status: (err as any).status,
       details: err,
     };
@@ -142,7 +141,7 @@ const createApiError = (
 
   if (typeof err === "object" && err !== null) {
     return {
-      message: (err as any).message || defaultMessage,
+      message: String(extractErrorDetail(err) || (err as any).message || defaultMessage),
       status: (err as any).status,
       details: err,
     };
@@ -154,7 +153,6 @@ const createApiError = (
   };
 };
 
-/* ---------------- COMPONENT ---------------- */
 
 export default function ExpenditurePage() {
   const [expenses, setExpenses] = useState<Expenditure[]>([]);
@@ -166,7 +164,7 @@ export default function ExpenditurePage() {
   const [editing, setEditing] = useState<Expenditure | null>(null);
   const [page, setPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any>(null);
 
   const [dateRange, setDateRange] = useState({
     startDate: getCurrentMonthStart(),
@@ -181,10 +179,8 @@ export default function ExpenditurePage() {
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  // Reset page when search changes
   useEffect(() => setPage(1), [debouncedSearch]);
 
-  // Fetch data when search, page, or date range changes
   useEffect(() => {
     fetchExpenditureData({
       search: debouncedSearch,
@@ -193,8 +189,6 @@ export default function ExpenditurePage() {
       endDate: dateRange.endDate,
     });
   }, [debouncedSearch, page, dateRange]);
-
-  /* ---------------- API ---------------- */
 
   const fetchExpenditureData = useCallback(
     async (opts?: FetchExpenditureOptions) => {
@@ -214,7 +208,6 @@ export default function ExpenditurePage() {
 
         const query = buildQuery({ search, page });
 
-        // Make API calls in parallel with independent error handling
         const [listResult, statsResult] = await Promise.allSettled([
           apiRequest<ApiResponse<ExpenditureRaw>>(`/expenditures/?${query}`, {
             method: "GET",
@@ -273,8 +266,6 @@ export default function ExpenditurePage() {
     [],
   );
 
-  /* ---------------- CRUD ---------------- */
-
   const handleAddClick = () => {
     setEditing(null);
     setIsModalOpen(true);
@@ -299,12 +290,10 @@ export default function ExpenditurePage() {
       "Nov",
       "Dec",
     ];
-    const currentMonthIndex = new Date().getMonth(); // 1 for Feb in 2026
+    const currentMonthIndex = new Date().getMonth(); 
 
-    // 1. Initialize totals for each month
     const monthlyTotals = months.map((month) => ({ label: month, total: 0 }));
 
-    // 2. Sum up expenses into their respective months
     expenses.forEach((exp) => {
       if (!exp.date) return;
       const date = new Date(exp.date);
@@ -340,7 +329,6 @@ export default function ExpenditurePage() {
       console.error(err);
       const apiError = createApiError(err, "Failed to delete expenditure");
       setError(apiError.message);
-      alert(apiError.message);
     } finally {
       setLoading(false);
     }
@@ -353,7 +341,7 @@ export default function ExpenditurePage() {
       window.open(exportUrl, "_blank");
     } catch (err) {
       console.error("Export failed:", err);
-      alert("Failed to export data. Please try again.");
+      setError(extractErrorDetail(err) || "Failed to export data. Please try again.");
     }
   };
 
@@ -385,18 +373,15 @@ export default function ExpenditurePage() {
     const height = 160;
     const step = width / (trendData.length - 1);
 
-    // Map data to coordinates
     const points = trendData.map((d, i) => ({
       x: i * step,
       y: height - (parseFloat(d.height) / 100) * height,
     }));
 
-    // Function to create smooth Bezier curves
     const renderCurve = (pts: { x: number; y: number }[]) => {
       return pts.reduce((acc, point, i, a) => {
         if (i === 0) return `M ${point.x},${point.y}`;
 
-        // Control points for the curve (roughly 20% of the step distance)
         const cp1x = a[i - 1].x + step * 0.4;
         const cp1y = a[i - 1].y;
         const cp2x = point.x - step * 0.4;
@@ -412,55 +397,53 @@ export default function ExpenditurePage() {
     return { line: linePath, fill: fillPath };
   }, [trendData]);
 
-  /* ---------------- RENDER ---------------- */
 
   return (
     <div className="p-8 bg-slate-50 min-h-screen space-y-8 animate-in fade-in duration-500">
-      {/* Error Banner */}
+
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-            <span className="text-sm font-semibold">{error}</span>
-          </div>
+        <div className="flex items-center justify-between gap-3">
+          <ErrorMessage errorDetail={error} className="flex-1" />
           <button
             onClick={() => setError(null)}
             className="text-red-500 hover:text-red-700 font-bold text-lg"
           >
-            ×
+            x
           </button>
         </div>
       )}
 
-      {/* Header */}
-      <header className="flex flex-col md:flex-row justify-between items-end gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase">
-            Expenditure Management
-          </h1>
-          <p className="text-slate-500 text-sm font-medium">
-            Track school spending, utility costs, and resource procurement.
-          </p>
+
+
+
+      <header className="mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          <div className="flex-1">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl">
+                <TrendingUp size={24} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight uppercase">
+                  Expenditure Management
+                </h1>
+                <p className="text-slate-600 text-sm font-medium mt-1">
+                  Track school spending, utility costs, and resource procurement.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleAddClick}
+            className="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/30 hover:shadow-xl hover:shadow-amber-500/40 hover:scale-105 active:scale-95"
+          >
+            <Plus size={20} />
+            <span>Add Expenditure</span>
+          </button>
         </div>
-        {/* <div className="flex gap-3">
-          <button 
-            onClick={handleExport} 
-            className="flex items-center gap-2 px-5 py-2.5 bg-white border rounded-xl text-slate-700 hover:bg-slate-50 text-xs font-bold uppercase shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={loading || expenses.length === 0}
-          >
-            <Download size={16} /> Export CSV
-          </button>
-          <button 
-            onClick={handleAddClick} 
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg text-xs font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={loading}
-          >
-            <Plus size={16} /> Record Expense
-          </button>
-        </div> */}
       </header>
 
-      {/* Stats Cards */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           label="Infrastructure"
@@ -492,8 +475,6 @@ export default function ExpenditurePage() {
         />
       </section>
 
-      {/* Trend */}
-      {/* Trend Section */}
       <section className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
         <div className="flex justify-between items-center mb-10 relative z-1">
           <div>
@@ -516,27 +497,20 @@ export default function ExpenditurePage() {
             className="w-full h-full overflow-visible"
           >
             <defs>
-              {/* Smooth Gradient Fill */}
               <linearGradient id="waveGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
                 <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
               </linearGradient>
-
-              {/* Glow/Shadow for the line */}
               <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
                 <feGaussianBlur stdDeviation="3" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
             </defs>
-
-            {/* The Area Fill (The Wave) */}
             <path
               d={areaPath.fill}
               fill="url(#waveGradient)"
               className="transition-all duration-1000 ease-in-out"
             />
-
-            {/* The Main Curved Line */}
             <path
               d={areaPath.line}
               fill="none"
@@ -547,14 +521,12 @@ export default function ExpenditurePage() {
               className="transition-all duration-1000 ease-in-out"
             />
 
-            {/* Highlighters loop (The code you provided) */}
             {trendData.map((d, i) => {
               const x = (i * 1000) / (trendData.length - 1);
               const y = 160 - (parseFloat(d.height) / 100) * 160;
 
               return (
                 <g key={i} className="group/point">
-                  {/* Vertical Guide line */}
                   <line
                     x1={x}
                     y1="0"
@@ -565,7 +537,6 @@ export default function ExpenditurePage() {
                     strokeDasharray="4"
                   />
 
-                  {/* Invisible Hover Area */}
                   <circle
                     cx={x}
                     cy={y}
@@ -573,8 +544,6 @@ export default function ExpenditurePage() {
                     fill="transparent"
                     className="cursor-pointer"
                   />
-
-                  {/* The Dot */}
                   <circle
                     cx={x}
                     cy={y}
@@ -584,8 +553,6 @@ export default function ExpenditurePage() {
                     } transition-all duration-300 group-hover/point:scale-125 group-hover/point:fill-blue-600`}
                     strokeWidth="3"
                   />
-
-                  {/* Tooltip */}
                   <g className="opacity-0 group-hover/point:opacity-100 transition-all duration-200 pointer-events-none translate-y-2 group-hover/point:translate-y-0">
                     <rect
                       x={x - 45}
@@ -614,7 +581,6 @@ export default function ExpenditurePage() {
           </svg>
         </div>
 
-        {/* X-Axis Labels */}
         <div className="flex justify-between mt-4 px-1">
           {trendData.map((d) => (
             <span
@@ -626,8 +592,6 @@ export default function ExpenditurePage() {
           ))}
         </div>
       </section>
-
-      {/* Table */}
       <main className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-6 border-b bg-slate-50/30 flex justify-between items-center">
           <div className="relative w-full max-w-sm">
@@ -644,12 +608,6 @@ export default function ExpenditurePage() {
               disabled={loading}
             />
           </div>
-          {/* <button 
-            className="p-3 bg-white border rounded-xl hover:bg-slate-50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={loading}
-          >
-            <Filter size={18} className="text-slate-600" />
-          </button> */}
         </div>
 
         <div className="overflow-x-auto">
@@ -741,7 +699,7 @@ export default function ExpenditurePage() {
                       />
                     </td>
                     <td className="px-8 py-5 text-right">
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex justify-end gap-2   transition-opacity">
                         <button
                           onClick={() => handleEditClick(exp)}
                           className="px-3 py-1.5 bg-white border rounded-lg text-[10px] font-black uppercase text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -764,8 +722,6 @@ export default function ExpenditurePage() {
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
         {!loading && expenses.length > 0 && (
           <div className="p-4 flex justify-between items-center bg-slate-50">
             <div className="text-sm text-slate-500">
@@ -794,7 +750,6 @@ export default function ExpenditurePage() {
         )}
       </main>
 
-      {/* Modal */}
       <RecordExpenseModal
         key={editing?.id || "new"}
         isOpen={isModalOpen}
@@ -805,8 +760,6 @@ export default function ExpenditurePage() {
     </div>
   );
 }
-
-/* ---------------- SUBCOMPONENTS ---------------- */
 
 function StatCard({ label, value, icon, color, loading }: any) {
   const colors: any = {
@@ -848,7 +801,6 @@ const TrendBar = ({ height, label, active = false, tooltip }: any) => {
           style={{ height: height }}
         />
 
-        {/* Tooltip shows actual $ value */}
         <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-2 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all transform group-hover:-translate-y-1 pointer-events-none z-10 whitespace-nowrap shadow-xl">
           {tooltip}
           <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900" />

@@ -37,7 +37,7 @@ interface FilterState {
 }
 
 export default function TeachersDirectoryPage() {
-  // State Management
+
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -51,9 +51,8 @@ export default function TeachersDirectoryPage() {
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<FilterState>({});
 
-  const resultsPerPage = 10;
+  const resultsPerPage = 20;
 
-  // Fetch Teachers
   const fetchTeachers = async (
     page: number,
     search: string,
@@ -109,7 +108,6 @@ export default function TeachersDirectoryPage() {
     }
   };
 
-  // Delete Teacher
   const handleDelete = async (teacherId: number) => {
     if (
       !confirm(
@@ -132,7 +130,6 @@ export default function TeachersDirectoryPage() {
     }
   };
 
-  // Deactivate Teacher
   const handleDeactivate = async (teacherId: number) => {
     try {
       await apiRequest(`/teachers/${teacherId}/deactivate/`, {
@@ -147,25 +144,21 @@ export default function TeachersDirectoryPage() {
     }
   };
 
-  // View Details
   const handleViewDetails = (teacher: Teacher) => {
     setSelectedTeacher(teacher);
     setIsDetailsModalOpen(true);
   };
 
-  // Edit Teacher
   const handleEdit = (teacher: Teacher) => {
     setSelectedTeacher(teacher);
     setIsEditModalOpen(true);
   };
 
-  // Assign Subjects
   const handleAssignSubjects = (teacher: Teacher) => {
     setSelectedTeacher(teacher);
     setIsAssignModalOpen(true);
   };
 
-  // Export to CSV
   const handleExport = async () => {
     try {
       toast.loading("Preparing export...");
@@ -181,7 +174,6 @@ export default function TeachersDirectoryPage() {
         },
       );
 
-      // Convert to CSV
       const headers = [
         "ID",
         "Full Name",
@@ -214,7 +206,6 @@ export default function TeachersDirectoryPage() {
         ),
       ].join("\n");
 
-      // Download
       const blob = new Blob([csv], { type: "text/csv" });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -230,15 +221,11 @@ export default function TeachersDirectoryPage() {
       toast.error("Failed to export teachers");
     }
   };
-
-  // Apply Filters
   const handleApplyFilters = (newFilters: FilterState) => {
     setFilters(newFilters);
     setCurrentPage(1);
     setIsFilterModalOpen(false);
   };
-
-  // Trigger fetch on page, search, or filter change
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchTeachers(currentPage, searchTerm, filters);
@@ -251,7 +238,6 @@ export default function TeachersDirectoryPage() {
 
   return (
     <div className="staff-page">
-      {/* Header */}
       <div className="page-header">
         <div className="page-title-group">
           <h1 className="page-title">
@@ -279,7 +265,6 @@ export default function TeachersDirectoryPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-content">
@@ -322,7 +307,6 @@ export default function TeachersDirectoryPage() {
         </div>
       </div>
 
-      {/* Search & Filters */}
       <div className="control-bar">
         <div className="search-wrapper">
           <Search className="search-icon" size={20} />
@@ -359,7 +343,6 @@ export default function TeachersDirectoryPage() {
         </div>
       </div>
 
-      {/* Table & Pagination */}
       <div className={`table-section ${loading ? "is-loading" : ""}`}>
         <div className="table-container">
           <TeacherTable
@@ -404,7 +387,6 @@ export default function TeachersDirectoryPage() {
         )}
       </div>
 
-      {/* Modals */}
       <AddTeacherModal
         isOpen={isAddModalOpen}
         onClose={() => {

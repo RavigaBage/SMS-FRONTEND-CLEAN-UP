@@ -2,13 +2,11 @@ import Link from "next/dist/client/link";
 import { Student } from "../../types/api";
 import { Trash2, Users } from "lucide-react";
 import Image from "next/image";
-import { image } from "framer-motion/client";
 interface StudentTableProps {
   students: Student[];
   onDelete: (id: number) => void;
 }
 export function StudentTable({ students, onDelete }: StudentTableProps) {
-  console.log(students);
 
   return (
     <div className="bg-white overflow-hidden">

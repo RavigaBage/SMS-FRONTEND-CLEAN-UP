@@ -40,7 +40,7 @@ interface FilterState {
 }
 
 export default function StudentAttendancePage() {
-  // State Management
+
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [isMarkModalOpen, setIsMarkModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -66,7 +66,6 @@ export default function StudentAttendancePage() {
 
   const resultsPerPage = 20;
 
-  // Fetch Attendance
   const fetchAttendance = async (
     page: number,
     search: string,
@@ -92,7 +91,6 @@ export default function StudentAttendancePage() {
         previous: res.previous ?? null,
         results: res.results ?? [],
       };
-      console.log(data.results);
 
       const formattedAttendance = data.results.map((a: any) => ({
         id: a.id,
@@ -117,7 +115,6 @@ export default function StudentAttendancePage() {
       setAttendance(formattedAttendance);
       setTotalResults(data.count);
 
-      // Calculate stats
       calculateStats(formattedAttendance);
     } catch (err: any) {
       console.error("Error fetching attendance:", err);
@@ -127,7 +124,6 @@ export default function StudentAttendancePage() {
     }
   };
 
-  // Calculate Stats
   const calculateStats = (records: AttendanceRecord[]) => {
     const total = records.length;
     const present = records.filter((r) => r.status === "present").length;
@@ -137,8 +133,6 @@ export default function StudentAttendancePage() {
 
     setStats({ total, present, absent, late, excused });
   };
-
-  // Update Attendance
   const handleUpdateAttendance = async (
     id: number,
     status: string,
@@ -158,7 +152,6 @@ export default function StudentAttendancePage() {
     }
   };
 
-  // Delete Attendance
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this attendance record?")) {
       return;
@@ -176,8 +169,6 @@ export default function StudentAttendancePage() {
       toast.error(err?.detail || "Failed to delete attendance record");
     }
   };
-
-  // Export to CSV
   const handleExport = async () => {
     try {
       toast.loading("Preparing export...");
@@ -235,14 +226,12 @@ export default function StudentAttendancePage() {
     }
   };
 
-  // Apply Filters
   const handleApplyFilters = (newFilters: FilterState) => {
     setFilters(newFilters);
     setCurrentPage(1);
     setIsFilterModalOpen(false);
   };
 
-  // Trigger fetch on changes
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchAttendance(currentPage, searchTerm, selectedDate, filters);
@@ -257,7 +246,7 @@ export default function StudentAttendancePage() {
 
   return (
     <div className="attendance-page">
-      {/* Header */}
+      
       <div className="page-header">
         <div className="page-title-group">
           <h1 className="page-title">
@@ -293,13 +282,11 @@ export default function StudentAttendancePage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <AttendanceStatsCards
         stats={stats}
         attendanceRate={Number(attendanceRate)}
       />
 
-      {/* Date & Controls */}
       <div className="attendance-controls">
         <div className="date-selector">
           <Calendar size={20} />
@@ -340,7 +327,6 @@ export default function StudentAttendancePage() {
         </button>
       </div>
 
-      {/* Table & Pagination */}
       <div className={`table-section ${loading ? "is-loading" : ""}`}>
         <div className="table-container">
           <AttendanceTable
@@ -380,7 +366,6 @@ export default function StudentAttendancePage() {
         )}
       </div>
 
-      {/* Modals */}
       <MarkAttendanceModal
         isOpen={isMarkModalOpen}
         selectedDate={selectedDate}

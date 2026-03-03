@@ -13,7 +13,6 @@
   --font-main: "Inter", system-ui, sans-serif;
 }
 
-/* Base */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -31,7 +30,6 @@ body {
   margin: 0 auto;
 }
 
-/* Header */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -44,7 +42,6 @@ body {
   font-weight: 700;
 }
 
-/* Buttons */
 .btn {
   padding: 0.7rem 1.5rem;
   border-radius: var(--radius-md);
@@ -63,14 +60,12 @@ body {
   color: #fff;
 }
 
-/* Layout */
 .settings-layout {
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 2rem;
 }
 
-/* Sidebar */
 .settings-nav {
   background: var(--bg-white);
   border-radius: var(--radius-lg);
@@ -94,7 +89,6 @@ body {
   color: var(--primary-blue);
 }
 
-/* Card */
 .settings-card {
   background: var(--bg-white);
   border-radius: var(--radius-lg);
@@ -113,7 +107,6 @@ body {
   margin-top: 2.5rem;
 }
 
-/* Form */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -144,7 +137,6 @@ textarea {
   font-size: 0.95rem;
 }
 
-/* Toggle */
 .setting-row {
   display: flex;
   justify-content: space-between;
@@ -200,7 +192,6 @@ input:checked + .slider::before {
   transform: translateX(20px);
 }
 
-/* Danger */
 .danger-zone {
   margin-top: 2rem;
   padding: 1.5rem;

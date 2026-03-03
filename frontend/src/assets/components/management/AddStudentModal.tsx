@@ -46,7 +46,7 @@ export function AddStudentModal({
     middle_name: "",
     admission_number: GenerateStudentAdmissionNumber(),
     date_of_birth: "",
-    admission_date: new Date().toISOString().split("T")[0], // Default to today
+    admission_date: new Date().toISOString().split("T")[0],
     gender: "male",
     status: "active",
     class_id: "",
@@ -55,7 +55,6 @@ export function AddStudentModal({
 
   const [formData, setFormData] = useState(initialData);
 
-  // Fetch classes so user can pick from a list instead of typing an ID
   useEffect(() => {
     if (isOpen) {
       const fetchClasses = async () => {
@@ -76,10 +75,16 @@ export function AddStudentModal({
     setError(null);
 
     try {
+ 
+      if (!formData.class_id || !formData.class_id.toString().trim()) {
+        setError("To add a student, assign the student to a specific class");
+        return;
+      }
+
       const payload = {
         ...formData,
-        class_obj: formData.class_id || null,
-        parents: [], // Keep as empty list per your requirement
+        class_obj: Number(formData.class_id), 
+        parents: [],
       };
 
       const result = await apiRequest<Student>("/students/", {
@@ -87,28 +92,37 @@ export function AddStudentModal({
         body: JSON.stringify(payload),
       });
 
-      console.log("Student created:", result);
       const student = result?.data ?? result;
 
-      setFormData(initialData);
-      onSuccess(); // optional
-      onClose();
-      console.log("creation was a success");
+      if (student) {
+        onSuccess();
+        onClose();
+        setFormData(initialData);
+      }
+
     } catch (err: any) {
-      // Simple error handling: extract message from DRF response
-      const errorMsg = err.response?.data
-        ? Object.entries(err.response.data)
-            .map(([k, v]) => `${k}: ${v}`)
-            .join(", ")
-        : "Failed to register student. Please check the fields.";
-      setError(errorMsg);
+      const response = err?.response?.data;
+
+      if (response) {
+    
+        Object.keys(response).forEach((field) => {
+          const message = Array.isArray(response[field])
+            ? response[field][0]
+            : response[field];
+
+          setError(message);
+        });
+      } else {
+        setError( "Failed to register student. Please check the fields.");
+      }
     } finally {
       setLoading(false);
     }
+    GenerateStudentAdmissionNumber();
   };
 
   function GenerateStudentAdmissionNumber(classCode = "SNS", lastNumber = 0) {
-    const year = new Date().getFullYear();
+    const year = new Date().getTime();
     const seq = String(lastNumber + 1).padStart(3, "0");
     return `${year}${classCode}${seq}`;
   }
@@ -118,22 +132,22 @@ export function AddStudentModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white w-full max-w-xl rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden transform animate-in zoom-in-95 duration-200">
-        {/* Header */}
         <div className="px-6 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
           <div>
             <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">
               Student Registration
             </h2>
             {error && (
-              <p className="text-[10px] text-red-500 font-bold mt-1">{error}</p>
+              <p className="text-[18px] text-red-500 font-bold mt-1">{error}</p>
             )}
           </div>
           <button
-            onClick={onClose}
-            className="p-1.5 hover:bg-slate-100 rounded-full transition-colors"
-          >
-            <X size={18} className="text-slate-400" />
-          </button>
+              onClick={onClose}
+              className="p-2 hover:bg-red-100 rounded-full transition-all duration-200 group"
+              aria-label="Close"
+            >
+              <X size={20} className="text-red-500 group-hover:text-red-600 transition-colors" />
+            </button>
         </div>
 
         <form
@@ -266,12 +280,14 @@ export function AddStudentModal({
             </div>
           </div>
 
-          {/* Footer Actions */}
           <div className="flex gap-2 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 bg-slate-50 text-slate-400 font-black rounded-xl hover:bg-slate-100 transition-all text-[10px] uppercase tracking-widest"
+              className="flex-1 py-3 border bg-red-700 border-red-500 text-white-600 font-semibold rounded-xl 
+                        hover:bg-white-50 
+                        transition-all duration-200 
+                        text-xs uppercase tracking-widest"
             >
               Cancel
             </button>

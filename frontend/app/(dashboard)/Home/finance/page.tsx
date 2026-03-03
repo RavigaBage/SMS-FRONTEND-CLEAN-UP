@@ -5,8 +5,6 @@ import "@/styles/finance.css";
 
 export default function FinancePage() {
   useEffect(() => {
-    // Chart.js setup can go here later
-    // Example: initialize charts after mount
   }, []);
 
   return (

@@ -63,7 +63,6 @@ export function TeacherTable({
         <tbody>
           {teachers.map((teacher) => (
             <tr key={teacher.id}>
-              {/* Teacher Info */}
               <td>
                 <div className="user-cell">
                   <Image
@@ -82,14 +81,12 @@ export function TeacherTable({
                 </div>
               </td>
 
-              {/* Specialization */}
               <td>
                 <span className="badge badge-purple">
                   {teacher.specialization || "General"}
                 </span>
               </td>
 
-              {/* Subjects */}
               <td>
                 <div className="subjects-cell">
                   {teacher.subjects.length > 0 ? (
@@ -118,7 +115,6 @@ export function TeacherTable({
                 </div>
               </td>
 
-              {/* Experience */}
               <td>
                 <span className="text-secondary">
                   {teacher.yearsOfExperience} year
@@ -126,12 +122,10 @@ export function TeacherTable({
                 </span>
               </td>
 
-              {/* Contact */}
               <td>
                 <span className="text-secondary">{teacher.phoneNumber}</span>
               </td>
 
-              {/* Status */}
               <td>
                 {teacher.isActive ? (
                   <span className="status-badge status-active">Active</span>
@@ -140,7 +134,6 @@ export function TeacherTable({
                 )}
               </td>
 
-              {/* Actions */}
               <td>
                 <div className="action-buttons">
                   <button

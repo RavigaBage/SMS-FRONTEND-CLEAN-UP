@@ -79,7 +79,6 @@
   color: var(--text-dark);
 }
 
-/* --- MAIN CONTENT --- */
 .main-view {
   flex: 1;
   display: flex;
@@ -122,7 +121,6 @@
   gap: 25px;
 }
 
-/* KPI Cards */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -163,7 +161,6 @@
   color: #ef4444;
 }
 
-/* Charts */
 .chart-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -178,7 +175,6 @@
   min-height: 380px;
 }
 
-/* Tables */
 .table-card {
   background: white;
   border-radius: var(--radius-lg);
@@ -208,7 +204,6 @@ td {
   border-bottom: 1px solid var(--border);
 }
 
-/* --- RIGHT PANEL --- */
 .right-panel {
   display: flex;
   flex-direction: column;
@@ -342,7 +337,6 @@ td {
   border-radius: 50%;
 }
 
-/* KPI */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -381,14 +375,12 @@ td {
   background: #f0fdfa;
 }
 
-/* Charts */
 .chart-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-/* Bars */
 .bar-chart {
   display: flex;
   align-items: flex-end;
@@ -414,7 +406,6 @@ td {
   height: 45%;
 }
 
-/* Table */
 .status.paid {
   background: #f0fdf4;
   color: #16a34a;

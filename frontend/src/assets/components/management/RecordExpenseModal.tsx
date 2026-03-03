@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 
 interface ExpenseModalProps {
   isOpen: boolean;
@@ -20,8 +21,8 @@ export function RecordExpenseModal({
   const [loading, setLoading] = useState(false);
   const [staffList, setStaffList] = useState<any[]>([]);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [errorDetail, setErrorDetail] = useState<any>(null);
 
-  console.log(editData);
   const [formData, setFormData] = useState({
     expenditure_number: editData?.expenditureNumber || "",
     item_name: editData?.itemName || "",
@@ -51,36 +52,63 @@ export function RecordExpenseModal({
     }
   }, [isOpen]);
 
+  const extractErrorMessage = (detail: string): string => {
+    if (!detail) return "Something went wrong.";
+    try {
+      const matches = [...detail.matchAll(/string='([^']+)'/g)];
+      if (matches.length > 0) return matches.map((m) => m[1]).join(", ");
+
+      const jsonString = detail
+        .replace(/'/g, '"')
+        .replace(/\bNone\b/g, "null")
+        .replace(/\bTrue\b/g, "true")
+        .replace(/\bFalse\b/g, "false");
+
+      const parsed = JSON.parse(jsonString);
+      const firstKey = Object.keys(parsed)[0];
+      const firstVal = parsed[firstKey];
+      return Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
+    } catch {
+      return detail;
+    }
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrors({});
+    setErrorDetail(null);
     try {
-      await apiRequest("/expenditures/", {
+      var response = await apiRequest("/expenditures/", {
         method: "POST",
         body: JSON.stringify({
           ...formData,
           amount: parseFloat(formData.amount),
         }),
       });
+      if(response?.data === null){
+        setErrorDetail(extractErrorMessage(response?.error as any));
+        return
+      }
       onSuccess();
       onClose();
-      setFormData({
-        expenditure_number: generateExpenditureNumber(),
-        item_name: "",
-        category: "",
-        description: "",
-        vendor_name: "",
-        amount: "",
-        date: new Date().toISOString().split("T")[0],
-        staff_id: "",
-        status: "Pending",
-      });
+      setFormData(
+          {
+          expenditure_number: generateExpenditureNumber(),
+          item_name: "",
+          category: "",
+          description: "",
+          vendor_name: "",
+          amount: "",
+          date: new Date().toISOString().split("T")[0],
+          staff_id: "",
+          status: "Pending",
+        }
+      );
     } catch (err: any) {
       if (err?.errors) {
         setErrors(err.errors);
       } else {
-        alert("Failed to record expense.");
+        setErrorDetail(extractErrorDetail(err) || "Failed to record expense.");
         console.error(err);
       }
     } finally {
@@ -111,6 +139,7 @@ export function RecordExpenseModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {errorDetail && <ErrorMessage errorDetail={errorDetail} />}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
@@ -122,7 +151,7 @@ export function RecordExpenseModal({
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none text-sm"
                 value={
                   editData?.expenditure_number ||
-                  formData.expenditure_number ||
+                  formData.expenditure_number || generateExpenditureNumber() ||
                   "auto gen"
                 }
                 onChange={(e) =>
@@ -193,10 +222,15 @@ export function RecordExpenseModal({
                   setFormData({ ...formData, category: e.target.value })
                 }
               >
-                <option value="infrastructure">Infrastructure</option>
+                <option value="">select category</option>
+                <option value="transport">transport</option>
                 <option value="academic">Academic</option>
                 <option value="utilities">Utilities</option>
+                <option value="supplies">supplies</option>
+                <option value="maintenance">maintenance</option>
+                <option value="salaries">salaries</option>
                 <option value="maintenance">Maintenance</option>
+                <option value="other">others</option>
               </select>
               {errors.category && (
                 <p className="text-rose-600 text-[10px] font-bold">

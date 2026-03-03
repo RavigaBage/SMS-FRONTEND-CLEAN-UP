@@ -20,6 +20,10 @@ import {
   Trash2,
 } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
+import { Pagination } from "@/src/assets/components/management/Pagination";
+
+const PAGE_SIZE = 20;
 
 interface Payment {
   id: number;
@@ -62,7 +66,7 @@ function RecordPaymentModal({
   const isEdit = Boolean(initialPayment);
   const [loading, setLoading] = useState(false);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -79,15 +83,13 @@ function RecordPaymentModal({
     setError(null);
     setSuccess(false);
 
-    // If editing, prefill known fields from initialPayment
     if (isEdit && initialPayment) {
       setFormData({
-        invoice_id: "", // we don't have invoice id in initialPayment; keep blank and show readonly header
+        invoice_id: "",
         amount_paid: String(initialPayment.amount),
         payment_method: initialPayment.method || "cash",
         transaction_reference: initialPayment.reference || "",
       });
-      // still fetch invoices in case user wants to change invoice when editing (optional)
     } else {
       setFormData({
         invoice_id: "",
@@ -100,7 +102,6 @@ function RecordPaymentModal({
     setInvoices([]);
     (async () => {
       try {
-        // Only load unpaid invoices for creation flow; for edit it's okay to fetch too
         const raw = await apiRequest<any>("/invoices/?status=unpaid");
         const payload = unwrap<Invoice[] | Invoice>(raw);
         const arr = Array.isArray(payload)
@@ -156,7 +157,6 @@ function RecordPaymentModal({
           body: JSON.stringify(payload),
         });
       } else {
-        // PATCH existing payment
         await apiRequest<any>(`/payments/${initialPayment!.id}/`, {
           method: "PATCH",
           body: JSON.stringify(payload),
@@ -169,40 +169,38 @@ function RecordPaymentModal({
         onClose();
       }, 700);
     } catch (err: any) {
-      const detail = err?.message || err?.detail;
-      if (detail && typeof detail === "object") {
-        const msgs = Object.entries(detail)
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
-          .join(" · ");
-        setError(msgs);
-      } else {
-        setError(
-          String(
-            detail ||
-              (isEdit
-                ? "Failed to update payment. Please try again."
-                : "Failed to record payment. Please try again."),
-          ),
-        );
-      }
+      setError(
+        extractErrorDetail(err) ||
+          (isEdit
+            ? "Failed to update payment. Please try again."
+            : "Failed to record payment. Please try again."),
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const generateID = (): string => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    return `TXN-${year}${month}${day}-${random}`;
+  };
+
   if (!isOpen) return null;
 
-  // If editing and invoice info exists in initialPayment, show it as readonly header
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 m-0 flex items-center justify-center p-4"
       style={{ background: "rgba(15,23,42,0.45)", backdropFilter: "blur(4px)" }}
     >
       <div
         className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden"
         style={{ animation: "modalIn 0.22s cubic-bezier(.4,0,.2,1)" }}
       >
-        {/* Header */}
         <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-slate-100">
           <div>
             <h2 className="text-lg font-bold text-slate-900">
@@ -227,23 +225,15 @@ function RecordPaymentModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+            className="p-2.5 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition-all duration-200 hover:scale-110"
+            aria-label="Close"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Body */}
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
-          {/* Error banner */}
-          {error && (
-            <div className="flex items-start gap-3 px-4 py-3 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700">
-              <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {/* Success banner */}
+          {error && <ErrorMessage errorDetail={error} className="rounded-xl" />}
           {success && (
             <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700">
               <CheckCircle2 size={16} className="shrink-0" />
@@ -251,7 +241,6 @@ function RecordPaymentModal({
             </div>
           )}
 
-          {/* Invoice selector (only for create) */}
           {!isEdit && (
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
@@ -273,8 +262,6 @@ function RecordPaymentModal({
               </select>
             </div>
           )}
-
-          {/* Amount */}
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
               Amount (GHS) *
@@ -298,7 +285,6 @@ function RecordPaymentModal({
             </div>
           </div>
 
-          {/* Payment method */}
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
               Payment Method *
@@ -331,7 +317,6 @@ function RecordPaymentModal({
             </div>
           </div>
 
-          {/* Reference (optional) */}
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
               Transaction Reference{" "}
@@ -341,7 +326,7 @@ function RecordPaymentModal({
             </label>
             <input
               type="text"
-              value={formData.transaction_reference}
+              value={formData.transaction_reference || generateID()}
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -353,7 +338,6 @@ function RecordPaymentModal({
             />
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3 pt-1">
             <button
               type="button"
@@ -399,8 +383,6 @@ function RecordPaymentModal({
   );
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
-
 function StatCard({
   icon,
   label,
@@ -435,26 +417,33 @@ function StatCard({
   );
 }
 
-// ─── Payments Page ────────────────────────────────────────────────────────────
-
 export default function PaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalPayment, setModalPayment] = useState<Payment | null>(null); // null = create, object = edit
+  const [modalPayment, setModalPayment] = useState<Payment | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingId, setDeleteingId] = useState<number | null>(null);
+  const [pageError, setPageError] = useState<any>(null);
 
-  const fetchPayments = async () => {
+
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
+
+  const fetchPayments = async (pageNumber: number) => {
     setLoading(true);
+    setPageError(null);
     try {
-      const res = await apiRequest<any>("/payments/");
+      const res = await apiRequest<any>(`/payments/?page=${pageNumber}`);
       const rows: any[] = Array.isArray(res.results)
         ? res.results
         : Array.isArray(res.data)
           ? res.data
           : [];
 
+      setTotalCount(res.count || rows.length);
       setPayments(
         rows.map((p) => ({
           id: p.id,
@@ -470,14 +459,20 @@ export default function PaymentsPage() {
       );
     } catch (err) {
       console.error("Failed to load payments", err);
+      setPageError(extractErrorDetail(err) || "Failed to load payments.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPayments();
-  }, []);
+    fetchPayments(page);
+  }, [page]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setPage(newPage);
+  };
 
   const filtered = payments.filter(
     (p) =>
@@ -502,21 +497,21 @@ export default function PaymentsPage() {
       "Delete this payment? This action cannot be undone.",
     );
     if (!ok) return;
-    setDeletingId(id);
+    setDeleteingId(id);
     try {
       await apiRequest<any>(`/payments/${id}/`, { method: "DELETE" });
-      await fetchPayments();
+      await fetchPayments(page);
     } catch (err) {
       console.error("Failed to delete payment", err);
-      alert("Failed to delete payment. Please try again.");
+      setPageError(extractErrorDetail(err) || "Failed to delete payment. Please try again.");
     } finally {
-      setDeletingId(null);
+      setDeleteingId(null);
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Header */}
+      {pageError && <ErrorMessage errorDetail={pageError} />}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Payments</h1>
@@ -526,7 +521,7 @@ export default function PaymentsPage() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={fetchPayments}
+            onClick={() => fetchPayments(page)}
             title="Refresh"
             className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-500 transition"
           >
@@ -541,7 +536,6 @@ export default function PaymentsPage() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <StatCard
           icon={<Clock size={22} />}
@@ -552,20 +546,18 @@ export default function PaymentsPage() {
         <StatCard
           icon={<CheckCircle2 size={22} />}
           label="Transactions"
-          value={String(payments.length)}
+          value={String(totalCount)}
           color="emerald"
         />
         <StatCard
           icon={<AlertCircle size={22} />}
-          label="Pending Invoices"
-          value="—"
+          label="Page"
+          value={`${page} / ${totalPages}`}
           color="rose"
         />
       </div>
 
-      {/* Table card */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        {/* Toolbar */}
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60 flex justify-between items-center">
           <div className="relative w-72">
             <Search
@@ -584,7 +576,6 @@ export default function PaymentsPage() {
           </button>
         </div>
 
-        {/* Table */}
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 border-b border-slate-100">
             <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -668,7 +659,7 @@ export default function PaymentsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                    <div className="flex justify-end gap-1 transition-all">
                       <button
                         className="p-1.5 hover:bg-blue-50 text-blue-600 rounded-lg transition"
                         title="View"
@@ -704,23 +695,30 @@ export default function PaymentsPage() {
           </tbody>
         </table>
 
-        {/* Footer */}
-        {!loading && filtered.length > 0 && (
-          <div className="px-6 py-3 border-t border-slate-100 bg-slate-50/50 text-xs text-slate-400 flex justify-between">
-            <span>
-              Showing {filtered.length} of {payments.length} transactions
-            </span>
-            <span>
-              Total:{" "}
-              <strong className="text-slate-600">
-                GHS{" "}
-                {totalRevenue.toLocaleString("en-GH", {
-                  minimumFractionDigits: 2,
-                })}
-              </strong>
-            </span>
-          </div>
-        )}
+        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-between items-center">
+          <span className="text-xs text-slate-500 font-medium">
+            Showing {filtered.length} of {totalCount} transactions
+          </span>
+          <span className="text-xs text-slate-500 font-medium">
+            Total:{" "}
+            <strong className="text-slate-700">
+              GHS{" "}
+              {totalRevenue.toLocaleString("en-GH", {
+                minimumFractionDigits: 2,
+              })}
+            </strong>
+          </span>
+        </div>
+
+        <div className="px-6 py-4 border-t border-slate-100 bg-white">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalResults={totalCount}
+            resultsPerPage={PAGE_SIZE}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </div>
 
       <RecordPaymentModal
@@ -730,7 +728,7 @@ export default function PaymentsPage() {
           setModalPayment(null);
         }}
         onSuccess={() => {
-          fetchPayments();
+          fetchPayments(page);
         }}
         initialPayment={modalPayment}
       />

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/src/lib/apiClient";
-// ─── Types ────────────────────────────────────────────────────────────────────
 type EmailConfig = {
   backend: "console" | "smtp";
   host: string;
@@ -27,7 +26,6 @@ const DEFAULT_CONFIG: EmailConfig = {
   school_name: "",
 };
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
 function Field({
   label,
   hint,
@@ -135,7 +133,6 @@ function SectionCard({
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function EmailConfigPage() {
   const [config, setConfig] = useState<EmailConfig>(DEFAULT_CONFIG);
   const [saving, setSaving] = useState(false);
@@ -148,7 +145,6 @@ export default function EmailConfigPage() {
   const set = <K extends keyof EmailConfig>(key: K, value: EmailConfig[K]) =>
     setConfig((prev) => ({ ...prev, [key]: value }));
 
-  // Load config on mount
   useEffect(() => {
     apiRequest(`/api/settings/email/`)
       .then((r) => r.results)
@@ -168,7 +164,6 @@ export default function EmailConfigPage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch {
-      /* handle error */
     } finally {
       setSaving(false);
     }
@@ -185,7 +180,6 @@ export default function EmailConfigPage() {
       });
       const response = await res;
       const data = response.data;
-      console.log(response);
       if (data) {
         setTestStatus("success");
         setTestMessage(`Test email sent to ${testEmail}`);
@@ -203,7 +197,7 @@ export default function EmailConfigPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      {/* ── Page header ── */}
+
       <div className="border-b border-slate-200 bg-white sticky top-0 z-10 backdrop-blur">
         <div className="w-full mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -286,7 +280,7 @@ export default function EmailConfigPage() {
       </div>
 
       <div className="w-full mx-auto px-6 py-8 space-y-6">
-        {/* ── Backend toggle ── */}
+   
         <SectionCard
           title="Email Backend"
           description="Choose how emails are sent. Use Console in development to preview emails in your terminal."
@@ -344,7 +338,6 @@ export default function EmailConfigPage() {
           )}
         </SectionCard>
 
-        {/* ── School info ── */}
         <SectionCard
           title="School Information"
           description="Used in email templates and the sender name shown to parents."
@@ -386,7 +379,6 @@ export default function EmailConfigPage() {
           </Field>
         </SectionCard>
 
-        {/* ── SMTP settings ── */}
         <SectionCard
           title="SMTP Settings"
           description="Required when using the SMTP backend. Use Gmail App Passwords — never your real Gmail password."
@@ -504,7 +496,6 @@ export default function EmailConfigPage() {
           </div>
         </SectionCard>
 
-        {/* ── Send test email ── */}
         <SectionCard
           title="Send Test Email"
           description="Verify your configuration is working by sending a test email."

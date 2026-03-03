@@ -17,7 +17,6 @@ export default function ProfilesList() {
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  // Fetch students from DRF backend
   useEffect(() => {
     const fetchStudents = async () => {
       try {
@@ -36,7 +35,6 @@ export default function ProfilesList() {
     fetchStudents();
   }, []);
 
-  // Filtered list based on search query
   const filteredStudents = students.filter(
     (s) =>
       s.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -45,7 +43,7 @@ export default function ProfilesList() {
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-8">
-      {/* Header */}
+  
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-800">Students</h1>
         <p className="text-sm text-gray-500">
@@ -53,7 +51,6 @@ export default function ProfilesList() {
         </p>
       </div>
 
-      {/* Search */}
       <div className="mb-4">
         <input
           type="text"
@@ -64,7 +61,6 @@ export default function ProfilesList() {
         />
       </div>
 
-      {/* Students Table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-6 text-center text-gray-500">

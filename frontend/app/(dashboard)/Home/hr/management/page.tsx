@@ -1,10 +1,9 @@
 import React from "react";
-import "@/styles/management_1.css"; // Adjust the path as needed
+import "@/styles/management_1.css"; 
 
 export default function StaffProfilePage() {
   return (
     <div className="pageContainer">
-      {/* Main Content */}
       <main className="mainContent">
         <header className="header">
           <div className="breadcrumb">Staff / Sarah Jenkins / Profile</div>
@@ -25,7 +24,6 @@ export default function StaffProfilePage() {
           </div>
         </header>
 
-        {/* Profile Banner */}
         <section className="profileBanner">
           <div className="profileHeader">
             <div className="profileInfo">
@@ -50,7 +48,6 @@ export default function StaffProfilePage() {
           </div>
         </section>
 
-        {/* Stats Grid */}
         <div className="statsGrid">
           <div className="statCard">
             <div className="statHeader">
@@ -88,7 +85,6 @@ export default function StaffProfilePage() {
           </div>
         </div>
 
-        {/* Content Layout */}
         <div className="contentGrid">
           <aside>
             <div className="card">

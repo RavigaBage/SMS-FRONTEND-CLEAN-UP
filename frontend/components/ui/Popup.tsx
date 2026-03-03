@@ -1,7 +1,15 @@
 "use client";
 
-import TeachingForm from "./PopupForm";
+import dynamic from "next/dynamic";
 
+const TeachingForm = dynamic(() => import("./PopupForm"), {
+  loading: () => (
+    <div style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>
+      Loading form...
+    </div>
+  ),
+  ssr: false,
+});
 type PopupProps = {
   active: boolean;
   togglePopup: () => void;

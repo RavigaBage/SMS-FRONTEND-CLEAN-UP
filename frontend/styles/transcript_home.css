@@ -20,7 +20,6 @@ body {
   min-height: 100vh;
 }
 
-/* Sidebar - Matches Students/Finance modules */
 .TRANSCRIPTDATA .sidebar {
   width: 260px;
   background: white;
@@ -46,7 +45,6 @@ body {
   padding: 20px 40px;
 }
 
-/* Top Nav Bar with Filters */
 .TRANSCRIPTDATA .main-header {
   display: flex;
   justify-content: space-between;
@@ -84,7 +82,6 @@ body {
   width: 100px;
 }
 
-/* Summary Stats */
 .TRANSCRIPTDATA .summary-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -115,7 +112,6 @@ body {
   font-weight: 600;
 }
 
-/* Table Design */
 .TRANSCRIPTDATA .table-card {
   background: white;
   border-radius: 16px;
@@ -184,7 +180,6 @@ body {
   color: white;
 }
 
-/* Pagination */
 .TRANSCRIPTDATA .pagination {
   padding: 20px;
   display: flex;

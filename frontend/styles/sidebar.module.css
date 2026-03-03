@@ -91,7 +91,6 @@
   font-size: 16px;
 }
 
-/* Navigation */
 .navSection {
   padding: 10px 0;
   font-family: "Noto Sans", sans-serif;
@@ -181,7 +180,6 @@
   transform: rotate(90deg);
 }
 
-/* Submenu */
 .submenu {
   max-height: 0;
   overflow: hidden;
@@ -210,7 +208,7 @@
 }
 
 .submenuItem::before {
-  content: "•";
+  content: "";
   color: rgb(0, 0, 0);
 }
 
@@ -238,12 +236,10 @@
   stroke: #555353;
 }
 
-/* 2, 5, 8... (Blue) */
 .sidebar:nth-child(3n + 2) svg {
   stroke: #4a90e2;
 }
 
-/* 3, 6, 9... (Soft Indigo/Slate) */
 .sidebar:nth-child(3n + 3) svg {
   stroke: #ffee01;
 }
@@ -252,12 +248,10 @@
   stroke: #00a896;
 }
 
-/* 2, 5, 8... (Blue) */
 .submenuItem:nth-child(3n + 2) svg {
   stroke: #4a90e2;
 }
 
-/* 3, 6, 9... (Soft Indigo/Slate) */
 .submenuItem:nth-child(3n + 3) svg {
   stroke: #64748b;
 }

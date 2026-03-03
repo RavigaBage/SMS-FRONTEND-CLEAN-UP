@@ -19,7 +19,6 @@
   box-sizing: border-box;
 }
 
-/* Page wrapper */
 .logout-page {
   height: 100vh;
   display: flex;
@@ -30,7 +29,6 @@
   color: var(--text-dark);
 }
 
-/* Card */
 .logout-card {
   width: 100%;
   max-width: 440px;
@@ -42,7 +40,6 @@
   text-align: center;
 }
 
-/* Branding */
 .brand-logo {
   display: flex;
   align-items: center;
@@ -57,7 +54,6 @@
   font-size: 1.1rem;
 }
 
-/* Avatar */
 .avatar-wrapper {
   position: relative;
   width: 100px;
@@ -85,7 +81,6 @@
   border-radius: 50%;
 }
 
-/* Text */
 .logout-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -99,7 +94,6 @@
   margin-bottom: 2rem;
 }
 
-/* Session summary */
 .session-summary {
   display: flex;
   justify-content: space-around;
@@ -135,7 +129,6 @@
   color: var(--text-muted);
 }
 
-/* Actions */
 .action-group {
   display: flex;
   flex-direction: column;

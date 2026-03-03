@@ -22,7 +22,6 @@
   padding: 0 24px;
 }
 
-/* Header */
 .header {
   display: flex;
   justify-content: space-between;
@@ -41,7 +40,6 @@
   margin-top: 4px;
 }
 
-/* Filters */
 .filters {
   display: flex;
   gap: 16px;
@@ -78,14 +76,12 @@
   margin-left: auto;
 }
 
-/* Table Card */
 .tableCard {
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
 
-/* Table */
 .classTable {
   width: 100%;
   border-collapse: collapse;

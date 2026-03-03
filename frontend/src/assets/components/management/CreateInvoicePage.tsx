@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 
 interface FeeItem {
   id: string;
@@ -13,6 +14,7 @@ interface FeeItem {
 const CreateInvoicePage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [errorDetail, setErrorDetail] = useState<any>(null);
 
   const [formData, setFormData] = useState({
     studentId: "",
@@ -59,11 +61,12 @@ const CreateInvoicePage = () => {
 
   const handleSaveInvoice = async () => {
     if (!formData.studentId || !formData.academicYearId) {
-      alert("Please select a student and academic year");
+      setErrorDetail("Please select a student and academic year");
       return;
     }
 
     setLoading(true);
+    setErrorDetail(null);
     try {
       const payload = {
         student_id: parseInt(formData.studentId),
@@ -92,14 +95,13 @@ const CreateInvoicePage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(JSON.stringify(errorData));
+        throw errorData;
       }
 
       alert("Invoice Created Successfully!");
       router.push("/dashboard/finance/invoices");
     } catch (err: any) {
-      console.error(err);
-      alert("Failed to save: " + err.message);
+      setErrorDetail(extractErrorDetail(err) || "Failed to save invoice.");
     } finally {
       setLoading(false);
     }
@@ -107,6 +109,7 @@ const CreateInvoicePage = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto bg-white min-h-screen">
+      {errorDetail && <ErrorMessage errorDetail={errorDetail} className="mb-4" />}
       <div className="flex justify-between items-center mb-8 border-b pb-4">
         <h1 className="text-2xl font-bold text-slate-800">
           Generate Student Invoice

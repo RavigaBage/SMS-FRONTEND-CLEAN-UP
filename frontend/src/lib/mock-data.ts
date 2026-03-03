@@ -1,24 +1,20 @@
-// frontend/src/lib/mock-data.ts
 
 export const mockStudentProfile = {
-  responseCode: 0, // Success [cite: 24]
-  responseMessage: "Request completed successfully", // [cite: 9]
-  dataCount: 1, // [cite: 11]
+  responseCode: 0,
+  responseMessage: "Request completed successfully", 
+  dataCount: 1, 
   data: {
-    // Profile Header Info
     fullName: "Alex Johnson",
     studentId: "2023-8492",
     gradeLevel: "Grade 10-B",
     stream: "Science Stream",
     profileImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
 
-    // Stats Cards
     currentGpa: 3.8,
     gpaTrend: "+0.2%",
     attendancePercentage: 96,
     pendingTasks: 2,
 
-    // Personal Details (Left Column)
     personalDetails: {
       dateOfBirth: "14 March 2008",
       phone: "+233 20 123 4567",
@@ -27,7 +23,6 @@ export const mockStudentProfile = {
       guardianName: "Sarah Johnson (Mother)",
     },
 
-    // Academic History Table (Right Column)
     academicHistory: [
       {
         subjectName: "Mathematics",

@@ -9,7 +9,6 @@ import type {
 } from "@/src/assets/types/invoice";
 import { invoiceApi } from "@/src/lib/invoiceApi";
 import Link from "next/link";
-// ─── Constants ────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<
   InvoiceStatus,
@@ -61,7 +60,6 @@ const STATUS_FILTERS: Array<{ value: InvoiceStatus | "all"; label: string }> = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
-// ─── Formatters ───────────────────────────────────────────────────────────────
 
 const fmt = (n: string | number): string =>
   `GHS ${parseFloat(String(n)).toLocaleString("en-GH", { minimumFractionDigits: 2 })}`;
@@ -72,8 +70,6 @@ const fmtDate = (d: string): string =>
     month: "short",
     year: "numeric",
   });
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: InvoiceStatus }) {
   const cfg = STATUS_CONFIG[status];
@@ -238,7 +234,6 @@ function SkeletonRow() {
   );
 }
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -310,7 +305,6 @@ export default function InvoicesPage() {
         fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
       }}
     >
-      {/* ── Top bar ───────────────────────────────────────────────────────── */}
       <div
         style={{
           borderBottom: "1px solid #e5e7eb",
@@ -383,7 +377,6 @@ export default function InvoicesPage() {
       </div>
 
       <div style={{ maxWidth: 1300, margin: "0 auto", padding: "36px 40px" }}>
-        {/* ── Heading ─────────────────────────────────────────────────────── */}
         <div style={{ marginBottom: 28 }}>
           <h1
             style={{
@@ -401,7 +394,6 @@ export default function InvoicesPage() {
           </p>
         </div>
 
-        {/* ── Summary cards ────────────────────────────────────────────────── */}
         <div
           style={{
             display: "grid",
@@ -447,8 +439,6 @@ export default function InvoicesPage() {
             }
           />
         </div>
-
-        {/* ── Filters ──────────────────────────────────────────────────────── */}
         <div
           style={{
             display: "flex",
@@ -539,8 +529,6 @@ export default function InvoicesPage() {
             ↻
           </button>
         </div>
-
-        {/* ── Error ────────────────────────────────────────────────────────── */}
         {error && (
           <div
             style={{
@@ -573,7 +561,6 @@ export default function InvoicesPage() {
           </div>
         )}
 
-        {/* ── Table ────────────────────────────────────────────────────────── */}
         <div
           style={{
             background: "#ffffff",
@@ -583,7 +570,6 @@ export default function InvoicesPage() {
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          {/* Header */}
           <div
             style={{
               display: "grid",
@@ -754,7 +740,6 @@ export default function InvoicesPage() {
                     </div>
                   </div>
 
-                  {/* Expanded */}
                   {isExpanded && (
                     <div
                       style={{
@@ -900,7 +885,6 @@ export default function InvoicesPage() {
               );
             })}
 
-          {/* Footer */}
           {!loading && invoices.length > 0 && (
             <div
               style={{

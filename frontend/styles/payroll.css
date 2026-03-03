@@ -29,7 +29,6 @@ body {
   margin: 0 auto;
 }
 
-/* --- Header --- */
 .header {
   display: flex;
   justify-content: space-between;
@@ -87,7 +86,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* --- Stats Summary --- */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -126,7 +124,6 @@ body {
   color: var(--primary-teal);
 }
 
-/* --- Table Card --- */
 .table-card {
   background: white;
   border-radius: var(--radius);
@@ -168,7 +165,6 @@ body {
   background-color: #f8fafc;
 }
 
-/* --- Specific Cell Styling --- */
 .staff-info {
   display: flex;
   align-items: center;
@@ -208,7 +204,6 @@ body {
   color: #e53e3e;
 }
 
-/* --- Status Badges --- */
 .badge {
   padding: 4px 10px;
   border-radius: 20px;
@@ -253,7 +248,6 @@ body {
   padding: 24px;
 }
 
-/* Header */
 .header {
   display: flex;
   justify-content: space-between;
@@ -282,7 +276,6 @@ body {
   gap: 12px;
 }
 
-/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -305,7 +298,6 @@ body {
   border: none;
 }
 
-/* Stats */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -348,7 +340,6 @@ body {
   color: #38a169;
 }
 
-/* Table Card */
 .table-card {
   background: #fff;
   border-radius: 14px;
@@ -374,7 +365,6 @@ body {
   font-size: 0.85rem;
 }
 
-/* Table */
 .payroll-table {
   width: 100%;
   border-collapse: collapse;
@@ -391,7 +381,6 @@ body {
   text-align: right;
 }
 
-/* Staff */
 .staff-info {
   display: flex;
   align-items: center;
@@ -425,7 +414,6 @@ body {
   color: var(--text-muted);
 }
 
-/* Amounts */
 .amt {
   font-weight: 600;
 }
@@ -438,7 +426,6 @@ body {
   color: var(--primary-teal);
 }
 
-/* Badges */
 .badge {
   font-size: 0.7rem;
   font-weight: 600;
@@ -456,7 +443,6 @@ body {
   color: #718096;
 }
 
-/* Actions */
 .actions-cell {
   text-align: right;
 }
@@ -468,9 +454,6 @@ body {
   color: var(--text-muted);
 }
 
-/* =========================
-   MODAL BASE
-========================= */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -507,9 +490,6 @@ body {
   }
 }
 
-/* =========================
-   MODAL HEADER
-========================= */
 .modal-header {
   padding: 18px 22px;
   border-bottom: 1px solid #e5e7eb;
@@ -524,9 +504,6 @@ body {
   color: #0f172a;
 }
 
-/* =========================
-   FORM
-========================= */
 .modal-form {
   padding: 20px 22px;
   display: flex;
@@ -568,16 +545,12 @@ body {
   min-height: 70px;
 }
 
-/* Two-column layout */
 .grid-two {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-/* =========================
-   ERROR MESSAGE
-========================= */
 .error-message {
   margin: 0 22px;
   padding: 10px 12px;
@@ -588,9 +561,6 @@ body {
   font-weight: 600;
 }
 
-/* =========================
-   MODAL ACTIONS
-========================= */
 .modal-actions {
   padding: 16px 22px;
   border-top: 1px solid #e5e7eb;
@@ -599,9 +569,6 @@ body {
   gap: 10px;
 }
 
-/* =========================
-   BUTTONS (SAFE EXTENSIONS)
-========================= */
 .btn-danger {
   background: #dc2626;
   color: #ffffff;
@@ -624,9 +591,6 @@ body {
   background: #f1f5f9;
 }
 
-/* =========================
-   FILTER BUTTON
-========================= */
 .filter-wrapper {
   position: relative;
 }
@@ -637,9 +601,6 @@ body {
   gap: 6px;
 }
 
-/* =========================
-   FILTER PANEL
-========================= */
 .filter-panel {
   position: absolute;
   top: 110%;
@@ -664,9 +625,6 @@ body {
   }
 }
 
-/* =========================
-   FILTER FIELDS
-========================= */
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -696,9 +654,6 @@ body {
   box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
 }
 
-/* =========================
-   FILTER ACTIONS
-========================= */
 .filter-actions {
   display: flex;
   justify-content: space-between;

@@ -84,13 +84,11 @@
   font-size: 12px;
 }
 
-/* Main */
 .timetableApp .main {
   flex: 1;
   padding: 24px;
 }
 
-/* Header */
 .timetableApp .header {
   display: flex;
   justify-content: space-between;
@@ -107,7 +105,6 @@
   margin-left: 10px;
 }
 
-/* Buttons */
 .timetableApp .btn {
   padding: 8px 14px;
   border-radius: 8px;
@@ -125,7 +122,6 @@
   border: 1px solid #d1d5db;
 }
 
-/* Filters */
 .timetableApp .filters {
   margin: 20px 0;
   display: flex;
@@ -158,14 +154,12 @@
   background: #bae6fd;
 }
 
-/* Content */
 .timetableApp .content {
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
 }
 
-/* Timetable */
 .timetableApp .timetable {
   background: #fff;
   border-radius: 12px;
@@ -253,7 +247,6 @@
 .timetableApp .grid .grid_feild .slot_options .item_ svg.update:hover {
   fill: greenyellow;
 }
-/* Cards */
 .timetableApp .grid .grid_feild .card {
   border-radius: 10px;
   padding: 10px;
@@ -268,7 +261,6 @@
   border: 5px dashed #ccc;
 }
 
-/* Color tokens */
 .timetableApp div[data-color="1"] {
   background: #e0f2fe;
   border-left: 5px solid #0195f7;
@@ -314,7 +306,6 @@
   border: 1px dashed #ef4444;
 }
 
-/* Break */
 .timetableApp .break {
   grid-column: 1 / -1;
   text-align: center;
@@ -331,7 +322,6 @@
   letter-spacing: 30px;
 }
 
-/* Empty */
 .timetableApp .empty {
   border: 2px dashed #e5e7eb;
   border-radius: 10px;
@@ -341,7 +331,6 @@
   color: #9ca3af;
 }
 
-/* Unscheduled */
 .timetableApp .unscheduled {
   background: #fff;
   border-radius: 12px;
@@ -419,7 +408,6 @@
   opacity: 1;
 }
 
-/* Close button */
 .timetableApp .close-btn {
   margin-top: 16px;
   padding: 8px 16px;
@@ -517,12 +505,7 @@
   }
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   TIMETABLE — design improvements & skeleton loader
-   Add this block to the bottom of timetable.css (or import as a separate file)
-   ───────────────────────────────────────────────────────────────────────────── */
 
-/* ── Grid layout ─────────────────────────────────────────────────────────── */
 .tt-grid-header {
   display: grid;
   grid-template-columns: 72px repeat(5, 1fr);
@@ -535,7 +518,6 @@
 }
 
 .tt-col-time {
-  /* empty corner */
 }
 
 .tt-col-day {
@@ -596,7 +578,6 @@
   border-radius: 4px;
 }
 
-/* ── Filled card ─────────────────────────────────────────────────────────── */
 .tt-card {
   position: relative;
   border-radius: 10px;
@@ -621,7 +602,6 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
-/* left accent bar */
 .tt-card__bar {
   display: block;
   width: 4px;
@@ -668,7 +648,6 @@
   opacity: 0.7;
 }
 
-/* action buttons — reveal on hover */
 .tt-card__actions {
   display: flex;
   flex-direction: column;
@@ -718,7 +697,6 @@
   background: rgba(244, 63, 94, 0.2);
 }
 
-/* ── Empty / + card ──────────────────────────────────────────────────────── */
 .tt-card--empty {
   width: 100%;
   display: flex;
@@ -758,7 +736,6 @@
   transition: transform 0.18s;
 }
 
-/* the SVG inside needs to be white */
 .tt-add-icon svg {
   color: #fff;
 }
@@ -774,7 +751,6 @@
   text-transform: uppercase;
 }
 
-/* ── Skeleton loader ─────────────────────────────────────────────────────── */
 @keyframes tt-shimmer {
   0% {
     background-position: -400px 0;
@@ -821,7 +797,6 @@
   margin-left: auto;
 }
 
-/* ── Empty state (before first load) ────────────────────────────────────── */
 .tt-empty-state {
   grid-column: 1 / -1;
   display: flex;
@@ -849,7 +824,6 @@
   color: #475569;
 }
 
-/* ── "Load table" chip loading state ────────────────────────────────────── */
 .chip--loading {
   opacity: 0.75;
   cursor: not-allowed;

@@ -20,7 +20,6 @@
   padding: 30px 40px;
 }
 
-/* Header Components */
 .staff-header-card {
   background: white;
   padding: 24px;
@@ -47,7 +46,6 @@
   font-weight: 700;
 }
 
-/* Stats Grid */
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -75,7 +73,6 @@
   color: #ef4444;
 }
 
-/* History Table */
 .table-card {
   background: white;
   border-radius: 16px;

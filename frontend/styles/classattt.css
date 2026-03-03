@@ -16,7 +16,6 @@
   font-family: "Inter", sans-serif;
 }
 
-/* Sidebar & Layout */
 .sidebar {
   width: 260px;
   background: white;
@@ -31,7 +30,6 @@
   padding: 30px 40px;
 }
 
-/* Header & Context */
 .main-header {
   display: flex;
   justify-content: space-between;
@@ -58,7 +56,6 @@
   font-weight: 600;
 }
 
-/* Table Design */
 .table-card {
   background: white;
   border-radius: 16px;
@@ -84,7 +81,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* Interaction Design */
 .status-toggle input {
   display: none;
 }
@@ -102,7 +98,6 @@
   transition: all 0.2s;
 }
 
-/* Present/Absent Toggle States */
 .status-toggle input:checked + .tick {
   background: #dcfce7;
   color: #166534;
@@ -114,7 +109,6 @@
   border-color: var(--absent-red);
 }
 
-/* Dynamic Row Highlighting */
 .student-row.is-present {
   background: #f0fdfa;
 }

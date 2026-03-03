@@ -41,7 +41,7 @@ export default function GradesManagement() {
     },
   ];
 
-  // Helper to apply specific grade styles
+
   const getGradeClass = (grade: string) => {
     switch (grade.toUpperCase()) {
       case "A":
@@ -60,13 +60,12 @@ export default function GradesManagement() {
   return (
     <div className="dashboardWrapper">
       <div className="dashboard">
-        {/* Header */}
+    
         <header className="header">
           <h1>Grades Management</h1>
           <p>View and analyze student academic performance</p>
         </header>
 
-        {/* Filters */}
         <section className="filters">
           <select aria-label="Term">
             <option>Term</option>
@@ -90,7 +89,7 @@ export default function GradesManagement() {
           </select>
         </section>
 
-        {/* Table */}
+     
         <main className="tableCard">
           <table className="gradesTable">
             <thead>

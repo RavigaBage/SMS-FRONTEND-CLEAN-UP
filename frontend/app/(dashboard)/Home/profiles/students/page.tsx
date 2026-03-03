@@ -42,7 +42,7 @@ interface Filters {
   status: string;
 }
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 export default function StudentsManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,7 +60,6 @@ export default function StudentsManagementPage() {
 
   const totalPages = Math.ceil(totalResults / PAGE_SIZE);
 
-  // Build query string from active filters + page + search
   const buildQuery = (
     page: number,
     currentFilters: Filters,
@@ -105,6 +104,7 @@ export default function StudentsManagementPage() {
         email: s.email || "N/A",
         grade: s.grade || "Unassigned",
         gender: s.gender || "uncaptured",
+        classInfo:s.class_info?.class_name || '-',
         enrollmentDate: s.created_at
           ? new Date(s.created_at).toLocaleDateString()
           : "N/A",
@@ -113,6 +113,7 @@ export default function StudentsManagementPage() {
           s.profile_image ||
           `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}&background=random`,
       }));
+      console.log(students);
 
       setStudents(formattedData as any);
     } catch (err) {
@@ -121,14 +122,11 @@ export default function StudentsManagementPage() {
       setIsLoading(false);
     }
   };
-
-  // Re-fetch when page, filters, or search changes
   useEffect(() => {
     fetchStudents(currentPage, filters, searchTerm);
     fetchClasses();
   }, [currentPage, filters, searchTerm]);
 
-  // When a filter changes, reset to page 1
   const handleFilterChange = (field: keyof Filters, value: string) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
     setCurrentPage(1);
@@ -196,7 +194,7 @@ export default function StudentsManagementPage() {
 
   return (
     <div className="students-page">
-      {/* Page Header */}
+
       <div className="page-header">
         <div className="page-title-group">
           <h1 className="page-title">Students</h1>
@@ -212,7 +210,6 @@ export default function StudentsManagementPage() {
         </div>
       </div>
 
-      {/* Control Bar */}
       <div className="control-bar">
         <div className="search-wrapper">
           <span className="search-icon">🔍</span>
@@ -232,7 +229,6 @@ export default function StudentsManagementPage() {
         </div>
       </div>
 
-      {/* Inline Filter Bar */}
       <div className="flex flex-wrap items-center gap-3 p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
         <select
           value={filters.grade}
@@ -294,7 +290,6 @@ export default function StudentsManagementPage() {
         />
       </div>
 
-      {/* Modal */}
       <AddStudentModal
         isOpen={isModalOpen}
         onClose={() => {

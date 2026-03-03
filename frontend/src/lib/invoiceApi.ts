@@ -4,7 +4,6 @@ import type {
   InvoiceListResponse,
 } from "@/src/assets/types/invoice";
 
-// ─── Core API Response Shape ──────────────────────────────────────────────────
 
 export interface ApiResponse<T> {
   data: T;
@@ -18,7 +17,6 @@ export interface ApiResponse<T> {
   error?: string | null;
 }
 
-// ─── Core Request Helper ──────────────────────────────────────────────────────
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -36,7 +34,6 @@ export async function apiRequest<T>(
 
   let response: Response;
 
-  // ── 1. Initial request ────────────────────────────────────────────────────
   try {
     response = await fetch(url, { ...options, headers: getHeaders() });
   } catch (error) {
@@ -46,7 +43,6 @@ export async function apiRequest<T>(
     );
   }
 
-  // ── 2. Handle 401 → attempt token refresh ────────────────────────────────
   if (response.status === 401) {
     try {
       const errorData = await response.clone().json();
@@ -75,7 +71,6 @@ export async function apiRequest<T>(
                 localStorage.setItem("refreshToken", refreshData.refresh);
               }
 
-              // Retry original request with the new access token
               response = await fetch(url, {
                 ...options,
                 headers: {
@@ -107,7 +102,6 @@ export async function apiRequest<T>(
     }
   }
 
-  // ── 3. Handle 204 No Content ─────────────────────────────────────────────
   if (response.status === 204) {
     return {
       data: null as unknown as T,
@@ -117,7 +111,6 @@ export async function apiRequest<T>(
     };
   }
 
-  // ── 4. Parse response body ────────────────────────────────────────────────
   let raw: Record<string, unknown> = {};
   const contentType = response.headers.get("content-type") ?? "";
   try {
@@ -128,7 +121,6 @@ export async function apiRequest<T>(
     raw = {};
   }
 
-  // ── 5. Handle non-OK responses ────────────────────────────────────────────
   if (!response.ok) {
     return {
       data: null as unknown as T,
@@ -140,7 +132,6 @@ export async function apiRequest<T>(
     };
   }
 
-  // ── 6. Normalise paginated vs plain response ──────────────────────────────
   const isPaginated = Array.isArray(raw.results);
 
   return {
@@ -155,7 +146,6 @@ export async function apiRequest<T>(
   };
 }
 
-// ─── Query String Builder ─────────────────────────────────────────────────────
 
 function buildQueryString(filters: InvoiceFilters): string {
   const params = new URLSearchParams();
@@ -172,14 +162,8 @@ function buildQueryString(filters: InvoiceFilters): string {
   return qs ? `?${qs}` : "";
 }
 
-// ─── Invoice API ──────────────────────────────────────────────────────────────
 
 export const invoiceApi = {
-  /**
-   * GET /invoices/ — paginated, filtered list.
-   * Returns a normalised InvoiceListResponse regardless of whether
-   * DRF pagination is on or off.
-   */
   async list(filters: InvoiceFilters = {}): Promise<InvoiceListResponse> {
     const qs = buildQueryString(filters);
     const res = await apiRequest<Invoice[]>(`/invoices/${qs}`);
@@ -194,9 +178,6 @@ export const invoiceApi = {
     };
   },
 
-  /**
-   * GET /invoices/:id/ — single invoice with items.
-   */
   async get(id: number): Promise<Invoice> {
     const res = await apiRequest<Invoice>(`/invoices/${id}/`);
     if (res.error) throw new Error(res.error);

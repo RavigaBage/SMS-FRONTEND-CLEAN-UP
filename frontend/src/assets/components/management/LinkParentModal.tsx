@@ -1,9 +1,9 @@
 import React, { useState, ChangeEvent } from "react";
 import ParentForm, { MyFormData } from "./ParentForm";
 import { apiRequest } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 import { X, Link2, UserPlus, Search, Phone, Check, Heart } from "lucide-react";
 
-/* 1. Types */
 interface ParentSummary {
   id: number;
   full_name: string;
@@ -28,20 +28,19 @@ export default function LinkParentModal({
   const [showCreate, setShowCreate] = useState(false);
   const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [errorDetail, setErrorDetail] = useState<any>(null);
 
   if (!open) return null;
 
-  /* 2. Handlers */
   const csrfToken =
     document.cookie
       .split("; ")
       .find((c) => c.startsWith("csrftoken="))
       ?.split("=")[1] || "";
 
-  /* Updated Handler for linking an existing record */
   const linkExistingParent = async () => {
     if (!selectedParentId) {
-      alert("Select a parent first");
+      setErrorDetail("Select a parent first");
       return;
     }
 
@@ -53,6 +52,7 @@ export default function LinkParentModal({
     };
 
     try {
+      setErrorDetail(null);
       const res = await apiRequest(`/student-parents/`, {
         method: "POST",
         headers: {
@@ -66,11 +66,13 @@ export default function LinkParentModal({
       onClose();
     } catch (err) {
       console.error("Link parent error", err);
-      alert("Could not link parent. Check if this link already exists.");
+      setErrorDetail(
+        extractErrorDetail(err) ||
+          "Could not link parent. Check if this link already exists.",
+      );
     }
   };
 
-  // Filter parents by search
   const filteredParents = parentsList.filter(
     (parent) =>
       parent.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -128,9 +130,7 @@ export default function LinkParentModal({
       `}</style>
 
       <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/70 backdrop-blur-sm overflow-y-auto">
-        {/* Modal Container */}
         <div className="modal-content bg-white w-full max-w-2xl max-h-[90vh] my-auto rounded-3xl shadow-2xl overflow-hidden border-2 border-stone-200 flex flex-col">
-          {/* Header */}
           <div className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-stone-50 px-6 py-4 border-b-2 border-amber-200 flex-shrink-0">
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-200/30 rounded-full blur-3xl"></div>
             <div className="relative flex items-start justify-between">
@@ -157,7 +157,7 @@ export default function LinkParentModal({
           </div>
 
           <div className="p-6 overflow-y-auto flex-1">
-            {/* Quick Create Button */}
+            {errorDetail && <ErrorMessage errorDetail={errorDetail} className="mb-3" />}
             <button
               onClick={() => setShowCreate(true)}
               className="w-full mb-4 p-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2"
@@ -166,7 +166,6 @@ export default function LinkParentModal({
               Create New Parent & Link
             </button>
 
-            {/* Divider */}
             <div className="relative mb-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t-2 border-stone-200"></div>
@@ -178,7 +177,6 @@ export default function LinkParentModal({
               </div>
             </div>
 
-            {/* Search Bar */}
             <div className="relative mb-3">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-4 h-4" />
               <input
@@ -190,7 +188,6 @@ export default function LinkParentModal({
               />
             </div>
 
-            {/* Parents List */}
             <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-2">
               {filteredParents.length === 0 ? (
                 <div className="text-center py-8 text-stone-500">
@@ -215,7 +212,6 @@ export default function LinkParentModal({
                     }}
                   >
                     <div className="flex items-center gap-3">
-                      {/* Avatar */}
                       <div
                         className={`relative w-10 h-10 rounded-full flex items-center justify-center text-white font-display text-base font-bold shadow-md flex-shrink-0 ${
                           selectedParentId === parent.id
@@ -231,7 +227,6 @@ export default function LinkParentModal({
                         )}
                       </div>
 
-                      {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-stone-900 truncate text-sm">
                           {parent.full_name}
@@ -242,7 +237,6 @@ export default function LinkParentModal({
                         </div>
                       </div>
 
-                      {/* Selection Indicator */}
                       {selectedParentId === parent.id && (
                         <div className="flex items-center gap-1.5 text-amber-600 font-semibold text-xs flex-shrink-0">
                           <Heart className="w-3.5 h-3.5 fill-current" />
@@ -256,7 +250,6 @@ export default function LinkParentModal({
             </div>
           </div>
 
-          {/* Footer Actions */}
           <div className="px-6 py-4 bg-stone-50 border-t-2 border-stone-200 flex items-center justify-between gap-3 flex-shrink-0">
             <button
               onClick={onClose}
@@ -279,7 +272,6 @@ export default function LinkParentModal({
           </div>
         </div>
 
-        {/* Nested Create Form Modal */}
         {showCreate && (
           <ParentForm
             open={showCreate}
@@ -309,7 +301,7 @@ export default function LinkParentModal({
                 onClose();
               } catch (err) {
                 console.error("Create & link error", err);
-                alert("Failed to create/link parent.");
+                setErrorDetail(extractErrorDetail(err) || "Failed to create/link parent.");
               }
             }}
           />

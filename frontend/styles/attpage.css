@@ -61,7 +61,6 @@
   border: none;
 }
 
-/* Primary */
 .primary-button {
   background: #0d9488;
   color: white;
@@ -72,7 +71,6 @@
   transform: translateY(-1px);
 }
 
-/* Dark Primary */
 .primary-dark-button {
   background: #0f172a;
   color: white;
@@ -83,7 +81,6 @@
   transform: translateY(-1px);
 }
 
-/* Secondary */
 .secondary-button {
   background: white;
   border: 1px solid #e2e8f0;
@@ -94,7 +91,6 @@
   background: #f1f5f9;
 }
 
-/* Ghost */
 .ghost-button {
   background: transparent;
   border: 1px dashed #cbd5e1;
@@ -128,7 +124,6 @@
   border: 1px solid #e2e8f0;
 }
 
-/* Date */
 .date-selector {
   display: flex;
   align-items: center;
@@ -147,7 +142,6 @@
   outline: none;
 }
 
-/* Search */
 .search-wrapper {
   position: relative;
   flex: 1;
@@ -220,9 +214,6 @@
   color: #64748b;
 }
 
-/* ===============================
-   Status Badges
-================================= */
 
 .status-present,
 .status-absent,
@@ -257,9 +248,6 @@
   color: #2563eb;
 }
 
-/* ===============================
-   Responsive
-================================= */
 
 @media (max-width: 768px) {
   .page-header {
@@ -280,9 +268,6 @@
   }
 }
 
-/* ===============================
-   Stats Grid Layout
-================================= */
 
 .stats-grid {
   display: grid;
@@ -291,9 +276,6 @@
   margin-bottom: 2rem;
 }
 
-/* ===============================
-   Base Stat Card
-================================= */
 
 .stat-card {
   position: relative;
@@ -314,7 +296,6 @@
   box-shadow: 0 18px 35px rgba(15, 23, 42, 0.08);
 }
 
-/* Subtle gradient glow effect */
 .stat-card::after {
   content: "";
   position: absolute;
@@ -327,9 +308,6 @@
   pointer-events: none;
 }
 
-/* ===============================
-   Content
-================================= */
 
 .stat-content {
   display: flex;
@@ -351,9 +329,6 @@
   color: #0f172a;
 }
 
-/* ===============================
-   Icon Container
-================================= */
 
 .stat-icon {
   width: 52px;
@@ -364,11 +339,7 @@
   justify-content: center;
 }
 
-/* ===============================
-   Color Variants
-================================= */
 
-/* Blue - Total */
 .stat-icon-blue {
   background: linear-gradient(135deg, #3b82f6, #6366f1);
   color: white;
@@ -378,7 +349,6 @@
   background: #3b82f6;
 }
 
-/* Green - Present */
 .stat-icon-green {
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
@@ -392,7 +362,6 @@
   background: #10b981;
 }
 
-/* Red - Absent */
 .stat-icon-red {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
@@ -406,7 +375,6 @@
   background: #ef4444;
 }
 
-/* Yellow - Late */
 .stat-icon-yellow {
   background: linear-gradient(135deg, #f59e0b, #d97706);
   color: white;
@@ -420,9 +388,6 @@
   background: #f59e0b;
 }
 
-/* ===============================
-   Highlight Card (Attendance Rate)
-================================= */
 
 .stat-card-highlight {
   flex-direction: column;
@@ -456,9 +421,6 @@
   transition: width 0.4s ease;
 }
 
-/* ===============================
-   Responsive
-================================= */
 
 @media (max-width: 768px) {
   .stat-card {
@@ -470,9 +432,6 @@
   }
 }
 
-/* ===============================
-   Overlay
-================================= */
 
 .modal-overlay {
   position: fixed;
@@ -487,9 +446,6 @@
   animation: fadeIn 0.2s ease forwards;
 }
 
-/* ===============================
-   Modal Container
-================================= */
 
 .modal-container {
   background: white;
@@ -507,9 +463,6 @@
   max-width: 520px;
 }
 
-/* ===============================
-   Header
-================================= */
 
 .modal-header {
   padding: 1.5rem 1.75rem 1rem;
@@ -551,9 +504,6 @@
   transform: rotate(90deg);
 }
 
-/* ===============================
-   Form Area
-================================= */
 
 .modal-form {
   padding: 1.5rem 1.75rem;
@@ -579,7 +529,6 @@
   letter-spacing: 0.05em;
 }
 
-/* Inputs & Selects */
 
 .form-select,
 .form-input {
@@ -604,7 +553,6 @@
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
 }
 
-/* Date Row */
 
 .form-row {
   display: flex;
@@ -626,9 +574,6 @@
   letter-spacing: 0.05em;
 }
 
-/* ===============================
-   Footer
-================================= */
 
 .modal-footer {
   padding: 1rem 1.75rem 1.5rem;
@@ -638,7 +583,6 @@
   align-items: center;
 }
 
-/* Reuse your existing button styles */
 .modal-footer .ghost-button {
   border: 1px dashed #cbd5e1;
   background: transparent;
@@ -658,9 +602,6 @@
   box-shadow: 0 8px 20px rgba(13, 148, 136, 0.25);
 }
 
-/* ===============================
-   Animations
-================================= */
 
 @keyframes fadeIn {
   from {
@@ -682,9 +623,6 @@
   }
 }
 
-/* ===============================
-   Responsive
-================================= */
 
 @media (max-width: 600px) {
   .modal-container {
@@ -712,9 +650,6 @@
   }
 }
 
-/* ===============================
-   Table Wrapper
-================================= */
 
 .table-wrapper {
   background: white;
@@ -724,9 +659,6 @@
   overflow: hidden;
 }
 
-/* ===============================
-   Table Base
-================================= */
 
 .data-table {
   width: 100%;
@@ -755,7 +687,6 @@
   vertical-align: middle;
 }
 
-/* Row Hover */
 
 .data-table tbody tr {
   transition: all 0.2s ease;
@@ -765,9 +696,6 @@
   background: #f8fafc;
 }
 
-/* ===============================
-   User Cell
-================================= */
 
 .user-cell {
   display: flex;
@@ -794,9 +722,6 @@
   font-size: 0.9rem;
 }
 
-/* ===============================
-   Badge Styles
-================================= */
 
 .badge {
   padding: 0.4rem 0.75rem;
@@ -813,9 +738,6 @@
   color: #2563eb;
 }
 
-/* ===============================
-   Status Badge
-================================= */
 
 .status-badge {
   padding: 0.45rem 0.75rem;
@@ -827,7 +749,6 @@
   gap: 0.4rem;
 }
 
-/* Status Variants */
 
 .status-present {
   background: #ecfdf5;
@@ -849,18 +770,12 @@
   color: #2563eb;
 }
 
-/* ===============================
-   Text Secondary
-================================= */
 
 .text-secondary {
   color: #64748b;
   font-size: 0.85rem;
 }
 
-/* ===============================
-   Editable Fields
-================================= */
 
 .status-select {
   padding: 0.45rem 0.65rem;
@@ -895,9 +810,6 @@
   background: white;
 }
 
-/* ===============================
-   Action Buttons
-================================= */
 
 .action-buttons {
   display: flex;
@@ -916,7 +828,6 @@
   transition: all 0.2s ease;
 }
 
-/* Edit */
 .icon-button-edit {
   background: #f1f5f9;
   color: #0f172a;
@@ -926,7 +837,6 @@
   background: #e2e8f0;
 }
 
-/* Delete */
 .icon-button-delete {
   background: #fef2f2;
   color: #dc2626;
@@ -936,7 +846,6 @@
   background: #fee2e2;
 }
 
-/* Save */
 .icon-button-save {
   background: #ecfdf5;
   color: #047857;
@@ -946,7 +855,6 @@
   background: #d1fae5;
 }
 
-/* Cancel */
 .icon-button-cancel {
   background: #f1f5f9;
   color: #64748b;
@@ -956,9 +864,6 @@
   background: #e2e8f0;
 }
 
-/* ===============================
-   Responsive Scroll
-================================= */
 
 @media (max-width: 1024px) {
   .table-wrapper {
@@ -970,9 +875,6 @@
   }
 }
 
-/* ===============================
-   MODAL OVERLAY
-================================= */
 
 .attendance-modal.modal-overlay {
   position: fixed;
@@ -986,9 +888,6 @@
   padding: 2rem;
 }
 
-/* ===============================
-   MODAL CONTAINER
-================================= */
 
 .attendance-modal .modal-container {
   background: #ffffff;
@@ -1002,9 +901,6 @@
   overflow: hidden;
 }
 
-/* ===============================
-   HEADER
-================================= */
 
 .attendance-modal .modal-header {
   padding: 1.5rem 2rem;
@@ -1046,9 +942,6 @@
   background: #e2e8f0;
 }
 
-/* ===============================
-   FORM SECTION
-================================= */
 
 .attendance-modal .modal-form {
   padding: 1.5rem 2rem;
@@ -1091,9 +984,6 @@
   background: white;
 }
 
-/* ===============================
-   BULK LIST
-================================= */
 
 .attendance-modal .bulk-attendance-list {
   border: 1px solid #e2e8f0;
@@ -1134,9 +1024,6 @@
   background: #f8fafc;
 }
 
-/* ===============================
-   STUDENT INFO
-================================= */
 
 .attendance-modal .student-info {
   display: flex;
@@ -1174,9 +1061,6 @@
   color: #64748b;
 }
 
-/* ===============================
-   STATUS SELECT SMALL
-================================= */
 
 .attendance-modal .status-select-sm {
   width: 150px;
@@ -1195,9 +1079,6 @@
   background: white;
 }
 
-/* ===============================
-   FOOTER
-================================= */
 
 .attendance-modal .modal-footer {
   padding: 1.2rem 2rem;
@@ -1207,7 +1088,6 @@
   gap: 1rem;
 }
 
-/* Buttons */
 
 .attendance-modal .secondary-button {
   background: #f1f5f9;

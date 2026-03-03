@@ -19,6 +19,7 @@ import { EditStudentModal } from "@/src/assets/components/management/EditStudent
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import Image from "next/image";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 
 export default function StudentProfilePage() {
   const params = useParams();
@@ -33,6 +34,7 @@ export default function StudentProfilePage() {
   const [error, setError] = useState<{ code: number; message: string } | null>(
     null,
   );
+  const [actionError, setActionError] = useState<any>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
@@ -84,6 +86,7 @@ export default function StudentProfilePage() {
 
   const handleUpdateStudent = async (updatedFields: any) => {
     try {
+      setActionError(null);
       // Call your Django API to update the student
       await apiRequest(`/students/${id}/`, {
         method: "PATCH",
@@ -98,9 +101,9 @@ export default function StudentProfilePage() {
 
       setIsEditModalOpen(false);
       alert("Profile updated successfully!");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Update failed", err);
-      alert("Failed to save changes.");
+      setActionError(extractErrorDetail(err) || "Failed to save changes.");
     }
   };
 
@@ -134,6 +137,7 @@ export default function StudentProfilePage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500">
+      {actionError && <ErrorMessage errorDetail={actionError} />}
       {/* Header Section */}
       <section className="bg-white rounded-2xl border overflow-hidden shadow-sm">
         <div className="h-32 bg-gradient-to-r from-blue-500 to-cyan-400" />

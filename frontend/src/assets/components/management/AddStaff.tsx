@@ -98,11 +98,11 @@ export function AddStaffModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[95vh] overflow-y-auto">
         <div className="p-6 border-b flex justify-between items-center bg-slate-900 text-white sticky top-0">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center align-center gap-3">
             <div className="p-2 bg-white/10 rounded-lg">
               <Briefcase size={20} />
             </div>
-            <h2 className="text-xl font-bold">Add Staff Member</h2>
+            <h2 className="text-xl font-bold text-white ">Add Staff Member</h2>
           </div>
           <button
             onClick={onClose}
@@ -202,7 +202,7 @@ export function AddStaffModal({
                 }
                 className="w-full p-2.5 border border-slate-200 rounded-lg outline-none bg-white text-sm"
               >
-                <option value="teacher">Teacher</option>
+                <option value="">Select Role</option>
                 <option value="headmaster">Headmaster</option>
                 <option value="bursar">Bursar</option>
                 <option value="admin_staff">Admin Staff</option>
@@ -352,7 +352,7 @@ export function AddStaffModal({
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+              className="flex-1 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors text-white"
             >
               Cancel
             </button>

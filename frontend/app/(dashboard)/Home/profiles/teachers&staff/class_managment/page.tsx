@@ -14,17 +14,20 @@ import {
 import { apiRequest } from "@/src/lib/apiClient";
 import Link from "next/link";
 import { AddClassModal } from "@/src/assets/components/management/AddClassModal";
+import { Pagination } from "@/src/assets/components/management/Pagination";
 
 export default function ClassManagementPage() {
   const [classes, setClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ year: "2024/2025", level: "" });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const RESULTS_PER_PAGE = 20;
 
   const fetchClasses = async () => {
     setLoading(true);
     try {
-      // Adjust the endpoint to match your Django URL
       const res = await apiRequest<any[]>("/classes/", { method: "GET" });
 
       const classes = Array.isArray(res.data) ? res.data : (res.results ?? []);
@@ -41,9 +44,42 @@ export default function ClassManagementPage() {
     fetchClasses();
   }, []);
 
+  const filteredClasses = classes.filter((cls) => {
+    const className = String(cls.class_name || cls.name || "").toLowerCase();
+    const classYear = String(cls.academic_year || "2024/2025");
+
+    const yearMatch = !filters.year || classYear === filters.year;
+
+    if (!filters.level) return yearMatch;
+
+    const levelMatch =
+      (filters.level === "primary" &&
+        (className.includes("primary") ||
+          className.includes("grade 1") ||
+          className.includes("grade 2") ||
+          className.includes("grade 3") ||
+          className.includes("grade 4") ||
+          className.includes("grade 5") ||
+          className.includes("grade 6"))) ||
+      (filters.level === "jhs" &&
+        (className.includes("jhs") || className.includes("junior"))) ||
+      (filters.level === "shs" &&
+        (className.includes("shs") || className.includes("senior")));
+
+    return yearMatch && levelMatch;
+  });
+
+  const totalResults = filteredClasses.length;
+  const totalPages = Math.max(1, Math.ceil(totalResults / RESULTS_PER_PAGE));
+  const startIndex = (currentPage - 1) * RESULTS_PER_PAGE;
+  const paginatedClasses = filteredClasses.slice(
+    startIndex,
+    startIndex + RESULTS_PER_PAGE,
+  );
+
   return (
     <div className="p-8 bg-slate-50 min-h-screen space-y-8 animate-in fade-in duration-500">
-      {/* Header */}
+  
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase">
@@ -63,12 +99,14 @@ export default function ClassManagementPage() {
         </button>
       </div>
 
-      {/* Filters Bar */}
       <div className="flex flex-wrap items-center gap-4">
         <select
           className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-cyan-500/20"
           value={filters.year}
-          onChange={(e) => setFilters({ ...filters, year: e.target.value })}
+          onChange={(e) => {
+            setFilters({ ...filters, year: e.target.value });
+            setCurrentPage(1);
+          }}
         >
           <option value="2024/2025">Academic Year: 2024 / 2025</option>
           <option value="2023/2024">Academic Year: 2023 / 2024</option>
@@ -77,7 +115,10 @@ export default function ClassManagementPage() {
         <select
           className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-cyan-500/20"
           value={filters.level}
-          onChange={(e) => setFilters({ ...filters, level: e.target.value })}
+          onChange={(e) => {
+            setFilters({ ...filters, level: e.target.value });
+            setCurrentPage(1);
+          }}
         >
           <option value="">All Class Levels</option>
           <option value="primary">Primary</option>
@@ -86,7 +127,6 @@ export default function ClassManagementPage() {
         </select>
       </div>
 
-      {/* Table Card */}
       <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-20 flex flex-col items-center gap-4">
@@ -120,7 +160,7 @@ export default function ClassManagementPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {classes.map((cls) => (
+              {paginatedClasses.map((cls) => (
                 <tr
                   key={cls.id}
                   className="hover:bg-slate-50/50 transition-colors group"
@@ -171,6 +211,16 @@ export default function ClassManagementPage() {
                   </td>
                 </tr>
               ))}
+              {paginatedClasses.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-8 py-8 text-sm font-semibold text-slate-400 text-center"
+                  >
+                    No classes found for selected filters.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         )}
@@ -180,6 +230,20 @@ export default function ClassManagementPage() {
           onSuccess={fetchClasses}
         />
       </div>
+      {!loading && totalResults > 0 && (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(p) => {
+              if (p < 1 || p > totalPages) return;
+              setCurrentPage(p);
+            }}
+            totalResults={totalResults}
+            resultsPerPage={RESULTS_PER_PAGE}
+          />
+        </div>
+      )}
     </div>
   );
 }

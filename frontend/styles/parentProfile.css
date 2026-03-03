@@ -20,7 +20,6 @@
   padding: 30px 40px;
 }
 
-/* Parent Profile Card */
 .parent-profile-card {
   background: white;
   padding: 30px;
@@ -61,7 +60,6 @@
   gap: 8px;
 }
 
-/* Wards Grid */
 .wards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));

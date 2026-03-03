@@ -7,7 +7,7 @@ type PopupProps = {
   togglePopup: () => void;
   formData: Record<string, any>;
   fieldNames: string | string[];
-  selectedIM: number | number[] | null;
+  selectedIM: number | null;
   setFormData: (field: string, value: any) => void;
   onSuccess?: () => void;
 };
@@ -32,7 +32,6 @@ export default function Popup({
       >
         <EnrollForm
           formData={formData}
-          fieldName={fieldNames}
           setFormData={setFormData}
           selectedIM={selectedIM}
           onSuccess={onSuccess}

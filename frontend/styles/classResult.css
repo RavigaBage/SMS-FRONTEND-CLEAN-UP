@@ -41,7 +41,6 @@
   border-radius: 50%;
 }
 
-/* Controls Section */
 .GRADEDATA .controls-card {
   background: white;
   padding: 16px 24px;
@@ -75,7 +74,6 @@
   width: 200px;
 }
 
-/* Summary Stats */
 .GRADEDATA .summary-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -105,7 +103,6 @@
   color: var(--primary-blue);
 }
 
-/* Table Styling */
 .GRADEDATA .table-container {
   background: white;
   border-radius: 16px;
@@ -148,7 +145,6 @@
   background-color: #f0fdfa;
 }
 
-/* Sticky Column for Name */
 .GRADEDATA .sticky-col {
   position: sticky;
   left: 0;

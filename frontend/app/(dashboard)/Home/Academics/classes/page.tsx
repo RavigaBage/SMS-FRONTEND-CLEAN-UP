@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ClassPopup from "@/components/ui/classPopup";
 import { fetchWithAuth } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 import SkeletonTable from "@/components/ui/SkeletonLoader";
 import Pagination from "@/src/assets/components/dashboard/Pagnation";
 import { ErrorState } from "@/src/assets/components/dashboard/ErrorState";
@@ -44,7 +45,7 @@ export interface Classroom {
   room_number?: string;
   class_teacher: Teacher;
   teacher_name?: string;
-  subjects: any[];
+  subjects: number[];
   capacity: number;
   current_enrollment: number;
   students_on_leave: number;
@@ -91,6 +92,7 @@ export default function ClassesManagement() {
   const [isUpdating, setUpdating] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [pageError, setPageError] = useState<any>(null);
   const [formData, setFormData] = useState<Record<string, any>>({
     schoolClass: "",
     term: "",
@@ -120,14 +122,15 @@ export default function ClassesManagement() {
   };
 
   const [selectedClass, setSelectedClass] = useState<Classroom | null>(null);
-  const [selectedYear, setSelectedYear] = useState("2025-2026");
-  const [pagination, setPagination] =
-    useState<PaginatedResponse<Classroom> | null>(null);
+  const [selectedYear, setSelectedYear] = useState("");
+  const [pagination, setPagination] = useState<PaginatedResponse<Classroom> | null>(null);
   const [page, setPage] = useState(1);
+  const getSubjectCount = (subjects: Classroom["subjects"]) =>
+    Array.isArray(subjects) ? subjects.length : 0;
 
   const handleEditClick = (item: Classroom) => {
     setSelectedClass(item);
-
+    setUpdating(true);
     setFormData({
       id: item.id,
       class_name: item.class_name,
@@ -174,6 +177,7 @@ export default function ClassesManagement() {
     }
 
     setDeleting(true);
+    setPageError(null);
 
     try {
       const fetchRequest = await fetchWithAuth(
@@ -189,16 +193,16 @@ export default function ClassesManagement() {
       if (!fetchRequest.ok) {
         const errorData = await fetchRequest.json();
         console.error("Delete Error:", errorData);
-        alert("Failed to delete class. Please try again.");
+        setPageError(extractErrorDetail(errorData) || "Failed to delete class. Please try again.");
         setDeleting(false);
         return;
       }
 
-      await fetchClassData();
+      await fetchClassData(selectedYear);
       setClickvelvet(null);
     } catch (err) {
       console.error("Delete request failed:", err);
-      alert("Network error. Please try again.");
+      setPageError(extractErrorDetail(err) || "Network error. Please try again.");
     } finally {
       setDeleting(false);
     }
@@ -253,11 +257,6 @@ export default function ClassesManagement() {
     });
   };
 
-  const handleClearFilter = () => {
-    setSelectedYear("");
-    fetchClassData_();
-  };
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -275,60 +274,46 @@ export default function ClassesManagement() {
     };
   }, [clickvelvet]);
 
-  const FilterPop = () => {
-    fetchClassData(selectedYear);
-  };
 
-  useEffect(() => {
-    fetchClassData_();
-  }, [selectedYear]);
+const fetchClassData = async (year: string = selectedYear, pageNum: number = page) => {
+  setLoading(true);
+  try {
+    const params = new URLSearchParams();
+    if (year) params.append("academic_year", year);
+    if (pageNum) params.append("page", pageNum.toString());
 
-  const fetchClassData = async (year: string = selectedYear) => {
-    try {
-      const params = new URLSearchParams();
-      if (year) params.append("academic_year", year);
-
-      const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes?${params.toString()}`,
-        {
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-      const data: PaginatedResponse<Classroom> = await res.json();
-      if (data) {
-        setPagination(data);
-        setClassData(data.results);
-        setPage(1);
-      }
-    } catch (err) {
-      console.error("Failed to load classes", err);
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}/classes?${params.toString()}`,
+      { headers: { "Content-Type": "application/json" } },
+    );
+    const data: PaginatedResponse<Classroom> = await res.json();
+    if (data) {
+      setPagination(data);
+      setClassData(data.results);
     }
-  };
-  const fetchClassData_ = async () => {
-    try {
-      const params = new URLSearchParams();
-      const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes`,
-        {
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-      const data: PaginatedResponse<Classroom> = await res.json();
-      if (data) {
-        setPagination(data);
-        setClassData(data.results);
-        setPage(1);
-      }
-    } catch (err) {
-      console.error("Failed to load classes", err);
-    }
-  };
+  } catch (err) {
+    console.error("Failed to load classes", err);
+    setPageError("Failed to load classes.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchClassData(selectedYear, page);
+}, [selectedYear, page]);
+
+const FilterPop = () => fetchClassData(selectedYear);
+
+const handleClearFilter = () => { setSelectedYear(""); };
+
   const handleUpdate = () => {
     setDeleting(!isUpdating);
   };
 
   return (
     <div className="dashboardWrapper CLASSDATA">
+      {pageError && <ErrorMessage errorDetail={pageError} />}
       <ClassPopup
         active={active}
         togglePopup={handlePopup}
@@ -338,7 +323,7 @@ export default function ClassesManagement() {
         isDeleting={isDeleting}
         isUpdating={isUpdating}
         onSuccess={() => {
-          fetchClassData();
+          fetchClassData(selectedYear);
         }}
       />
       {isLoading ? (
@@ -406,7 +391,7 @@ export default function ClassesManagement() {
               className="add_subject"
               onClick={() => {
                 setTimeout(() => {
-                  handleEditClick(EmptyForm);
+                  handlePopup();
                 }, 100);
               }}
             >
@@ -432,6 +417,7 @@ export default function ClassesManagement() {
                   <th>Class Name</th>
                   <th>Academic Year</th>
                   <th>Assigned Teacher</th>
+                  <th>Subjects</th>
                   <th>Room Number</th>
                   <th>Students</th>
                   <th>Actions</th>
@@ -441,7 +427,7 @@ export default function ClassesManagement() {
                 {classData.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       style={{ textAlign: "center", padding: "2rem" }}
                     >
                       <div>
@@ -460,6 +446,8 @@ export default function ClassesManagement() {
                       <td>{item.academic_year}</td>
 
                       <td>{item.teacher_name || "Unassigned"}</td>
+
+                      <td>{getSubjectCount(item.subjects)}</td>
 
                       <td>{item.room_number}</td>
 
@@ -503,9 +491,6 @@ export default function ClassesManagement() {
                             onClick={() => handleEditClick(item)}
                           >
                             Edit
-                          </button>
-                          <button className="actionBtn btnAssign">
-                            Assign Teacher
                           </button>
                           <button
                             className="actionBtn btnManage"

@@ -20,7 +20,6 @@ export default function Dropdown({
   fieldName,
   setFormData,
 }: DropdownProps) {
-  console.log(options);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -32,7 +31,6 @@ export default function Dropdown({
     setSelected(item.class_name);
     setIsOpen(false);
     setFormData(fieldName, item.class_name);
-    console.log(fieldName);
     if (fieldName === "schoolClass") {
       setFormData("class_id", item.id);
     }

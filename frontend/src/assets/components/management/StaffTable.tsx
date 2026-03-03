@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { apiRequest } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 import Image from "next/image";
 export interface StaffMember {
   id: string;
@@ -28,28 +29,31 @@ export interface StaffMember {
 export function StaffTable({ staff }: { staff: StaffMember[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [errorDetail, setErrorDetail] = useState<any>(null);
   const handleDelete = async (id: string) => {
     setIsProcessing(true);
+    setErrorDetail(null);
     try {
       await apiRequest(`/staff/${id}/`, { method: "DELETE" });
       window.location.reload();
     } catch (err) {
       console.error("Delete failed:", err);
-      alert("Failed to delete staff member. Please try again.");
+      setErrorDetail(
+        extractErrorDetail(err) || "Failed to delete staff member. Please try again.",
+      );
     } finally {
       setIsProcessing(false);
       setDeletingId(null);
     }
   };
   const ConvertIsoTime = (time: string) => {
-    console.log(time);
     const currentDate = new Date(time);
-    console.log(currentDate);
     return currentDate.toLocaleString();
   };
 
   return (
     <div className="bg-white overflow-hidden">
+      {errorDetail && <ErrorMessage errorDetail={errorDetail} className="m-4" />}
       <table className="w-full text-left">
         <thead className="bg-slate-50 border-y text-[10px] font-bold text-slate-400 uppercase tracking-widest">
           <tr>
@@ -107,7 +111,6 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
               <td className="px-6 py-4 text-right">
                 <div className="flex justify-end items-center gap-2">
                   {deletingId === member.id ? (
-                    // VERIFICATION STATE
                     <div className="flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
                       <span className="text-[10px] font-black text-rose-500 uppercase mr-2">
                         Confirm?
@@ -131,7 +134,6 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
                       </button>
                     </div>
                   ) : (
-                    // DEFAULT STATE
                     <>
                       <Link
                         href={`/Home/profiles/teachers&staff/profile/${member.id}`}

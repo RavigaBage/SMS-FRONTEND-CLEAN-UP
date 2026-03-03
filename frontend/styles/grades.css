@@ -25,7 +25,6 @@
   padding: 0 24px;
 }
 
-/* Header */
 .header {
   margin-bottom: 24px;
 }
@@ -41,7 +40,6 @@
   margin-top: 4px;
 }
 
-/* Filters */
 .filters {
   display: flex;
   gap: 12px;
@@ -59,7 +57,6 @@
   cursor: pointer;
 }
 
-/* Table Card */
 .tableCard {
   background: var(--card);
   border-radius: var(--radius);
@@ -97,13 +94,11 @@
   background: #f8fafc;
 }
 
-/* Score */
 .score {
   font-weight: 600;
   color: var(--text-dark);
 }
 
-/* Grade Badges */
 .grade {
   padding: 6px 12px;
   border-radius: 20px;
@@ -129,7 +124,6 @@
   color: var(--red);
 }
 
-/* Remarks */
 .remark {
   font-weight: 500;
   color: var(--text-muted);

@@ -1,4 +1,3 @@
-/* Overlay */
 .delete-overlay {
   position: fixed;
   inset: 0;
@@ -17,7 +16,6 @@
   pointer-events: auto;
 }
 
-/* Popup box */
 .delete-popup {
   background: #ffffff;
   width: 380px;
@@ -37,7 +35,6 @@
   opacity: 1;
 }
 
-/* Typography */
 .delete-popup h3 {
   margin-bottom: 10px;
   font-size: 1.3rem;
@@ -51,7 +48,6 @@
   margin-bottom: 22px;
 }
 
-/* Buttons */
 .delete-actions {
   display: flex;
   gap: 12px;
@@ -74,13 +70,11 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* Cancel */
 .btn-cancel {
   background: #e6e6e6;
   color: #333;
 }
 
-/* Delete */
 .btn-delete {
   background: #ff4d5a;
   color: #fff;

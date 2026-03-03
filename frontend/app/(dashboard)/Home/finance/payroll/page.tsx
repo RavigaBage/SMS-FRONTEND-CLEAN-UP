@@ -4,6 +4,10 @@ import React, { useEffect, useState, useCallback } from "react";
 import "@/styles/payroll.css";
 import { X, Plus, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
+import { Pagination } from "@/src/assets/components/management/Pagination";
+
+const PAGE_SIZE = 20;
 
 interface StaffOption {
   id: number;
@@ -88,7 +92,7 @@ function AddEditModal({
   const isEdit = !!record;
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any>(null);
   const [staffList, setStaffList] = useState<StaffOption[]>([]);
   const [staffLoading, setStaffLoading] = useState(false);
 
@@ -156,8 +160,8 @@ function AddEditModal({
           ),
         }));
       }
-    } catch {
-      // non-fatal — user can fill manually
+    } catch (error) {
+      console.error('message ' + error)
     }
   };
 
@@ -209,7 +213,7 @@ function AddEditModal({
       onClose();
     } catch (err: any) {
       const raw = err?.message ?? err?.detail ?? "Failed to save record.";
-      // Surface DRF field errors clearly
+
       if (typeof raw === "object") {
         const msgs = Object.entries(raw)
           .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
@@ -240,15 +244,7 @@ function AddEditModal({
           </button>
         </div>
 
-        {error && (
-          <div
-            className="error-message"
-            style={{ display: "flex", alignItems: "center", gap: 8 }}
-          >
-            <AlertCircle size={14} />
-            {error}
-          </div>
-        )}
+        {error && <ErrorMessage errorDetail={error} className="error-message" />}
 
         <form onSubmit={handleSubmit} className="modal-form">
           <label>
@@ -469,7 +465,7 @@ function RunPayrollModal({
   const [period, setPeriod] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any>(null);
 
   useEffect(() => {
     if (!open) {
@@ -495,7 +491,7 @@ function RunPayrollModal({
       setResults(data);
       onDone();
     } catch (err: any) {
-      setError(err?.message ?? err?.detail ?? "Failed to run payroll.");
+      setError(extractErrorDetail(err) || "Failed to run payroll.");
     } finally {
       setLoading(false);
     }
@@ -524,15 +520,7 @@ function RunPayrollModal({
             gap: 16,
           }}
         >
-          {error && (
-            <div
-              className="error-message"
-              style={{ display: "flex", alignItems: "center", gap: 8 }}
-            >
-              <AlertCircle size={14} />
-              {error}
-            </div>
-          )}
+          {error && <ErrorMessage errorDetail={error} className="error-message" />}
 
           {!results && (
             <>
@@ -677,12 +665,15 @@ function RunPayrollModal({
   );
 }
 
-// ─── Main Payroll Page ────────────────────────────────────────────────────────
-
 export default function PayrollPage() {
   const [records, setRecords] = useState<PayrollRecord[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any>(null);
+
+
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editRecord, setEditRecord] = useState<PayrollRecord | null>(null);
@@ -704,18 +695,20 @@ export default function PayrollPage() {
     staffIdFilter,
   ].filter(Boolean).length;
 
-  const fetchRecords = useCallback(async () => {
+
+  const fetchRecords = useCallback(async (pageNumber: number) => {
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
+      params.append("page", pageNumber.toString());
       if (statusFilter) params.append("status", statusFilter);
       if (paymentPeriodFilter)
         params.append("payment_period", paymentPeriodFilter);
       if (staffIdFilter) params.append("staff_id", staffIdFilter);
 
       const qs = params.toString();
-      const url = qs ? `/salary-payments/?${qs}` : "/salary-payments/";
+      const url = `/salary-payments/?${qs}`;
       const raw = await apiRequest<any>(url);
 
       const arr: any[] = Array.isArray(raw.data)
@@ -724,9 +717,10 @@ export default function PayrollPage() {
           ? raw.results
           : [];
 
+      setTotalCount(raw.count || arr.length);
       setRecords(arr.map(normalizeRecord));
     } catch (err: any) {
-      setError("Failed to load payroll records.");
+      setError(extractErrorDetail(err) || "Failed to load payroll records.");
       setRecords([]);
     } finally {
       setLoading(false);
@@ -734,8 +728,14 @@ export default function PayrollPage() {
   }, [statusFilter, paymentPeriodFilter, staffIdFilter]);
 
   useEffect(() => {
-    fetchRecords();
-  }, [fetchRecords]);
+    fetchRecords(page);
+  }, [page, fetchRecords]);
+
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setPage(newPage);
+  };
 
   const handleDelete = async () => {
     if (!toDeleteId) return;
@@ -744,7 +744,7 @@ export default function PayrollPage() {
       await apiRequest(`/salary-payments/${toDeleteId}/`, { method: "DELETE" });
       setConfirmOpen(false);
       setToDeleteId(null);
-      fetchRecords();
+      fetchRecords(page);
     } catch {
       setError("Failed to delete record.");
     } finally {
@@ -781,7 +781,7 @@ export default function PayrollPage() {
             ))}
           </select>
 
-          <button className="btn btn-outline" onClick={fetchRecords}>
+          <button className="btn btn-outline" onClick={() => fetchRecords(page)}>
             <svg
               width="16"
               height="16"
@@ -829,7 +829,6 @@ export default function PayrollPage() {
 
       {error && (
         <div
-          className="error-message"
           style={{
             margin: "0 0 16px",
             display: "flex",
@@ -837,10 +836,9 @@ export default function PayrollPage() {
             gap: 8,
           }}
         >
-          <AlertCircle size={14} />
-          {error}
+          <ErrorMessage errorDetail={error} className="error-message" />
           <button
-            onClick={fetchRecords}
+            onClick={() => fetchRecords(page)}
             style={{
               marginLeft: "auto",
               fontWeight: 700,
@@ -918,7 +916,6 @@ export default function PayrollPage() {
                     </select>
                   </div>
 
-                  {/* ✅ Bug 5 fix: YYYY-MM dropdown not free-text */}
                   <div className="filter-group">
                     <label>Payment Period</label>
                     <select
@@ -1024,7 +1021,6 @@ export default function PayrollPage() {
                       </div>
                     </div>
                   </td>
-                  {/* ✅ Bug 5 fix: display human-readable period */}
                   <td>{fmtPeriod(r.payment_period)}</td>
                   <td className="amt">{ghs(r.base_salary)}</td>
                   <td className="amt">{ghs(r.allowances)}</td>
@@ -1046,7 +1042,6 @@ export default function PayrollPage() {
                         setModalOpen(true);
                       }}
                     >
-                      {/* Edit (Pencil) */}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -1071,7 +1066,6 @@ export default function PayrollPage() {
                         setConfirmOpen(true);
                       }}
                     >
-                      {/* Trash */}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -1096,13 +1090,42 @@ export default function PayrollPage() {
             )}
           </tbody>
         </table>
+
+        <div
+          style={{
+            padding: "12px 20px",
+            borderTop: "1px solid #e2e8f0",
+            background: "#f8fafc",
+            fontSize: 12,
+            color: "#64748b",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <span>
+            Showing {records.length} of {totalCount} records
+          </span>
+          <span>
+            Page {page} of {totalPages}
+          </span>
+        </div>
+
+        <div style={{ padding: "16px 20px", borderTop: "1px solid #e2e8f0" }}>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalResults={totalCount}
+            resultsPerPage={PAGE_SIZE}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </section>
 
       <AddEditModal
         open={modalOpen}
         record={editRecord}
         onClose={() => setModalOpen(false)}
-        onSaved={fetchRecords}
+        onSaved={() => fetchRecords(page)}
       />
 
       <ConfirmDelete
@@ -1115,7 +1138,7 @@ export default function PayrollPage() {
       <RunPayrollModal
         open={runPayrollOpen}
         onClose={() => setRunPayrollOpen(false)}
-        onDone={fetchRecords}
+        onDone={() => fetchRecords(page)}
       />
 
       <style>{`
@@ -1124,3 +1147,4 @@ export default function PayrollPage() {
     </div>
   );
 }
+

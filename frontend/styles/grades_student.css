@@ -47,7 +47,6 @@
   margin: 0 auto;
 }
 
-/* ==================== HEADER ==================== */
 .STUDENT_GRADE .main-header {
   display: flex;
   justify-content: space-between;
@@ -99,7 +98,6 @@
   box-shadow: var(--shadow-md);
 }
 
-/* ==================== INFO CARD ==================== */
 .STUDENT_GRADE .info-card {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -131,7 +129,6 @@
   color: var(--text-primary);
 }
 
-/* ==================== MAIN GRID ==================== */
 .STUDENT_GRADE .main-grid {
   display: grid;
   grid-template-columns: 1fr 450px;
@@ -145,7 +142,6 @@
   }
 }
 
-/* ==================== CARDS ==================== */
 .STUDENT_GRADE .card {
   background: var(--bg-card);
   border-radius: 16px;
@@ -177,7 +173,6 @@
   margin: 0;
 }
 
-/* ==================== INPUTS ==================== */
 .STUDENT_GRADE .exam-inputs {
   padding: 24px;
   display: grid;
@@ -218,7 +213,6 @@
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-/* ==================== SETTINGS CARD ==================== */
 .STUDENT_GRADE .settings-card .setting-item {
   padding: 16px 0;
   border-bottom: 1px solid var(--border);
@@ -247,7 +241,6 @@
   font-size: 16px;
 }
 
-/* ==================== GRADE PILLS ==================== */
 .STUDENT_GRADE .grade-pill {
   display: inline-block;
   padding: 6px 16px;
@@ -282,7 +275,6 @@
   background: var(--grade-f);
 }
 
-/* ==================== SUMMARY GRID ==================== */
 .STUDENT_GRADE .summary-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -314,7 +306,6 @@
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  /* color: var(--text-muted); */
   margin-bottom: 8px;
   letter-spacing: 0.5px;
 }
@@ -332,11 +323,9 @@
 }
 
 .STUDENT_GRADE .sum-box.final .val {
-  /* color: white; */
   font-size: 32px;
 }
 
-/* ==================== BUTTONS ==================== */
 .STUDENT_GRADE .action-area {
   padding: 20px;
 }
@@ -406,7 +395,6 @@
   }
 }
 
-/* ==================== LOADING STATE ==================== */
 .STUDENT_GRADE .loading-spinner {
   display: inline-block;
   width: 20px;
@@ -423,7 +411,6 @@
   }
 }
 
-/* ==================== RANK BADGES ==================== */
 .STUDENT_GRADE .rank-badge {
   display: inline-flex;
   align-items: center;
@@ -460,7 +447,6 @@
   color: white;
 }
 
-/* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
   .STUDENT_GRADE .dashboard-container {
     padding: 10px;
@@ -490,7 +476,6 @@
   }
 }
 
-/* ==================== TOOLTIPS ==================== */
 .tooltip {
   position: relative;
   display: inline-block;
@@ -512,7 +497,6 @@
   margin-bottom: 5px;
 }
 
-/* ==================== PERCENTAGE DISPLAY ==================== */
 .percentage-display {
   display: inline-block;
   padding: 4px 12px;
@@ -523,7 +507,6 @@
   color: var(--primary);
 }
 
-/* ==================== SCORE CARDS ==================== */
 .score-card {
   background: linear-gradient(
     135deg,

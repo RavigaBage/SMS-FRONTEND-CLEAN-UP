@@ -15,7 +15,6 @@ export default function DropdownYear({
   fieldName,
   setFormData,
 }: DropdownYearProps) {
-  // generate years dynamically
   const options = [];
   for (let i = currentYear; i >= currentYear - 5; i--) {
     options.push(`${i}/${i + 1}`);

@@ -21,9 +21,7 @@ interface StudentType {
   status: "active" | "inactive" | "graduated" | string;
 }
 
-// API functions
 
-// Type Definitions
 interface UserType {
   id: string;
   email: string;
@@ -115,7 +113,6 @@ const buildPayload = (
   grade_letter: data.grade_letter ?? "F",
   remarks: data.remarks ?? "", // ← add this
 });
-// API Methods
 export const gradeApi = {
   getGradeByParams: async ({
     studentId,
@@ -135,7 +132,7 @@ export const gradeApi = {
     );
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.detail || "Failed to fetch grade");
+      throw error?.detail || error || "Failed to fetch grade";
     }
     return (await res.json()).grade;
   },
@@ -170,17 +167,11 @@ export const gradeApi = {
 
     if (!res.ok) {
       const error = await res.json();
-      console.error("Create grade error:", error);
-      throw new Error(
-        error.detail || JSON.stringify(error) || "Failed to create grade",
-      );
+      throw error?.detail || error || "Failed to create grade";
     }
     return await res.json();
   },
 
-  /**
-   * Update an existing grade by its parameters
-   */
   updateGradeByParams: async ({
     studentId,
     classId,
@@ -228,10 +219,7 @@ export const gradeApi = {
     );
     if (!res.ok) {
       const error = await res.json();
-      console.error("Update grade error:", error);
-      throw new Error(
-        error.detail || JSON.stringify(error) || "Failed to update grade",
-      );
+      throw error?.detail || error || "Failed to update grade";
     }
     return await res.json();
   },

@@ -24,7 +24,6 @@ body {
   padding: 30px 40px;
 }
 
-/* Header & Filters */
 .main-header {
   display: flex;
   justify-content: space-between;
@@ -71,7 +70,6 @@ body {
   background: white;
 }
 
-/* Class Selection Grid */
 .class-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -136,7 +134,6 @@ body {
   color: var(--text-muted);
 }
 
-/* Buttons & Pills */
 .btn-attendance {
   width: 100%;
   background: var(--primary-teal);

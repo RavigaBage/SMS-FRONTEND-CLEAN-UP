@@ -28,19 +28,15 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#0a0a0a]">
-      {/* Animated gradient background */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-0 left-1/4 h-[500px] w-[500px] animate-pulse-slow rounded-full bg-gradient-to-br from-purple-500/30 to-transparent blur-3xl" />
         <div className="absolute bottom-0 right-1/4 h-[600px] w-[600px] animate-pulse-slower rounded-full bg-gradient-to-br from-pink-500/30 to-transparent blur-3xl" />
         <div className="absolute top-1/3 right-1/3 h-[400px] w-[400px] animate-pulse-slowest rounded-full bg-gradient-to-br from-indigo-500/20 to-transparent blur-3xl" />
       </div>
 
-      {/* Animated grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(167,139,250,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(167,139,250,0.03)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_100%)]" />
 
-      {/* Main content */}
       <div className="relative flex min-h-screen flex-col items-center justify-center px-6 py-12">
-        {/* Logo/Brand */}
         <div className="mb-12 animate-fade-in-down">
           <div className="relative">
             <div className="absolute -inset-1 animate-pulse-slow rounded-lg bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 opacity-30 blur" />
@@ -52,7 +48,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Welcome message */}
         <div className="max-w-2xl animate-fade-in-up space-y-6 text-center">
           <h2 className="text-5xl font-light tracking-tight text-white sm:text-6xl lg:text-7xl">
             Welcome to
@@ -67,9 +62,7 @@ export default function Home() {
             designed for modern education.
           </p>
 
-          {/* Redirect indicator */}
           <div className="flex flex-col items-center gap-6 pt-8">
-            {/* Animated spinner */}
             <div className="relative h-16 w-16">
               <div className="absolute inset-0 rounded-full border-4 border-purple-500/20" />
               <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-purple-500" />
@@ -86,7 +79,6 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Manual link */}
             <button
               onClick={() => router.push("/auth/login")}
               className="group relative mt-4 overflow-hidden rounded-full px-8 py-3 text-sm font-medium transition-all hover:scale-105"
@@ -113,7 +105,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Feature highlights */}
         <div
           className="mt-20 grid max-w-4xl animate-fade-in-up gap-6 sm:grid-cols-3"
           style={{ animationDelay: "200ms" }}
@@ -153,7 +144,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Floating particles - only render on client to avoid hydration mismatch */}
       {mounted && (
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           {[...Array(20)].map((_, i) => (

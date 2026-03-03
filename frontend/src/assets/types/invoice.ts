@@ -1,4 +1,3 @@
-// ─── Student (nested in Invoice) ────────────────────────────────────────────
 
 export interface InvoiceStudent {
   id: number;
@@ -25,15 +24,13 @@ export interface InvoiceStudent {
   class_info: string | null;
 }
 
-// ─── Invoice Item ────────────────────────────────────────────────────────────
 
 export interface InvoiceItem {
   id: number;
   description: string;
-  amount: string; // Django DecimalField serializes as string
+  amount: string; 
 }
 
-// ─── Invoice Status ──────────────────────────────────────────────────────────
 
 export type InvoiceStatus =
   | "unpaid"
@@ -44,20 +41,19 @@ export type InvoiceStatus =
 
 export type InvoiceTerm = "1" | "2" | "3" | "annual";
 
-// ─── Invoice ─────────────────────────────────────────────────────────────────
 
 export interface Invoice {
   id: number;
   invoice_number: string;
   student: InvoiceStudent;
-  student_id?: number; // write-only on create, may not be present in GET
+  student_id?: number; 
   academic_year: string;
   term: InvoiceTerm;
   term_display: string;
   total_amount: string;
   amount_paid: string;
   balance: string;
-  due_date: string; // ISO date string: "YYYY-MM-DD"
+  due_date: string;
   status: InvoiceStatus;
   status_display: string;
   items: InvoiceItem[];
@@ -67,7 +63,6 @@ export interface Invoice {
   updated_at: string;
 }
 
-// ─── API Responses ───────────────────────────────────────────────────────────
 
 export interface InvoiceListResponse {
   results: Invoice[];
@@ -76,7 +71,6 @@ export interface InvoiceListResponse {
   previous: string | null;
 }
 
-// ─── Query Params ─────────────────────────────────────────────────────────────
 
 export interface InvoiceFilters {
   search?: string;
@@ -86,7 +80,6 @@ export interface InvoiceFilters {
   page?: number;
 }
 
-// ─── Summary (computed client-side) ──────────────────────────────────────────
 
 export interface InvoiceSummary {
   totalBilled: number;

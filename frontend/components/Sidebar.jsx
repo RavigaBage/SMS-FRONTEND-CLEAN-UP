@@ -2,13 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import "@/styles/global.css";
 import styles from "@/styles/sidebar.module.css";
 
-/**
- * Colored SVG icons for sidebar — tweak colors here
- * Each icon returns an svg with a soft gradient and a simple shape.
- */
 
 const IconBase = ({ id, gradientFrom, gradientTo, children, size = 20 }) => (
   <svg
@@ -27,7 +24,6 @@ const IconBase = ({ id, gradientFrom, gradientTo, children, size = 20 }) => (
       </linearGradient>
     </defs>
 
-    {/* subtle circular backdrop */}
     <rect
       x="0"
       y="0"
@@ -49,7 +45,6 @@ const IconBase = ({ id, gradientFrom, gradientTo, children, size = 20 }) => (
   </svg>
 );
 
-/* Icons */
 const DashboardIcon = (props) => (
   <IconBase
     id="grad-dashboard"
@@ -70,7 +65,6 @@ const ConfigurationIcon = (props) => (
     gradientTo="#22D3EE"
     {...props}
   >
-    {/* Horizontal slider lines */}
     <line
       x1="2"
       y1="4"
@@ -276,7 +270,6 @@ const AppAccessIcon = (props) => (
     gradientTo="#059669"
     {...props}
   >
-    {/* Shield outline */}
     <path
       d="M10 2 L18 5 V10 C18 14 14.5 17.5 10 19 C5.5 17.5 2 14 2 10 V5 L10 2 Z"
       fill="none"
@@ -285,7 +278,6 @@ const AppAccessIcon = (props) => (
       strokeLinejoin="round"
     />
 
-    {/* Check mark */}
     <path
       d="M6.5 10.5 L9 13 L14 8"
       fill="none"
@@ -310,11 +302,15 @@ const LogoutIcon = (props) => (
   </IconBase>
 );
 
-/* End icons */
 
-/* ProtectedLink (keeps your original behavior) */
-const ProtectedLink = ({ isAdmin, href, children, className }) => {
-  if (isAdmin) {
+const ProtectedLink = ({ isAdmin, isHeadmaster, isTeacher = "", href, children, className }) => {
+  if (isAdmin || isHeadmaster || href== '/Home/logout/' || href== '/Home/management/studentManager') {
+    return (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+  } else if (isTeacher) {
     return (
       <Link href={href} className={className}>
         {children}
@@ -326,7 +322,6 @@ const ProtectedLink = ({ isAdmin, href, children, className }) => {
       className={`${className} ${styles.disabled}`}
       title="Admin Access Required"
     >
-      {children}
     </div>
   );
 };
@@ -334,6 +329,8 @@ const ProtectedLink = ({ isAdmin, href, children, className }) => {
 export default function Sidebar() {
   const [openMenu, setOpenMenu] = useState(null);
   const [userRole, setRole] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   const toggleSubmenu = (menu) => {
     setOpenMenu((prev) => (prev === menu ? null : menu));
@@ -342,40 +339,28 @@ export default function Sidebar() {
   useEffect(() => {
     const role = localStorage.getItem("userRole");
     if (role) {
-      setRole(role.toLowerCase());
+      const lowerRole = role.toLowerCase();
+      setRole(lowerRole);
+
+      if (lowerRole !== "admin" && lowerRole !== "headmaster") {
+        window.location.href = "/Home/teaching/";
+        return;
+      }
     }
+    setIsLoading(false);
   }, []);
 
   const isAdmin = userRole === "admin";
+  const isHeadmaster = userRole === "headmaster";
+  const isTeacher = userRole === "teacher";
 
-  const handleLogout = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (refreshToken) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          body: JSON.stringify({ refresh: refreshToken }),
-        });
-      }
-    } catch (err) {
-      console.warn("Backend logout failed, continuing client cleanup");
-    } finally {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = "/auth/login";
-    }
-  };
+
 
   return (
     <div className={styles.sidebar}>
       <div className={styles.logoSection}>
         <div className={styles.logo}>
           <div className={styles.logoIcon} aria-hidden>
-            {/* custom colorful logo mark */}
             <svg
               width="36"
               height="36"
@@ -403,6 +388,7 @@ export default function Sidebar() {
 
         <ProtectedLink
           isAdmin={isAdmin}
+          isHeadmaster={isHeadmaster}
           href="/Home/"
           className={`${styles.navItem} ${styles.active}`}
         >
@@ -414,7 +400,6 @@ export default function Sidebar() {
           </div>
         </ProtectedLink>
 
-        {/* ACADEMIC */}
         <div className={styles.navGroup}>
           <div
             className={`${styles.navItem} ${openMenu === "academic" ? styles.expanded : ""}`}
@@ -444,6 +429,8 @@ export default function Sidebar() {
             <div className={`submenu open`}>
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
                 href="/Home/Academics/enrollment/"
                 className={styles.submenuItem}
               >
@@ -457,6 +444,8 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
                 href="/Home/Academics/subject"
                 className={styles.submenuItem}
               >
@@ -470,6 +459,8 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
                 href="/Home/Academics/classes/"
                 className={styles.submenuItem}
               >
@@ -483,6 +474,8 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
                 href="/Home/Academics/grades/class"
                 className={styles.submenuItem}
               >
@@ -496,6 +489,8 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
                 href="/Home/Academics/transcripts"
                 className={styles.submenuItem}
               >
@@ -510,7 +505,6 @@ export default function Sidebar() {
           )}
         </div>
 
-        {/* TIMETABLE */}
         <div className={styles.navGroup}>
           <div
             className={`${styles.navItem} ${openMenu === "timetable" ? styles.expanded : ""}`}
@@ -540,7 +534,9 @@ export default function Sidebar() {
             <div className={`submenu open`}>
               <ProtectedLink
                 isAdmin={isAdmin}
-                href="/Home/timetable/"
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
+                href="/Home/Academics/timetable/"
                 className={styles.submenuItem}
               >
                 <div className={styles.navItemContent}>
@@ -553,6 +549,8 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
                 href="/Home/Academics/syllabi/"
                 className={styles.submenuItem}
               >
@@ -567,7 +565,6 @@ export default function Sidebar() {
           )}
         </div>
 
-        {/* PROFILES */}
         <div className={styles.navGroup}>
           <div
             className={`${styles.navItem} ${openMenu === "profiles" ? styles.expanded : ""}`}
@@ -597,6 +594,8 @@ export default function Sidebar() {
             <div className={`submenu open`}>
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
                 href="/Home/profiles/students"
                 className={styles.submenuItem}
               >
@@ -610,6 +609,7 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
                 href="/Home/profiles/teachers&staff"
                 className={styles.submenuItem}
               >
@@ -623,6 +623,7 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
                 href="/Home/profiles/teachers"
                 className={styles.submenuItem}
               >
@@ -636,6 +637,7 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
                 href="/Home/profiles/parents"
                 className={styles.submenuItem}
               >
@@ -650,7 +652,6 @@ export default function Sidebar() {
           )}
         </div>
 
-        {/* HR */}
         <div className={styles.navGroup}>
           <div
             className={`${styles.navItem} ${openMenu === "hr" ? styles.expanded : ""}`}
@@ -680,6 +681,7 @@ export default function Sidebar() {
             <div className={`submenu open`}>
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
                 href="/Home/hr/staffAttendance"
                 className={styles.submenuItem}
               >
@@ -693,6 +695,8 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
                 href="/Home/hr/studentAttendance"
                 className={styles.submenuItem}
               >
@@ -703,11 +707,25 @@ export default function Sidebar() {
                   <span>Student Attendance</span>
                 </div>
               </ProtectedLink>
+
+              <ProtectedLink
+                isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
+                isTeacher={isTeacher}
+                href="/Home/management/studentManager"
+                className={styles.submenuItem}
+              >
+                <div className={styles.navItemContent}>
+                  <div className={styles.navIcon}>
+                    <ProfilesIcon />
+                  </div>
+                  <span>Student Manager</span>
+                </div>
+              </ProtectedLink>
             </div>
           )}
         </div>
 
-        {/* FINANCE */}
         <div className={styles.navGroup}>
           <div
             className={`${styles.navItem} ${openMenu === "finance" ? styles.expanded : ""}`}
@@ -737,6 +755,7 @@ export default function Sidebar() {
             <div className={`submenu open`}>
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
                 href="/Home/finance/fees"
                 className={styles.submenuItem}
               >
@@ -750,6 +769,7 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
                 href="/Home/finance/expenditure"
                 className={styles.submenuItem}
               >
@@ -763,6 +783,7 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
                 href="/Home/finance/invoices/list/"
                 className={styles.submenuItem}
               >
@@ -776,6 +797,7 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
                 href="/Home/finance/payments"
                 className={styles.submenuItem}
               >
@@ -789,6 +811,7 @@ export default function Sidebar() {
 
               <ProtectedLink
                 isAdmin={isAdmin}
+                isHeadmaster={isHeadmaster}
                 href="/Home/finance/payroll"
                 className={styles.submenuItem}
               >
@@ -807,6 +830,7 @@ export default function Sidebar() {
 
         <ProtectedLink
           isAdmin={isAdmin}
+          isHeadmaster={isHeadmaster}
           href="/Home/userAccount/"
           className={styles.navItem}
         >
@@ -819,6 +843,7 @@ export default function Sidebar() {
         </ProtectedLink>
         <ProtectedLink
           isAdmin={isAdmin}
+          isHeadmaster={isHeadmaster}
           href="/Home/config/"
           className={styles.navItem}
         >
@@ -831,6 +856,7 @@ export default function Sidebar() {
         </ProtectedLink>
         <ProtectedLink
           isAdmin={isAdmin}
+          isHeadmaster={isHeadmaster}
           href="/Home/appaccess/"
           className={styles.navItem}
         >
@@ -842,19 +868,23 @@ export default function Sidebar() {
           </div>
         </ProtectedLink>
 
-        <div className={styles.navGroup}>
-          <div
-            className={`${styles.navItem} ${styles.logout}`}
-            onClick={handleLogout}
-          >
-            <div className={styles.navItemContent}>
-              <div className={styles.navIcon}>
-                <LogoutIcon />
+        <ProtectedLink
+          href="/Home/logout/"
+          className={styles.navItem}
+        >
+          <div className={styles.navGroup}>
+            <div
+              className={`${styles.navItem} ${styles.logout}`}
+            >
+              <div className={styles.navItemContent}>
+                <div className={styles.navIcon}>
+                  <LogoutIcon />
+                </div>
+                <span>Logout</span>
               </div>
-              <span>Logout</span>
             </div>
           </div>
-        </div>
+        </ProtectedLink>
       </div>
     </div>
   );

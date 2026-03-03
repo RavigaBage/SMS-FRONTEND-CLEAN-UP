@@ -12,16 +12,15 @@ interface InvoiceItem {
   total?: number | string;
 }
 
-// 1. Updated Interface to match API JSON response exactly
 interface Invoice {
   id: number;
   invoice_number: string;
   items: InvoiceItem[];
-  total_amount: string; // Changed from 'total'
-  amount_paid: string; // Added
-  balance: string; // Added
+  total_amount: string; 
+  amount_paid: string; 
+  balance: string;
   status?: string;
-  status_display?: string; // Added
+  status_display?: string; 
   due_date?: string;
   created_at?: string;
   student?: {
@@ -29,23 +28,20 @@ interface Invoice {
     admission_number?: string;
     class_info?: { class_name?: string } | null;
     address?: string;
-    // Note: 'parent' is not in your JSON response, but leaving it optional
     parent?: { full_name?: string } | string;
   } | null;
 }
 
 type PageProps = {
   params: Promise<{ id: string }>;
-};
+}
 
 export default function InvoiceViewPage({ params }: PageProps) {
   const router = useRouter();
   const { id: invoiceId } = use(params);
-
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
@@ -104,7 +100,6 @@ export default function InvoiceViewPage({ params }: PageProps) {
                   <strong>Class:</strong>{" "}
                   {invoice.student?.class_info?.class_name || "—"}
                 </p>
-                {/* Kept parent just in case your API sometimes returns it, otherwise it shows '—' */}
                 <p>
                   <strong>Parent:</strong>{" "}
                   {typeof invoice.student?.parent === "string"
@@ -141,7 +136,6 @@ export default function InvoiceViewPage({ params }: PageProps) {
                       <td className="border px-3 py-2">{item.description}</td>
                       <td className="border px-3 py-2">{item.qty}</td>
                       <td className="border px-3 py-2">{item.amount}</td>
-                      {/* Note: Ensure item.unit_price and qty are numbers if multiplying */}
                       <td className="border px-3 py-2">
                         {Number(item.amount)}
                       </td>
@@ -149,9 +143,9 @@ export default function InvoiceViewPage({ params }: PageProps) {
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan={4}
-                      className="border px-3 py-4 text-center text-gray-500"
+                    <td 
+                       colSpan={4}
+                       className="border px-3 py-4 text-center text-gray-500"
                     >
                       No items found on this invoice.
                     </td>
@@ -160,7 +154,6 @@ export default function InvoiceViewPage({ params }: PageProps) {
               </tbody>
             </table>
 
-            {/* 2. Updated to use the correct amounts from the API */}
             <div className="mt-6 text-right space-y-2 border-t pt-4 w-64 ml-auto">
               <div className="flex justify-between text-gray-600">
                 <span>Total Amount:</span>

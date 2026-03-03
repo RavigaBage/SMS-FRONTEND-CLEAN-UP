@@ -1,9 +1,8 @@
-// frontend/src/lib/mock-student-management.ts
 
 export const mockStudentManagement = {
   responseCode: 0,
   responseMessage: "Student records fetched successfully",
-  dataCount: 128, // Matches the "Showing 1 to 5 of 128" in the image
+  dataCount: 128, 
   data: [
     {
       id: "#STU001",

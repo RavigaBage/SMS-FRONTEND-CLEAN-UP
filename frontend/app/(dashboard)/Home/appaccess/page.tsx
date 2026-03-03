@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/src/lib/apiClient";
 import { Pagination } from "@/src/assets/components/management/Pagination";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 type InviteStatus = "active" | "expired" | "used" | "none";
 
 type Ward = {
@@ -39,7 +38,6 @@ type ParentAccess = {
 
 type FilterType = "all" | "active" | "no_access" | "pending" | "revoked";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
   active: {
     label: "Active",
@@ -101,7 +99,6 @@ function RelationshipBadge({ rel }: { rel: string }) {
   );
 }
 
-// ─── Confirm Dialog ───────────────────────────────────────────────────────────
 function ConfirmDialog({
   open,
   title,
@@ -150,7 +147,6 @@ function ConfirmDialog({
   );
 }
 
-// ─── Parent Row Card ──────────────────────────────────────────────────────────
 function ParentCard({
   parent,
   onSendInvite,
@@ -175,7 +171,7 @@ function ParentCard({
                     p-5 transition hover:shadow-md hover:shadow-slate-200/50"
     >
       <div className="flex items-start gap-4">
-        {/* Avatar */}
+  
         <div
           className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#1f3889] to-[#2d52c4]
                         flex items-center justify-center text-white font-bold text-base flex-shrink-0"
@@ -187,7 +183,6 @@ function ParentCard({
             .join("")}
         </div>
 
-        {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-slate-900 text-sm">
@@ -238,7 +233,6 @@ function ParentCard({
             </span>
           </div>
 
-          {/* Wards */}
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             {parent.wards.map((w) => (
               <span
@@ -265,7 +259,6 @@ function ParentCard({
             ))}
           </div>
 
-          {/* Active invite code display */}
           {status === "pending" && parent.invite_code && (
             <div className="mt-3 flex items-center gap-2">
               <div
@@ -294,7 +287,6 @@ function ParentCard({
           )}
         </div>
 
-        {/* Actions */}
         <div className="flex flex-col gap-2 flex-shrink-0">
           {status === "no_access" && (
             <ActionBtn
@@ -377,7 +369,6 @@ function ActionBtn({
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function ParentAccessPage() {
   const [parents, setParents] = useState<ParentAccess[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
@@ -397,7 +388,6 @@ export default function ParentAccessPage() {
     action: () => void;
   } | null>(null);
 
-  // Toast auto-dismiss
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 4000);
@@ -415,7 +405,6 @@ export default function ParentAccessPage() {
         const res = await apiRequest<ParentAccess[]>("/parents/app-access/", {
           method: "GET",
         });
-        console.log(res);
 
         const rows =
           res.data && Array.isArray(res.data)
@@ -438,7 +427,6 @@ export default function ParentAccessPage() {
     loadParents();
   }, []);
 
-  // ── API calls ─────────────────────────────────────────────────────────────
 
   const handleSendInvite = async (parentId: number) => {
     setLoading(parentId);
@@ -560,7 +548,6 @@ export default function ParentAccessPage() {
     }
   };
 
-  // ── Filtering ─────────────────────────────────────────────────────────────
   const filtered = parents.filter((p) => {
     const status = getParentStatus(p);
     const matchesFilter =
@@ -610,7 +597,7 @@ export default function ParentAccessPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      {/* ── Toast ── */}
+
       {toast && (
         <div
           className={`fixed top-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl
@@ -626,7 +613,6 @@ export default function ParentAccessPage() {
         </div>
       )}
 
-      {/* ── Confirm dialog ── */}
       {confirm && (
         <ConfirmDialog
           open={confirm.open}
@@ -639,7 +625,6 @@ export default function ParentAccessPage() {
         />
       )}
 
-      {/* ── Page header ── */}
       <div
         className="border-b border-slate-200 bg-white
                       sticky top-0 z-10 backdrop-blur"
@@ -671,7 +656,6 @@ export default function ParentAccessPage() {
                 </p>
               </div>
             </div>
-            {/* Bulk send to all without access */}
             <button
               onClick={() => {
                 const eligible = parents.filter(
@@ -719,7 +703,7 @@ export default function ParentAccessPage() {
       </div>
 
       <div className="w-full px-6 py-6 space-y-5">
-        {/* ── Stats row ── */}
+
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             {
@@ -756,7 +740,6 @@ export default function ParentAccessPage() {
           ))}
         </div>
 
-        {/* ── Search + filter ── */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <svg
@@ -801,7 +784,6 @@ export default function ParentAccessPage() {
           </div>
         </div>
 
-        {/* ── Parent list ── */}
         {filtered.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <svg

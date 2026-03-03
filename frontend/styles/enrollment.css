@@ -24,7 +24,6 @@
   padding: 0 24px;
 }
 
-/* Header */
 .ENROLLDATA .header {
   display: flex;
   justify-content: space-between;
@@ -43,7 +42,6 @@
   margin-top: 4px;
 }
 
-/* Primary Button */
 .ENROLLDATA .primaryBtn {
   background: linear-gradient(135deg, var(--primary), #2563eb);
   color: white;
@@ -62,7 +60,6 @@
   box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
 }
 
-/* Controls */
 .ENROLLDATA .controls {
   display: flex;
   justify-content: space-between;
@@ -104,7 +101,6 @@ input[type="number"] {
   cursor: pointer;
 }
 
-/* Table Card */
 .ENROLLDATA .tableCard {
   background: var(--card);
   border-radius: var(--radius);
@@ -141,7 +137,6 @@ input[type="number"] {
   background: #f8fafc;
 }
 
-/* Status Tags */
 .ENROLLDATA .status {
   padding: 6px 12px;
   border-radius: 20px;
@@ -165,7 +160,6 @@ input[type="number"] {
   color: #b91c1c;
 }
 
-/* Actions */
 .ENROLLDATA .actionGroup {
   display: flex;
   gap: 8px;

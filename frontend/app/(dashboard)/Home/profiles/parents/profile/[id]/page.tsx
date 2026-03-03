@@ -44,7 +44,7 @@ interface ParentProfileData {
 }
 
 export default function ParentProfile() {
-  const { id } = useParams(); // Gets the /12 from URL
+  const { id } = useParams(); 
   const [parent, setParent] = useState<ParentProfileData | null>(null);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,13 +53,11 @@ export default function ParentProfile() {
     const fetchFullProfile = async () => {
       setLoading(true);
       try {
-        // 1. Fetch Parent Basic Info
+     
         const parentRes = await apiRequest<ParentProfileData>(
           `/parents/${id}/`,
         );
         setParent(parentRes.data as any);
-
-        // 2. Fetch Children using the detail action we verified earlier
         const childrenRes = await apiRequest<Ward[]>(
           `/parents/${id}/children/`,
         );
@@ -86,14 +84,13 @@ export default function ParentProfile() {
   return (
     <div className="min-h-screen bg-slate-50/50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* BREADCRUMB */}
+    
         <nav className="flex items-center gap-2 text-sm text-slate-500">
           <span>Directory</span>
           <ChevronRight className="w-4 h-4" />
           <span className="font-bold text-slate-900">Parent Profile</span>
         </nav>
 
-        {/* PROFILE HEADER CARD */}
         <section className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-8 opacity-5">
             <User className="w-32 h-32" />
@@ -129,24 +126,15 @@ export default function ParentProfile() {
               </div>
             </div>
 
-            <div className="flex gap-2 w-full md:w-auto">
-              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-700 hover:bg-slate-50 transition-all">
-                <MessageSquare className="w-4 h-4" /> Message
-              </button>
-              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all">
-                <Edit3 className="w-4 h-4" /> Edit Profile
-              </button>
-            </div>
+         
           </div>
         </section>
 
-        {/* SUMMARY STATS */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatBox label="Wards" value={wards.length} sub="Children linked" />
           <StatBox label="Status" value="Active" sub="Payment Account" />
         </div>
 
-        {/* WARDS SECTION */}
         <section>
           <div className="flex items-center gap-4 mb-6">
             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">

@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, BookOpen, Hash, FileText, Target, ChevronDown } from "lucide-react";
+import { X, BookOpen, ChevronDown, AlertCircle, CheckCircle, Search } from "lucide-react";
 import "@/styles/syllabi.css";
 import { fetchWithAuth } from "@/src/lib/apiClient";
 
-// Types based on your backend serializer
 interface Subject {
   id: number;
   subject_name: string;
@@ -35,13 +34,62 @@ interface Syllabus {
   learning_objectives: string;
 }
 
+interface Toast {
+  id: string;
+  type: "success" | "error" | "info";
+  message: string;
+}
+
+function Toast({ toast, onClose }: { toast: Toast; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 5000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  const colors = {
+    success: { bg: "#ecfdf5", border: "#d1fae5", text: "#065f46", icon: "#10b981" },
+    error: { bg: "#fef2f2", border: "#fee2e2", text: "#7f1d1d", icon: "#ef4444" },
+    info: { bg: "#eff6ff", border: "#dbeafe", text: "#1e3a8a", icon: "#3b82f6" },
+  }[toast.type];
+
+  return (
+    <div
+      className="fixed bottom-4 right-4 max-w-md animate-in fade-in slide-in-from-bottom-4 duration-300"
+      style={{
+        backgroundColor: colors.bg,
+        borderLeft: `4px solid ${colors.icon}`,
+        borderRadius: "8px",
+        padding: "16px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+      }}
+    >
+      <div className="flex items-start gap-3">
+        <div style={{ color: colors.icon, marginTop: "2px" }}>
+          {toast.type === "success" && <CheckCircle size={18} />}
+          {toast.type === "error" && <AlertCircle size={18} />}
+          {toast.type === "info" && <AlertCircle size={18} />}
+        </div>
+        <div className="flex-1">
+          <p style={{ color: colors.text, fontSize: "13px", fontWeight: 500, lineHeight: 1.5 }}>
+            {toast.message}
+          </p>
+        </div>
+        <button
+          onClick={onClose}
+          style={{ color: colors.text, opacity: 0.6 }}
+          className="hover:opacity-100 transition-opacity"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Syllabi() {
   const [syllabi, setSyllabi] = useState<Syllabus[]>([]);
-  const [selectedSyllabus, setSelectedSyllabus] = useState<Syllabus | null>(
-    null,
-  );
+  const [selectedSyllabus, setSelectedSyllabus] = useState<Syllabus | null>(null);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingSyllabus, setEditingSyllabus] = useState<Syllabus | null>(null);
@@ -49,8 +97,17 @@ export default function Syllabi() {
   const [selectSubject, setSelectSubject] = useState("");
   const [classes, setClasses] = useState<ClassObj[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
-  // Fetch initial data on mount
+  const addToast = (type: "success" | "error" | "info", message: string) => {
+    const id = Date.now().toString();
+    setToasts((prev) => [...prev, { id, type, message }]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -58,21 +115,20 @@ export default function Syllabi() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch classes
       const classResponse = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/classes/`
       );
       const classData = await classResponse.json();
       setClasses(classData.results || classData);
 
-      // Fetch subjects
       const subjectResponse = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/subjects/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/subjects/`
       );
       const subjectData = await subjectResponse.json();
       setSubjects(subjectData.results || subjectData);
     } catch (error) {
       console.error("Failed to fetch data:", error);
+      addToast("error", "Failed to load subjects and classes");
     } finally {
       setLoading(false);
     }
@@ -80,7 +136,7 @@ export default function Syllabi() {
 
   const handleSyllabiClick = async () => {
     if (!selectSubject && !selectedClass) {
-      alert("Please select at least a subject or class");
+      addToast("info", "Please select at least a subject or class");
       return;
     }
 
@@ -101,16 +157,16 @@ export default function Syllabi() {
       const syllabusArray = syllData.results || syllData;
       setSyllabi(syllabusArray);
 
-      // Set first syllabus as selected if available
       if (syllabusArray.length > 0) {
         setSelectedSyllabus(syllabusArray[0]);
+        addToast("success", `Loaded ${syllabusArray.length} syllabus(es)`);
       } else {
         setSelectedSyllabus(null);
-        alert("No syllabi found for the selected filters");
+        addToast("info", "No syllabi found for the selected filters");
       }
     } catch (error) {
       console.error("Failed to fetch syllabi:", error);
-      alert("Failed to fetch syllabi. Please try again.");
+      addToast("error", "Failed to fetch syllabi");
     } finally {
       setLoading(false);
     }
@@ -119,7 +175,7 @@ export default function Syllabi() {
   const handleDeleteSyllabus = async (syllabusId: number) => {
     if (
       !confirm(
-        "Are you sure you want to delete this syllabus? This action cannot be undone.",
+        "Are you sure you want to delete this syllabus? This action cannot be undone."
       )
     ) {
       return;
@@ -130,23 +186,22 @@ export default function Syllabi() {
         `${process.env.NEXT_PUBLIC_API_URL}/syllabi/${syllabusId}/`,
         {
           method: "DELETE",
-        },
+        }
       );
 
       if (response.ok) {
-        alert("Syllabus deleted successfully!");
-        // Remove from list
         setSyllabi((prev) => prev.filter((s) => s.id !== syllabusId));
-        // Clear selection if deleted syllabus was selected
         if (selectedSyllabus?.id === syllabusId) {
-          setSelectedSyllabus(syllabi.length > 1 ? syllabi[0] : null);
+          const remaining = syllabi.filter((s) => s.id !== syllabusId);
+          setSelectedSyllabus(remaining.length > 0 ? remaining[0] : null);
         }
+        addToast("success", "Syllabus deleted successfully");
       } else {
         throw new Error("Failed to delete syllabus");
       }
     } catch (error) {
       console.error("Failed to delete syllabus:", error);
-      alert("Failed to delete syllabus. Please try again.");
+      addToast("error", "Failed to delete syllabus");
     }
   };
 
@@ -155,7 +210,6 @@ export default function Syllabi() {
     setShowEditModal(true);
   };
 
-  // Group syllabi by week number
   const groupedSyllabi = syllabi.reduce(
     (acc, syllabus) => {
       const weekKey = `Week ${syllabus.week_number}`;
@@ -165,175 +219,528 @@ export default function Syllabi() {
       acc[weekKey].push(syllabus);
       return acc;
     },
-    {} as Record<string, Syllabus[]>,
+    {} as Record<string, Syllabus[]>
   );
-
-  // Filter syllabi based on search
-  const filteredSyllabi = syllabi.filter(
-    (s) =>
-      s.subject?.subject_name
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      s.topic_title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.content_summary?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  const handleBulkDownload = async () => {
-    alert("Bulk download feature coming soon!");
-  };
 
   if (loading && syllabi.length === 0) {
     return (
-      <div className="container SYLLABIDATA">
-        <div style={{ padding: "40px", textAlign: "center" }}>
-          <p>Loading syllabi...</p>
+      <div style={{ background: "linear-gradient(135deg, #ffffff 0%, #f8fafb 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ marginBottom: "16px", display: "flex", justifyContent: "center", gap: "8px" }}>
+            <div style={{ width: "8px", height: "8px", background: "#9ca3af", borderRadius: "50%", animation: "pulse 2s infinite" }}></div>
+          </div>
+          <p style={{ color: "#6b7280", fontSize: "14px", fontWeight: 500 }}>Loading syllabi...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container SYLLABIDATA">
-      <header className="header">
-        <div>
-          <h1>Syllabi Management</h1>
-          <p>Academic Year 2025-2026 • {syllabi.length} Syllabi Found</p>
-        </div>
-        <div className="header-div">
-          <button className="btn btn-outline" onClick={handleBulkDownload}>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
-            </svg>
-            Bulk Download
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowUploadModal(true)}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Create New Syllabus
-          </button>
-        </div>
-      </header>
+    <div style={{ background: "linear-gradient(135deg, #ffffff 0%, #f8fafb 100%)", minHeight: "100vh" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+          font-family: 'Inter', sans-serif;
+        }
+        
+        h1, h2, h3 {
+          font-family: 'Crimson Text', serif;
+        }
 
-      <main className="syllabus-grid">
-        <aside className="list-panel">
-          <div className="panel-header">
-            <h3>Filter Syllabi</h3>
-            <select
-              className="search-box"
-              value={selectSubject}
-              onChange={(e) => setSelectSubject(e.target.value)}
-            >
-              <option value="">All Subjects</option>
-              {subjects.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.subject_name} - {item.subject_code}
-                </option>
-              ))}
-            </select>
-            <select
-              className="search-box"
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-            >
-              <option value="">All Classes</option>
-              {classes.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.class_name}
-                </option>
-              ))}
-            </select>
-            <button
-              className="btn btn-primary"
-              onClick={handleSyllabiClick}
-              style={{ width: "100%", marginTop: "8px" }}
-            >
+        .syllabus-container {
+          display: grid;
+          grid-template-columns: 320px 1fr;
+          height: 100vh;
+          gap: 0;
+        }
+
+        .sidebar {
+          background: white;
+          border-right: 1px solid #e5e7eb;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        }
+
+        .sidebar-header {
+          padding: 24px;
+          border-bottom: 1px solid #f3f4f6;
+        }
+
+        .sidebar-header h2 {
+          font-size: 24px;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0 0 8px 0;
+          letter-spacing: -0.5px;
+        }
+
+        .sidebar-header p {
+          font-size: 12px;
+          color: #9ca3af;
+          margin: 0;
+        }
+
+        .filter-panel {
+          padding: 20px 24px;
+          border-bottom: 1px solid #f3f4f6;
+        }
+
+        .filter-label {
+          font-size: 11px;
+          font-weight: 700;
+          color: #6b7280;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 12px;
+          display: block;
+        }
+
+        .select-wrapper {
+          position: relative;
+          margin-bottom: 12px;
+        }
+
+        .select-wrapper select {
+          width: 100%;
+          padding: 10px 12px;
+          font-size: 13px;
+          border: 1px solid #e5e7eb;
+          border-radius: 6px;
+          background: white;
+          color: #374151;
+          appearance: none;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .select-wrapper select:hover {
+          border-color: #d1d5db;
+        }
+
+        .select-wrapper select:focus {
+          outline: none;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .select-wrapper::after {
+          content: '';
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          pointer-events: none;
+          width: 5px;
+          height: 5px;
+          border-right: 2px solid #9ca3af;
+          border-bottom: 2px solid #9ca3af;
+          transform: translateY(-65%) rotate(45deg);
+        }
+
+        .load-btn {
+          width: 100%;
+          padding: 10px 12px;
+          background: #1f2937;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          margin-top: 8px;
+        }
+
+        .load-btn:hover {
+          background: #111827;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .syllabi-list {
+          flex: 1;
+          overflow-y: auto;
+          padding: 12px 0;
+        }
+
+        .syllabi-list::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .syllabi-list::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .syllabi-list::-webkit-scrollbar-thumb {
+          background: #e5e7eb;
+          border-radius: 3px;
+        }
+
+        .week-section {
+          margin-bottom: 16px;
+        }
+
+        .week-label {
+          padding: 8px 24px;
+          font-size: 11px;
+          font-weight: 700;
+          color: #9ca3af;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          background: #f9fafb;
+        }
+
+        .syllabus-item {
+          padding: 12px 16px;
+          margin: 0 12px;
+          border-left: 3px solid transparent;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border-radius: 4px;
+          margin-bottom: 6px;
+        }
+
+        .syllabus-item:hover {
+          background: #f9fafb;
+          border-left-color: #d1d5db;
+        }
+
+        .syllabus-item.active {
+          background: #f0f9ff;
+          border-left-color: #3b82f6;
+        }
+
+        .syllabus-item-title {
+          font-size: 13px;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .syllabus-item-subject {
+          font-size: 12px;
+          color: #9ca3af;
+          margin-top: 4px;
+          display: block;
+        }
+
+        .item-actions {
+          display: flex;
+          gap: 6px;
+          margin-top: 8px;
+        }
+
+        .action-btn {
+          flex: 1;
+          padding: 6px 8px;
+          font-size: 11px;
+          font-weight: 600;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+        }
+
+        .action-btn-edit {
+          background: #eff6ff;
+          color: #3b82f6;
+        }
+
+        .action-btn-edit:hover {
+          background: #dbeafe;
+        }
+
+        .action-btn-delete {
+          background: #fef2f2;
+          color: #ef4444;
+        }
+
+        .action-btn-delete:hover {
+          background: #fee2e2;
+        }
+
+        .main-content {
+          display: flex;
+          flex-direction: column;
+          padding: 40px 48px;
+          overflow-y: auto;
+        }
+
+        .header-section {
+          margin-bottom: 40px;
+          padding-bottom: 32px;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .main-title {
+          font-size: 48px;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0 0 24px 0;
+          letter-spacing: -1px;
+          line-height: 1.1;
+        }
+
+        .badges-group {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 12px;
+          font-size: 12px;
+          font-weight: 500;
+          border-radius: 4px;
+          border: 1px solid;
+        }
+
+        .badge-subject {
+          background: #f0f9ff;
+          border-color: #bfdbfe;
+          color: #0369a1;
+        }
+
+        .badge-class {
+          background: #f0fdf4;
+          border-color: #bbf7d0;
+          color: #15803d;
+        }
+
+        .badge-week {
+          background: #fffbeb;
+          border-color: #fde68a;
+          color: #92400e;
+        }
+
+        .content-section {
+          margin-bottom: 32px;
+        }
+
+        .section-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0 0 16px 0;
+          letter-spacing: -0.3px;
+        }
+
+        .content-text {
+          font-size: 14px;
+          line-height: 1.8;
+          color: #4b5563;
+          white-space: pre-line;
+          margin: 0;
+        }
+
+        .objectives-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .objectives-list li {
+          font-size: 14px;
+          line-height: 1.8;
+          color: #4b5563;
+          padding: 8px 0;
+          padding-left: 20px;
+          position: relative;
+        }
+
+        .objectives-list li::before {
+          content: '→';
+          position: absolute;
+          left: 0;
+          color: #d1d5db;
+          font-weight: 600;
+        }
+
+        .metadata-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+          background: #f9fafb;
+          padding: 20px 24px;
+          border-radius: 6px;
+        }
+
+        .metadata-item {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .metadata-label {
+          font-size: 11px;
+          font-weight: 700;
+          color: #9ca3af;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 6px;
+        }
+
+        .metadata-value {
+          font-size: 14px;
+          font-weight: 500;
+          color: #1f2937;
+        }
+
+        .empty-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          text-align: center;
+        }
+
+        .empty-icon {
+          width: 64px;
+          height: 64px;
+          background: #f3f4f6;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 20px;
+          color: #d1d5db;
+        }
+
+        .empty-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0 0 8px 0;
+        }
+
+        .empty-text {
+          font-size: 14px;
+          color: #9ca3af;
+          margin: 0;
+        }
+
+        .header-bar {
+          background: white;
+          border-bottom: 1px solid #e5e7eb;
+          padding: 24px 48px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .header-bar-title {
+          font-size: 32px;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0;
+          letter-spacing: -0.5px;
+        }
+
+        .header-bar-subtitle {
+          font-size: 13px;
+          color: #9ca3af;
+          margin: 4px 0 0 0;
+        }
+
+        .create-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 20px;
+          background: #3b82f6;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .create-btn:hover {
+          background: #2563eb;
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+      `}</style>
+
+      <div className="syllabus-container">
+        <div className="sidebar">
+          <div className="sidebar-header">
+            <h2>Syllabi</h2>
+            <p>{syllabi.length} syllabi loaded</p>
+          </div>
+
+          <div className="filter-panel">
+            <label className="filter-label">Subject</label>
+            <div className="select-wrapper">
+              <select value={selectSubject} onChange={(e) => setSelectSubject(e.target.value)}>
+                <option value="">All Subjects</option>
+                {subjects.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.subject_name} - {item.subject_code}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <label className="filter-label">Class</label>
+            <div className="select-wrapper">
+              <select value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
+                <option value="">All Classes</option>
+                {classes.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.class_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button className="load-btn" onClick={handleSyllabiClick}>
               Load Syllabi
             </button>
           </div>
 
-          <div className="scroll-area">
+          <div className="syllabi-list">
             {Object.entries(groupedSyllabi).map(([weekLabel, weekSyllabi]) => (
-              <div className="class-group" key={weekLabel}>
-                <div className="class-label">{weekLabel}</div>
+              <div className="week-section" key={weekLabel}>
+                <div className="week-label">{weekLabel}</div>
                 {weekSyllabi.map((syllabus) => (
                   <div
                     key={syllabus.id}
-                    className={`syllabus-item ${
-                      selectedSyllabus?.id === syllabus.id ? "active" : ""
-                    }`}
+                    className={`syllabus-item ${selectedSyllabus?.id === syllabus.id ? "active" : ""}`}
                   >
-                    <div
-                      className="item-info"
-                      onClick={() => setSelectedSyllabus(syllabus)}
-                      style={{ cursor: "pointer", flex: 1 }}
-                    >
-                      <h4>{syllabus.topic_title}</h4>
-                      <span>{syllabus.subject?.subject_name}</span>
+                    <div onClick={() => setSelectedSyllabus(syllabus)}>
+                      <p className="syllabus-item-title">{syllabus.topic_title}</p>
+                      <span className="syllabus-item-subject">{syllabus.subject?.subject_name} - {syllabus.subject?.subject_code}</span>
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "8px",
-                        alignItems: "center",
-                      }}
-                    >
+                    <div className="item-actions">
                       <button
-                        className="icon-btn"
+                        className="action-btn action-btn-edit"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleEditClick(syllabus);
                         }}
-                        title="Edit syllabus"
                       >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
+                        Edit
                       </button>
                       <button
-                        className="icon-btn icon-btn-danger"
+                        className="action-btn action-btn-delete"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteSyllabus(syllabus.id);
                         }}
-                        title="Delete syllabus"
                       >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <polyline points="3 6 5 6 21 6" />
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        </svg>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -342,160 +749,88 @@ export default function Syllabi() {
             ))}
 
             {Object.keys(groupedSyllabi).length === 0 && (
-              <div
-                style={{
-                  padding: "20px",
-                  textAlign: "center",
-                  color: "#64748b",
-                }}
-              >
-                <p>No syllabi found. Select filters and click "Load Syllabi"</p>
+              <div style={{ padding: "32px 20px", textAlign: "center", color: "#9ca3af" }}>
+                <p style={{ fontSize: "13px", margin: 0 }}>No syllabi found</p>
               </div>
             )}
           </div>
-        </aside>
+        </div>
 
-        <section className="detail-panel">
-          {selectedSyllabus ? (
-            <>
-              <div className="detail-hero">
-                <div className="detail-hero-flex">
-                  <div>
-                    <h2 className="detail-hero-flex-h2">
-                      {selectedSyllabus.topic_title}
-                    </h2>
-                    <div className="meta-badges">
-                      <span className="badge badge-blue">
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                        >
-                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                        </svg>
-                        {selectedSyllabus.subject?.subject_name}
-                      </span>
-                      {selectedSyllabus.class_obj && (
-                        <span className="badge badge-teal">
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                          >
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                            <polyline points="9 22 9 12 15 12 15 22" />
-                          </svg>
-                          {selectedSyllabus.class_obj.class_name}
-                        </span>
-                      )}
-                      <span className="badge badge-green">
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                        >
-                          <rect
-                            x="3"
-                            y="4"
-                            width="18"
-                            height="18"
-                            rx="2"
-                            ry="2"
-                          />
-                          <line x1="16" y1="2" x2="16" y2="6" />
-                          <line x1="8" y1="2" x2="8" y2="6" />
-                          <line x1="3" y1="10" x2="21" y2="10" />
-                        </svg>
-                        Week {selectedSyllabus.week_number}
-                      </span>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div className="header-bar">
+            <div>
+              <h1 className="header-bar-title">Syllabi Management</h1>
+              <p className="header-bar-subtitle">Create, edit, and manage course syllabi</p>
+            </div>
+            <button className="create-btn" onClick={() => setShowUploadModal(true)}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Create Syllabus
+            </button>
+          </div>
+
+          <div className="main-content">
+            {selectedSyllabus ? (
+              <>
+                <div className="header-section">
+                  <h1 className="main-title">{selectedSyllabus.topic_title}</h1>
+                  <div className="badges-group">
+                    <div className="badge badge-subject">
+                      <BookOpen size={12} />
+                      {selectedSyllabus.subject?.subject_name}
                     </div>
-                  </div>
-                  <div style={{ fontSize: "14px", color: "#64748b" }}>
-                    Teacher:{" "}
-                    {selectedSyllabus.teacher?.full_name || "Not assigned"}
+                    {selectedSyllabus.class_obj && (
+                      <div className="badge badge-class">{selectedSyllabus.class_obj.class_name}</div>
+                    )}
+                    <div className="badge badge-week">Week {selectedSyllabus.week_number}</div>
                   </div>
                 </div>
-              </div>
 
-              <div className="content-body">
-                <div className="main-content">
-                  <h3 className="section-title">Content Summary</h3>
-                  <p className="course-description">
-                    {selectedSyllabus.content_summary ||
-                      "No content summary provided"}
+                <div className="content-section">
+                  <h2 className="section-title">Content Summary</h2>
+                  <p className="content-text">
+                    {selectedSyllabus.content_summary || "No content summary provided"}
                   </p>
+                </div>
 
-                  <h3 className="section-title">Learning Objectives</h3>
+                <div className="content-section">
+                  <h2 className="section-title">Learning Objectives</h2>
                   <ul className="objectives-list">
                     {selectedSyllabus.learning_objectives ? (
                       selectedSyllabus.learning_objectives
                         .split("\n")
                         .filter((obj) => obj.trim())
-                        .map((objective, index) => (
-                          <li key={index}>{objective.trim()}</li>
-                        ))
+                        .map((objective, index) => <li key={index}>{objective.trim()}</li>)
                     ) : (
                       <li>No learning objectives specified</li>
                     )}
                   </ul>
                 </div>
 
-                <aside className="detail-sidebar">
-                  <div className="metadata-section">
-                    <h4 className="section-title">Details</h4>
-                    <div className="metadata-item">
-                      <span className="metadata-label">Subject Code:</span>
-                      <span className="metadata-value">
-                        {selectedSyllabus.subject?.subject_code || "N/A"}
-                      </span>
-                    </div>
-                    <div className="metadata-item">
-                      <span className="metadata-label">Week Number:</span>
-                      <span className="metadata-value">
-                        {selectedSyllabus.week_number}
-                      </span>
-                    </div>
-                    <div className="metadata-item">
-                      <span className="metadata-label">Teacher:</span>
-                      <span className="metadata-value">
-                        {selectedSyllabus.teacher?.full_name || "Not assigned"}
-                      </span>
-                    </div>
+                <div className="metadata-grid">
+                  <div className="metadata-item">
+                    <span className="metadata-label">Subject Code</span>
+                    <span className="metadata-value">{selectedSyllabus.subject?.subject_code || "N/A"}</span>
                   </div>
-                </aside>
+                  <div className="metadata-item">
+                    <span className="metadata-label">Teacher</span>
+                    <span className="metadata-value">{selectedSyllabus.teacher?.full_name || "Not assigned"}</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="empty-state">
+                <div className="empty-icon">
+                  <BookOpen size={32} />
+                </div>
+                <h3 className="empty-title">No Syllabus Selected</h3>
+                <p className="empty-text">Select a syllabus from the list to view details</p>
               </div>
-            </>
-          ) : (
-            <div className="empty-state">
-              <svg
-                width="64"
-                height="64"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
-              <h3>No Syllabus Selected</h3>
-              <p>Select a syllabus from the list to view its details</p>
-            </div>
-          )}
-        </section>
-      </main>
+            )}
+          </div>
+        </div>
+      </div>
 
       {showUploadModal && (
         <UploadModal
@@ -506,6 +841,7 @@ export default function Syllabi() {
           }}
           subjects={subjects}
           classes={classes}
+          addToast={addToast}
         />
       )}
 
@@ -523,28 +859,40 @@ export default function Syllabi() {
           subjects={subjects}
           classes={classes}
           syllabus={editingSyllabus}
+          addToast={addToast}
         />
       )}
+
+      <div>
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            toast={toast}
+            onClose={() => removeToast(toast.id)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
-// Upload Modal Component
 function UploadModal({
   onClose,
   onSuccess,
   subjects,
   classes,
+  addToast,
 }: {
   onClose: () => void;
   onSuccess: () => void;
   subjects: Subject[];
   classes: ClassObj[];
+  addToast: (type: "success" | "error" | "info", message: string) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     subject_id: "",
-    teacher_id: "1", // You should get this from auth context
     class_id: "",
     week_number: "1",
     topic_title: "",
@@ -553,25 +901,24 @@ function UploadModal({
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setUploading(true);
 
     try {
       const submitData = {
         subject_id: parseInt(formData.subject_id),
-        teacher_id: parseInt(formData.teacher_id),
         class_id: formData.class_id ? parseInt(formData.class_id) : null,
         week_number: parseInt(formData.week_number),
         topic_title: formData.topic_title,
@@ -583,266 +930,128 @@ function UploadModal({
         `${process.env.NEXT_PUBLIC_API_URL}/syllabi/`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(submitData),
-        },
+        }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          JSON.stringify(errorData.error || errorData) ||
-            "Failed to create syllabus",
-        );
+        let errorMessage = "Failed to create syllabus";
+
+        if (typeof errorData === "object") {
+          if (errorData.subject_id && Array.isArray(errorData.subject_id)) {
+            errorMessage = errorData.subject_id[0];
+          } else if (errorData.error) {
+            errorMessage = errorData.error;
+          }
+        }
+
+        setError(errorMessage);
+        return;
       }
 
-      alert("Syllabus created successfully!");
+      addToast("success", "Syllabus created successfully");
       onSuccess();
       onClose();
     } catch (error) {
       console.error("Failed to create syllabus:", error);
-      alert(
-        error instanceof Error
-          ? `The syllabus could not be created.\n\n${error.message}`
-          : "The syllabus could not be created right now. Please try again in a moment.",
-      );
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="relative bg-white w-full max-w-2xl mx-4 rounded-2xl shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* ── Top accent bar ─────────────────────────────────────────── */}
-        <div className="h-1 w-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500" />
-
-        {/* ── Header ─────────────────────────────────────────────────── */}
-        <div className="flex items-start justify-between px-7 pt-6 pb-5">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600">
-              <BookOpen size={18} strokeWidth={2} />
-            </span>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "16px" }}>
+      <div style={{ background: "white", width: "100%", maxWidth: "600px", borderRadius: "8px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}>
+        <div style={{ padding: "32px", borderBottom: "1px solid #e5e7eb" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <h2 className="text-[17px] font-semibold text-slate-800 tracking-tight">
-                Create New Syllabus
-              </h2>
-              <p className="text-[12px] text-slate-400 mt-0.5">
-                Fill in the details below to add a new syllabus entry
-              </p>
+              <h2 style={{ fontSize: "24px", fontWeight: 600, color: "#1f2937", margin: "0 0 4px 0" }}>Create New Syllabus</h2>
+              <p style={{ fontSize: "13px", color: "#9ca3af", margin: 0 }}>Fill in the details to add a new syllabus</p>
             </div>
+            <button
+              onClick={onClose}
+              style={{ background: "none", border: "none", fontSize: "24px", cursor: "pointer", color: "#9ca3af", padding: 0 }}
+            >
+              ×
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 red"
-          >
-            <X size={15} strokeWidth={2.5} />
-          </button>
         </div>
 
-        {/* ── Divider ────────────────────────────────────────────────── */}
-        <div className="h-px bg-slate-100 mx-7" />
-
-        {/* ── Form ───────────────────────────────────────────────────── */}
-        <form
-          onSubmit={handleSubmit}
-          className="px-7 py-6 space-y-6 overflow-y-auto max-h-[72vh]"
-        >
-          {/* Section 1 — Assignment */}
-          <fieldset className="space-y-4">
-            <legend className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">
-                1
-              </span>
-              Assignment
-            </legend>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* Subject */}
-              <div className="space-y-1.5">
-                <label className="block text-[12px] font-semibold text-slate-600">
-                  Subject <span className="text-rose-400">*</span>
-                </label>
-                <div className="relative">
-                  <select
-                    name="subject_id"
-                    value={formData.subject_id}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-2.5 pr-9 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all cursor-pointer"
-                  >
-                    <option value="">Select a subject</option>
-                    {subjects.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.subject_name} - {item.subject_code}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown
-                    size={14}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  />
-                </div>
-              </div>
-
-              {/* Class */}
-              <div className="space-y-1.5">
-                <label className="block text-[12px] font-semibold text-slate-600">
-                  Class
-                  <span className="ml-1.5 text-[10px] font-normal text-slate-400">
-                    (optional)
-                  </span>
-                </label>
-                <div className="relative">
-                  <select
-                    name="class_id"
-                    value={formData.class_id}
-                    onChange={handleInputChange}
-                    className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-2.5 pr-9 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all cursor-pointer"
-                  >
-                    <option value="">Select a class</option>
-                    {classes.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.class_name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown
-                    size={14}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  />
-                </div>
-              </div>
+        {error && (
+          <div style={{ margin: "20px 32px 0", padding: "12px 16px", background: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "6px", display: "flex", gap: "12px" }}>
+            <AlertCircle size={18} style={{ color: "#ef4444", flexShrink: 0, marginTop: "2px" }} />
+            <div>
+              <p style={{ margin: 0, fontSize: "13px", fontWeight: 500, color: "#7f1d1d" }}>{error}</p>
+              <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#dc2626" }}>Check your subject assignment and try again</p>
             </div>
-          </fieldset>
+          </div>
+        )}
 
-          {/* Section 2 — Topic */}
-          <fieldset className="space-y-4">
-            <legend className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">
-                2
-              </span>
-              Topic Details
-            </legend>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* Week Number */}
-              <div className="space-y-1.5">
-                <label className="block text-[12px] font-semibold text-slate-600">
-                  Week Number <span className="text-rose-400">*</span>
-                </label>
-                <div className="relative">
-                  <Hash
-                    size={13}
-                    className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                  />
-                  <input
-                    type="number"
-                    name="week_number"
-                    min="1"
-                    placeholder="e.g. 4"
-                    value={formData.week_number}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all"
-                  />
-                </div>
+        <form onSubmit={handleSubmit} style={{ padding: "32px", maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "24px" }}>
+            <div>
+              <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>
+                Subject <span style={{ color: "#ef4444" }}>*</span>
+              </label>
+              <div className="select-wrapper">
+                <select name="subject_id" value={formData.subject_id} onChange={handleInputChange} required style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "white" }}>
+                  <option value="">Select a subject</option>
+                  {subjects.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.subject_name} - {item.subject_code}
+                    </option>
+                  ))}
+                </select>
               </div>
-
-              {/* Topic Title */}
-              <div className="space-y-1.5">
-                <label className="block text-[12px] font-semibold text-slate-600">
-                  Topic Title <span className="text-rose-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="topic_title"
-                  placeholder="e.g. Algebra Fundamentals"
-                  value={formData.topic_title}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all"
-                />
-              </div>
-            </div>
-          </fieldset>
-
-          {/* Section 3 — Content */}
-          <fieldset className="space-y-4">
-            <legend className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-              <span className="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[9px] font-bold">
-                3
-              </span>
-              Content
-            </legend>
-
-            {/* Content Summary */}
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-1.5">
-                <FileText size={12} className="text-slate-400" />
-                <label className="block text-[12px] font-semibold text-slate-600">
-                  Content Summary <span className="text-rose-400">*</span>
-                </label>
-              </div>
-              <textarea
-                name="content_summary"
-                value={formData.content_summary}
-                onChange={handleInputChange}
-                placeholder="Describe what will be covered in this topic…"
-                required
-                rows={3}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all resize-none leading-relaxed"
-              />
+              <p style={{ fontSize: "12px", color: "#9ca3af", margin: "6px 0 0 0" }}>Select only subjects you teach</p>
             </div>
 
-            {/* Learning Objectives */}
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-1.5">
-                <Target size={12} className="text-slate-400" />
-                <label className="block text-[12px] font-semibold text-slate-600">
-                  Learning Objectives <span className="text-rose-400">*</span>
-                </label>
+            <div>
+              <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Class (Optional)</label>
+              <div className="select-wrapper">
+                <select name="class_id" value={formData.class_id} onChange={handleInputChange} style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "white" }}>
+                  <option value="">Select a class</option>
+                  {classes.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.class_name}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <textarea
-                name="learning_objectives"
-                value={formData.learning_objectives}
-                onChange={handleInputChange}
-                placeholder={
-                  "• Students will be able to…\n• Students will understand…"
-                }
-                required
-                rows={3}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-[13px] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-white transition-all resize-none leading-relaxed"
-              />
-              <p className="text-[11px] text-slate-400 pl-1">
-                Enter each objective on a new line.
-              </p>
             </div>
-          </fieldset>
+          </div>
 
-          {/* ── Footer actions ────────────────────────────────────────── */}
-          <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
-            >
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "24px" }}>
+            <div>
+              <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Week Number *</label>
+              <input type="number" name="week_number" min="1" value={formData.week_number} onChange={handleInputChange} required style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px" }} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Topic Title *</label>
+              <input type="text" name="topic_title" placeholder="e.g., Algebra Fundamentals" value={formData.topic_title} onChange={handleInputChange} required style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px" }} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: "24px" }}>
+            <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Content Summary *</label>
+            <textarea name="content_summary" value={formData.content_summary} onChange={handleInputChange} placeholder="Describe what will be covered..." required rows={3} style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", resize: "none", fontFamily: "inherit" }} />
+          </div>
+
+          <div style={{ marginBottom: "24px" }}>
+            <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Learning Objectives *</label>
+            <textarea name="learning_objectives" value={formData.learning_objectives} onChange={handleInputChange} placeholder="• Enter each objective on a new line" required rows={3} style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", resize: "none", fontFamily: "inherit" }} />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", paddingTop: "20px", borderTop: "1px solid #e5e7eb" }}>
+            <button type="button" onClick={onClose} style={{ padding: "10px 20px", background: "#f3f4f6", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, color: "#374151", cursor: "pointer" }}>
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={uploading}
-              className="relative px-6 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center gap-2 shadow-sm shadow-indigo-200"
-            >
-              {uploading && (
-                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              )}
-              {uploading ? "Creating…" : "Create Syllabus"}
+            <button type="submit" disabled={uploading} style={{ padding: "10px 20px", background: "#3b82f6", color: "white", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.6 : 1 }}>
+              {uploading ? "Creating..." : "Create Syllabus"}
             </button>
           </div>
         </form>
@@ -851,24 +1060,25 @@ function UploadModal({
   );
 }
 
-// Edit Modal Component
 function EditModal({
   onClose,
   onSuccess,
   subjects,
   classes,
   syllabus,
+  addToast,
 }: {
   onClose: () => void;
   onSuccess: () => void;
   subjects: Subject[];
   classes: ClassObj[];
   syllabus: Syllabus;
+  addToast: (type: "success" | "error" | "info", message: string) => void;
 }) {
   const [updating, setUpdating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     subject_id: syllabus.subject?.id?.toString() || "",
-    teacher_id: syllabus.teacher?.id?.toString() || "1",
     class_id: syllabus.class_obj?.id?.toString() || "",
     week_number: syllabus.week_number?.toString() || "1",
     topic_title: syllabus.topic_title || "",
@@ -877,25 +1087,24 @@ function EditModal({
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setUpdating(true);
 
     try {
       const submitData = {
         subject_id: parseInt(formData.subject_id),
-        teacher_id: parseInt(formData.teacher_id),
         class_id: formData.class_id ? parseInt(formData.class_id) : null,
         week_number: parseInt(formData.week_number),
         topic_title: formData.topic_title,
@@ -907,141 +1116,120 @@ function EditModal({
         `${process.env.NEXT_PUBLIC_API_URL}/syllabi/${syllabus.id}/`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(submitData),
-        },
+        }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          JSON.stringify(errorData) || "Failed to update syllabus",
-        );
+        let errorMessage = "Failed to update syllabus";
+
+        if (typeof errorData === "object") {
+          if (errorData.subject_id && Array.isArray(errorData.subject_id)) {
+            errorMessage = errorData.subject_id[0];
+          } else if (errorData.error) {
+            errorMessage = errorData.error;
+          }
+        }
+
+        setError(errorMessage);
+        return;
       }
 
-      alert("Syllabus updated successfully!");
+      addToast("success", "Syllabus updated successfully");
       onSuccess();
     } catch (error) {
       console.error("Failed to update syllabus:", error);
-      alert(
-        error instanceof Error
-          ? error.message
-          : "Failed to update syllabus. Please try again.",
-      );
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setUpdating(false);
     }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Edit Syllabus</h2>
-          <button className="modal-close" onClick={onClose}>
-            ✕
-          </button>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "16px" }}>
+      <div style={{ background: "white", width: "100%", maxWidth: "600px", borderRadius: "8px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}>
+        <div style={{ padding: "32px", borderBottom: "1px solid #e5e7eb" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <h2 style={{ fontSize: "24px", fontWeight: 600, color: "#1f2937", margin: "0 0 4px 0" }}>Edit Syllabus</h2>
+              <p style={{ fontSize: "13px", color: "#9ca3af", margin: 0 }}>Update the syllabus details</p>
+            </div>
+            <button
+              onClick={onClose}
+              style={{ background: "none", border: "none", fontSize: "24px", cursor: "pointer", color: "#9ca3af", padding: 0 }}
+            >
+              ×
+            </button>
+          </div>
         </div>
-        <form onSubmit={handleSubmit}>
-          <div className="grid-2x">
-            <div className="form-group">
-              <label>Subject *</label>
-              <select
-                name="subject_id"
-                className="search-box"
-                value={formData.subject_id}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">Select a Subject</option>
-                {subjects.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.subject_name}
-                  </option>
-                ))}
-              </select>
-            </div>
 
-            <div className="form-group">
-              <label>Class (Optional)</label>
-              <select
-                name="class_id"
-                className="search-box"
-                value={formData.class_id}
-                onChange={handleInputChange}
-              >
-                <option value="">Select a Class</option>
-                {classes.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.class_name}
-                  </option>
-                ))}
-              </select>
-            </div>
+        {error && (
+          <div style={{ margin: "20px 32px 0", padding: "12px 16px", background: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "6px", display: "flex", gap: "12px" }}>
+            <AlertCircle size={18} style={{ color: "#ef4444", flexShrink: 0 }} />
+            <p style={{ margin: 0, fontSize: "13px", fontWeight: 500, color: "#7f1d1d" }}>{error}</p>
           </div>
+        )}
 
-          <div className="grid-2x">
-            <div className="form-group">
-              <label>Week Number *</label>
-              <input
-                type="number"
-                name="week_number"
-                min="1"
-                placeholder="Week number"
-                value={formData.week_number}
-                onChange={handleInputChange}
-                required
-              />
+        <form onSubmit={handleSubmit} style={{ padding: "32px", maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "24px" }}>
+            <div>
+              <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Subject *</label>
+              <div className="select-wrapper">
+                <select name="subject_id" value={formData.subject_id} onChange={handleInputChange} required style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "white" }}>
+                  <option value="">Select a Subject</option>
+                  {subjects.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.subject_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Topic Title *</label>
-              <input
-                type="text"
-                name="topic_title"
-                placeholder="Topic title"
-                value={formData.topic_title}
-                onChange={handleInputChange}
-                required
-              />
+            <div>
+              <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Class (Optional)</label>
+              <div className="select-wrapper">
+                <select name="class_id" value={formData.class_id} onChange={handleInputChange} style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "white" }}>
+                  <option value="">Select a Class</option>
+                  {classes.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.class_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Content Summary *</label>
-            <textarea
-              name="content_summary"
-              value={formData.content_summary}
-              onChange={handleInputChange}
-              placeholder="Describe what will be covered in this topic"
-              required
-              rows={4}
-            />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "24px" }}>
+            <div>
+              <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Week Number *</label>
+              <input type="number" name="week_number" min="1" value={formData.week_number} onChange={handleInputChange} required style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px" }} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Topic Title *</label>
+              <input type="text" name="topic_title" value={formData.topic_title} onChange={handleInputChange} required style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px" }} />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Learning Objectives *</label>
-            <textarea
-              name="learning_objectives"
-              value={formData.learning_objectives}
-              onChange={handleInputChange}
-              placeholder="Enter each objective on a new line"
-              required
-              rows={4}
-            />
+          <div style={{ marginBottom: "24px" }}>
+            <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Content Summary *</label>
+            <textarea name="content_summary" value={formData.content_summary} onChange={handleInputChange} required rows={3} style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", resize: "none", fontFamily: "inherit" }} />
           </div>
 
-          <div className="modal-actions">
-            <button type="button" className="btn btn-outline" onClick={onClose}>
+          <div style={{ marginBottom: "24px" }}>
+            <label style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937", display: "block", marginBottom: "8px" }}>Learning Objectives *</label>
+            <textarea name="learning_objectives" value={formData.learning_objectives} onChange={handleInputChange} required rows={3} style={{ width: "100%", padding: "10px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", resize: "none", fontFamily: "inherit" }} />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", paddingTop: "20px", borderTop: "1px solid #e5e7eb" }}>
+            <button type="button" onClick={onClose} style={{ padding: "10px 20px", background: "#f3f4f6", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, color: "#374151", cursor: "pointer" }}>
               Cancel
             </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={updating}
-            >
+            <button type="submit" disabled={updating} style={{ padding: "10px 20px", background: "#3b82f6", color: "white", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: updating ? "not-allowed" : "pointer", opacity: updating ? 0.6 : 1 }}>
               {updating ? "Updating..." : "Update Syllabus"}
             </button>
           </div>

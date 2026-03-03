@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X, Loader2, Save, Users } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
 import { toast } from "react-hot-toast";
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 
 interface BulkAttendanceModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export function BulkAttendanceModal({
   const [selectedClass, setSelectedClass] = useState("");
   const [defaultStatus, setDefaultStatus] = useState("present");
   const [attendanceData, setAttendanceData] = useState<any[]>([]);
+  const [errorDetail, setErrorDetail] = useState<any>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -29,6 +31,7 @@ export function BulkAttendanceModal({
       setSelectedClass("");
       setStudents([]);
       setAttendanceData([]);
+      setErrorDetail(null);
     }
   }, [isOpen]);
 
@@ -43,8 +46,7 @@ export function BulkAttendanceModal({
       const res = await apiRequest<any>("/classes/", { method: "GET" });
       setClasses((res.results as any) || res);
     } catch (err) {
-      console.error("Error fetching classes:", err);
-      toast.error("Failed to load classes");
+      setErrorDetail(extractErrorDetail(err) || "Failed to load classes");
     }
   };
 
@@ -64,8 +66,7 @@ export function BulkAttendanceModal({
         })),
       );
     } catch (err) {
-      console.error("Error fetching students:", err);
-      toast.error("Failed to load students");
+      setErrorDetail(extractErrorDetail(err) || "Failed to load students");
     }
   };
 
@@ -93,13 +94,14 @@ export function BulkAttendanceModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorDetail(null);
 
     try {
       const res = await apiRequest("/attendance/bulk_mark/", {
         method: "POST",
         body: JSON.stringify({
-          class_id: parseInt(selectedClass), // ← top level
-          attendance_date: selectedDate, // ← top level
+          class_id: parseInt(selectedClass),
+          attendance_date: selectedDate,
           attendance_records: attendanceData.map((item) => ({
             student_id: item.student_id,
             status: item.status,
@@ -122,7 +124,9 @@ export function BulkAttendanceModal({
       onClose();
       resetForm();
     } catch (err: any) {
-      toast.error("Failed to mark bulk attendance. Please try again.");
+      setErrorDetail(
+        extractErrorDetail(err) || "Failed to mark bulk attendance. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -133,6 +137,7 @@ export function BulkAttendanceModal({
     setStudents([]);
     setAttendanceData([]);
     setDefaultStatus("present");
+    setErrorDetail(null);
   };
 
   if (!isOpen) return null;
@@ -160,6 +165,9 @@ export function BulkAttendanceModal({
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
+          {errorDetail && (
+            <ErrorMessage errorDetail={errorDetail} className="mb-3" />
+          )}
           <div className="form-section">
             <div className="form-row">
               <div className="form-group">

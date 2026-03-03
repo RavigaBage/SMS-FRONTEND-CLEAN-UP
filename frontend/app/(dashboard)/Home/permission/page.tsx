@@ -35,7 +35,6 @@ export default function PermissionsManagement() {
   return (
     <div className="dashboardWrapper">
       <div className="dashboard">
-        {/* Header */}
         <header className="header">
           <div>
             <h1>Permissions Management</h1>
@@ -46,7 +45,6 @@ export default function PermissionsManagement() {
           </button>
         </header>
 
-        {/* Permissions Matrix */}
         <main className="card">
           <table className="permissionsTable">
             <thead>
@@ -75,7 +73,6 @@ export default function PermissionsManagement() {
           </table>
         </main>
 
-        {/* Create Role Modal */}
         {isModalOpen && (
           <div className="modalOverlay" onClick={() => setModalOpen(false)}>
             <div className="modalContent" onClick={(e) => e.stopPropagation()}>

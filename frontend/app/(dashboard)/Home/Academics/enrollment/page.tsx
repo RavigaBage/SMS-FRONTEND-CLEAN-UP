@@ -1,13 +1,19 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import EnrollPopup from "@/components/ui/enrollmentPopup";
 import SkeletonTable from "@/components/ui/SkeletonLoader";
 import { fetchWithAuth } from "@/src/lib/apiClient";
 import Pagination from "@/src/assets/components/dashboard/Pagnation";
 import { ErrorState } from "@/src/assets/components/dashboard/ErrorState";
+import { MoreVertical, Edit2, Trash2, AlertCircle } from "lucide-react";
+import { YearsModel } from "../classes/page";
 
-// ─── Types (unchanged) ───────────────────────────────────────────────────────
+interface ActionMenuProps {
+  onEdit: () => void;
+  onDelete: () => void;
+}
 
 export interface UserInfo {
   id: string;
@@ -44,6 +50,7 @@ export interface Teacher {
 export interface ClassData {
   id: number;
   class_name: string;
+  academic_year?: string;
   teachers: Teacher[];
 }
 export interface EnrollmentData {
@@ -52,6 +59,7 @@ export interface EnrollmentData {
   class_obj: ClassData;
   enrollment_date: string;
   status_display: string;
+  academic_year?: string;
 }
 export interface EnrollmentApiResponse {
   count: number;
@@ -114,106 +122,180 @@ function Highlight({ text, query }: { text: string; query: string }) {
   );
 }
 
-// ─── Three-dot action menu ────────────────────────────────────────────────────
 
-function ActionMenu({
-  onEdit,
-  onDelete,
-}: {
-  onEdit: () => void;
-  onDelete: () => void;
-}) {
+export const ActionMenu = ({ onEdit, onDelete }: ActionMenuProps) => {
   const [open, setOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const ref = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const MENU_WIDTH = 192;
+  const EDGE_GAP = 8;
+
+  const getMenuPosition = (rect: DOMRect) => {
+    const maxLeft = Math.max(EDGE_GAP, window.innerWidth - MENU_WIDTH - EDGE_GAP);
+    const left = Math.min(
+      maxLeft,
+      Math.max(EDGE_GAP, rect.right - MENU_WIDTH),
+    );
+    return {
+      top: rect.bottom + 8,
+      left,
+    };
+  };
+
+  const updateMenuPosition = () => {
+    const btn = buttonRef.current;
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+    setMenuPos(getMenuPosition(rect));
+  };
+
+  const handleToggleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    setMenuPos(getMenuPosition(event.currentTarget.getBoundingClientRect()));
+    setOpen(true);
+  };
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node))
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (
+        ref.current &&
+        !ref.current.contains(target) &&
+        menuRef.current &&
+        !menuRef.current.contains(target)
+      ) {
         setOpen(false);
+      }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const handleWindowMove = () => {
+      if (open) updateMenuPosition();
+    };
+
+    if (open) {
+      updateMenuPosition();
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEsc);
+      window.addEventListener("resize", handleWindowMove);
+      window.addEventListener("scroll", handleWindowMove, true);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEsc);
+      window.removeEventListener("resize", handleWindowMove);
+      window.removeEventListener("scroll", handleWindowMove, true);
+    };
+  }, [open]);
+
+  const handleDelete = () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this item? This action cannot be undone."
+    );
+    if (confirmed) {
+      setIsDeleting(true);
+      onDelete();
+      setOpen(false);
+      setIsDeleting(false);
+    }
+  };
 
   return (
-    <div ref={ref} className="relative flex justify-center">
+    <div ref={ref} className="relative inline-block">
+
       <button
-        onClick={() => setOpen((p) => !p)}
-        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+        ref={buttonRef}
+        onClick={handleToggleMenu}
+        className="p-2 rounded-lg text-slate-500  hover:text-slate-700 hover:bg-slate-100 transition-all duration-200 hover:scale-110 active:scale-95 group"
+        aria-label="Actions"
+        title="Actions"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="20"
-          viewBox="0 -960 960 960"
-          width="20"
-          fill="currentColor"
-        >
-          <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
-        </svg>
+        <MoreVertical
+          size={20}
+          className="group-hover:rotate-90 transition-transform duration-300"
+        />
       </button>
 
-      {open && (
-        <div className="absolute right-0 top-8 z-20 w-36 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
-          <button
-            onClick={() => {
-              onEdit();
-              setOpen(false);
-            }}
-            className="w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition flex items-center gap-2"
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className="fixed z-[9999] w-48 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+            style={{ top: menuPos.top, left: menuPos.left }}
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-            </svg>
-            Edit
-          </button>
-          <button
-            onClick={() => {
-              onDelete();
-              setOpen(false);
-            }}
-            className="w-full text-left px-4 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition flex items-center gap-2"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-              <path d="M10 11v6M14 11v6" />
-              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-            </svg>
-            Delete
-          </button>
-        </div>
-      )}
+            <div className="px-4 py-2 bg-slate-50 border-b border-slate-100">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Actions
+              </p>
+            </div>
+
+            <div className="py-1">
+              <button
+                onClick={() => {
+                  onEdit();
+                  setOpen(false);
+                }}
+                className="w-full text-left px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-150 flex items-center gap-3 group"
+              >
+                <div className="p-1.5 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                  <Edit2 size={16} className="text-blue-600" />
+                </div>
+                <span>Edit</span>
+                <kbd className="ml-auto text-xs px-2 py-1 rounded bg-slate-100 text-slate-600 font-mono hidden md:block">
+                  E
+                </kbd>
+              </button>
+
+              <div className="my-1 border-t border-slate-100"></div>
+
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="w-full text-left px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-150 flex items-center gap-3 group disabled:opacity-50"
+              >
+                <div className="p-1.5 rounded-lg bg-red-100 group-hover:bg-red-200 transition-colors">
+                  <Trash2 size={16} className="text-red-600" />
+                </div>
+                <span>{isDeleting ? "Deleting..." : "Delete"}</span>
+              </button>
+            </div>
+
+            <div className="px-4 py-2 bg-slate-50 border-t border-slate-100">
+              <p className="text-xs text-slate-400 flex items-center gap-1">
+                <AlertCircle size={12} />
+                Press ESC to close
+              </p>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
+};
 
 export default function EnrollmentsManagement() {
   const [enrollmentData, setEnrollmentData] = useState<EnrollmentData[]>([]);
   const [formData, setFormData] = useState<Record<string, any>>({
     student: "",
     class_obj: "",
+    academic_year: "",
     status: "",
     roll_number: "",
   });
   const [Classes, setClasses] = useState<ClassData[]>([]);
   const [ClassFilter, setClassFilter] = useState("");
+  const [AcademicYearFilter, setAcademicYearFilter] = useState("");
+  const [academicYearOptions, setacademicYearOptions] = useState<YearsModel[]>([]);
   const [selectedClassId, setSelectedClassId] = useState("");
   const [active, setActive] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -221,17 +303,22 @@ export default function EnrollmentsManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [pagination, setPagination] =
-    useState<PaginatedResponse<EnrollmentData> | null>(null);
+  const [pagination, setPagination] =   useState<PaginatedResponse<EnrollmentData> | null>(null);
   const [page, setPage] = useState(1);
 
-  const fetchEnrollmentData = async (filterClassId?: string) => {
+  const fetchEnrollmentData = async (
+    filterClassId: string = selectedClassId,
+    pageNumber: number = page,
+    query: string = searchQuery,
+    filterAcademicYear: string = AcademicYearFilter,
+  ) => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (filterClassId) params.append("class_id", filterClassId);
-      if (searchQuery && searchQuery.trim())
-        params.append("search", searchQuery.trim());
+      if (filterAcademicYear) params.append("academic_year", filterAcademicYear);
+      if (query && query.trim()) params.append("search", query.trim());
+      params.append("page", String(pageNumber));
       const qs = params.toString();
       const url = `${process.env.NEXT_PUBLIC_API_URL}/enrollments/${qs ? `?${qs}` : ""}`;
       const res = await fetchWithAuth(url, {
@@ -240,7 +327,6 @@ export default function EnrollmentsManagement() {
       const data: EnrollmentApiResponse = await res.json();
       setEnrollmentData(data.results || []);
       setPagination(data);
-      setPage(1);
     } catch (err) {
       console.error("Failed to load enrollment data", err);
     } finally {
@@ -262,12 +348,18 @@ export default function EnrollmentsManagement() {
   };
 
   useEffect(() => {
-    fetchEnrollmentData();
     fetchClasses();
+    setacademicYearOptions(handleYearSync);
+    
   }, []);
+
   useEffect(() => {
-    fetchEnrollmentData(selectedClassId);
-  }, [selectedClassId, searchQuery]);
+    setPage(1);
+  }, [selectedClassId, searchQuery, AcademicYearFilter]);
+
+  useEffect(() => {
+    fetchEnrollmentData(selectedClassId, page, searchQuery, AcademicYearFilter);
+  }, [selectedClassId, searchQuery, page, AcademicYearFilter]);
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to remove this enrollment?"))
@@ -293,6 +385,7 @@ export default function EnrollmentsManagement() {
       ...f,
       student: item.student,
       class_obj: item.class_obj,
+      academic_year: item.academic_year || item.class_obj?.academic_year || "",
     }));
     setActive(true);
   };
@@ -313,10 +406,27 @@ export default function EnrollmentsManagement() {
     setSelectedClassId(val);
   };
 
+  const handleAcademicYearFilter = (val: string) => {
+    setAcademicYearFilter(val);
+  };
+
   const resetSearch = () => {
     setSearchTerm("");
     setSearchQuery("");
     setIsSearching(false);
+  };
+  const handleYearSync = (): YearsModel[] => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: currentYear - 2000 + 1 }, (_, i) => {
+      const year = currentYear - i;
+      return {
+        end_date: `${year}-${year + 1}`,
+        start_date: `${year}`,
+        id: i,
+        is_current: year === currentYear,
+        year_name: `${year}-${year + 1}`,
+      };
+    });
   };
 
   return (
@@ -326,15 +436,21 @@ export default function EnrollmentsManagement() {
           active={active}
           togglePopup={handlePopup}
           formData={formData}
-          fieldNames={["student", "class_obj"]}
+          fieldNames={["student", "class_obj", "academic_year"]}
           setFormData={(field, val) =>
             setFormData((f) => ({ ...f, [field]: val }))
           }
           selectedIM={selectedId}
-          onSuccess={() => fetchEnrollmentData(selectedClassId)}
+          onSuccess={() =>
+            fetchEnrollmentData(
+              selectedClassId,
+              page,
+              searchQuery,
+              AcademicYearFilter,
+            )
+          }
         />
 
-        {/* ── Header ────────────────────────────────────────────────────── */}
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
@@ -346,7 +462,7 @@ export default function EnrollmentsManagement() {
           </div>
           <button
             onClick={() => {
-              setFormData({ student: "", class_obj: "" });
+              setFormData({ student: "", class_obj: "", academic_year: "" });
               setActive(true);
             }}
             className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm transition"
@@ -366,7 +482,6 @@ export default function EnrollmentsManagement() {
           </button>
         </div>
 
-        {/* ── Stats strip ───────────────────────────────────────────────── */}
         <div className="grid grid-cols-3 gap-4">
           {[
             {
@@ -401,9 +516,7 @@ export default function EnrollmentsManagement() {
           ))}
         </div>
 
-        {/* ── Toolbar ───────────────────────────────────────────────────── */}
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Search */}
           <form onSubmit={handleSearch} className="relative flex-1 min-w-60">
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -445,7 +558,6 @@ export default function EnrollmentsManagement() {
             )}
           </form>
 
-          {/* Class filter */}
           <div className="relative">
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
@@ -472,11 +584,40 @@ export default function EnrollmentsManagement() {
             </select>
           </div>
 
-          {/* Reset filters */}
-          {(ClassFilter || isSearching) && (
+          <div className="relative">
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M8 2v4" />
+              <path d="M16 2v4" />
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M3 10h18" />
+            </svg>
+            <select
+              value={AcademicYearFilter}
+              onChange={(e) => handleAcademicYearFilter(e.target.value)}
+              className="pl-8 pr-8 py-2.5 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition shadow-sm appearance-none cursor-pointer"
+            >
+              <option value="">All Academic Years</option>
+              {academicYearOptions.map((y) => (
+                <option key={y.id} value={y.year_name}>
+                  {y.year_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {(ClassFilter || AcademicYearFilter || isSearching) && (
             <button
               onClick={() => {
                 handleClassFilter("");
+                handleAcademicYearFilter("");
                 resetSearch();
               }}
               className="px-3 py-2.5 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition shadow-sm"
@@ -486,7 +627,6 @@ export default function EnrollmentsManagement() {
           )}
         </div>
 
-        {/* Active search label */}
         {isSearching && searchQuery && (
           <div className="flex items-center gap-2 text-sm text-slate-500">
             <svg
@@ -513,17 +653,23 @@ export default function EnrollmentsManagement() {
           </div>
         )}
 
-        {/* ── Table ─────────────────────────────────────────────────────── */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible">
           {isLoading ? (
             <div className="p-6">
-              <SkeletonTable rows={5} columns={5} />
+              <SkeletonTable rows={5} columns={6} />
             </div>
           ) : (
             <table className="w-full text-sm text-left">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  {["Student", "Class", "Enrolled On", "Status", "Actions"].map(
+                  {[
+                    "Student",
+                    "Class",
+                    "Academic Year",
+                    "Enrolled On",
+                    "Status",
+                    "Actions",
+                  ].map(
                     (h) => (
                       <th
                         key={h}
@@ -539,7 +685,7 @@ export default function EnrollmentsManagement() {
               <tbody className="divide-y divide-slate-100">
                 {enrollmentData.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-20 text-center">
+                    <td colSpan={6} className="py-20 text-center">
                       <ErrorState
                         code={6}
                         message="No Student Enrollments Found"
@@ -556,12 +702,11 @@ export default function EnrollmentsManagement() {
                         key={item.id}
                         className="hover:bg-slate-50/60 transition-colors group"
                         style={{
-                          animation: `fadeUp 0.25s ease forwards`,
+                          animation: `fadeIn 0.25s ease forwards`,
                           animationDelay: `${idx * 30}ms`,
                           opacity: 0,
                         }}
                       >
-                        {/* Student */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0">
@@ -574,7 +719,6 @@ export default function EnrollmentsManagement() {
                           </div>
                         </td>
 
-                        {/* Class */}
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full">
                             <svg
@@ -592,7 +736,10 @@ export default function EnrollmentsManagement() {
                           </span>
                         </td>
 
-                        {/* Date */}
+                        <td className="px-6 py-4 text-slate-500 tabular-nums">
+                          {item.academic_year || item.class_obj?.academic_year || "-"}
+                        </td>
+
                         <td className="px-6 py-4 text-slate-500 tabular-nums">
                           {new Date(item.enrollment_date).toLocaleDateString(
                             "en-GB",
@@ -600,7 +747,6 @@ export default function EnrollmentsManagement() {
                           )}
                         </td>
 
-                        {/* Status */}
                         <td className="px-6 py-4">
                           <span
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${style.badge}`}
@@ -611,8 +757,6 @@ export default function EnrollmentsManagement() {
                             {status}
                           </span>
                         </td>
-
-                        {/* Actions */}
                         <td className="px-6 py-4">
                           <ActionMenu
                             onEdit={() => handleStartEdit(item)}
@@ -627,7 +771,6 @@ export default function EnrollmentsManagement() {
             </table>
           )}
 
-          {/* Footer */}
           {!isLoading && enrollmentData.length > 0 && (
             <div className="px-6 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-xs text-slate-400">
               <span>
@@ -649,9 +792,9 @@ export default function EnrollmentsManagement() {
       </div>
 
       <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(4px); }
-          to   { opacity: 1; transform: translateY(0); }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
       `}</style>
     </div>

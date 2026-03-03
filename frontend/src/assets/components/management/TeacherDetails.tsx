@@ -47,7 +47,6 @@ export function TeacherDetailsModal({
         </div>
 
         <div className="modal-content">
-          {/* Teacher Header */}
           <div className="teacher-detail-header">
             <img
               src={teacher.profileImage}
@@ -72,9 +71,7 @@ export function TeacherDetailsModal({
             </div>
           </div>
 
-          {/* Details Grid */}
           <div className="details-grid">
-            {/* Account Information */}
             <div className="detail-section">
               <h4 className="detail-section-title">Account Information</h4>
               <div className="detail-items">
@@ -111,7 +108,6 @@ export function TeacherDetailsModal({
               </div>
             </div>
 
-            {/* Contact Information */}
             <div className="detail-section">
               <h4 className="detail-section-title">Contact Information</h4>
               <div className="detail-items">
@@ -134,7 +130,6 @@ export function TeacherDetailsModal({
               </div>
             </div>
 
-            {/* Teaching Information */}
             <div className="detail-section detail-section-full">
               <h4 className="detail-section-title">Teaching Information</h4>
               <div className="detail-items">
@@ -165,7 +160,6 @@ export function TeacherDetailsModal({
               </div>
             </div>
 
-            {/* Assigned Subjects */}
             <div className="detail-section detail-section-full">
               <h4 className="detail-section-title">
                 <BookOpen size={16} />
