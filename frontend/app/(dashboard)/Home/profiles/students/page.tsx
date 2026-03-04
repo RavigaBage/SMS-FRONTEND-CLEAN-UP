@@ -113,7 +113,7 @@ export default function StudentsManagementPage() {
           s.profile_image ||
           `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}&background=random`,
       }));
-      console.log(students);
+      console.log(formattedData);
 
       setStudents(formattedData as any);
     } catch (err) {

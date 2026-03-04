@@ -78,6 +78,7 @@ export function AddStudentModal({
  
       if (!formData.class_id || !formData.class_id.toString().trim()) {
         setError("To add a student, assign the student to a specific class");
+        setLoading(false); 
         return;
       }
 
@@ -101,20 +102,17 @@ export function AddStudentModal({
       }
 
     } catch (err: any) {
-      const response = err?.response?.data;
-
-      if (response) {
-    
-        Object.keys(response).forEach((field) => {
-          const message = Array.isArray(response[field])
-            ? response[field][0]
-            : response[field];
-
-          setError(message);
-        });
-      } else {
-        setError( "Failed to register student. Please check the fields.");
-      }
+        const detail = err?.detail || err?.error;
+        
+        if (detail) {
+          const clean = typeof detail === 'string'
+            ? detail.replace(/^(Validation Error|Database Error|Server Error):\s*/i, '')
+            : JSON.stringify(detail);
+          setError(clean);
+        } else {
+          setError("Failed to register student. Please check the fields.");
+        }
+        
     } finally {
       setLoading(false);
     }

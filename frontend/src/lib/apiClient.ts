@@ -289,14 +289,13 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
-    return {
-      data: null,
+    const err = {
       status: response.status,
-      error:
-        raw.detail ||
-        raw.error ||
-        `Error ${response.status}: ${response.statusText}`,
-    } as ApiResponse<T>;
+      error: raw.error || `Error ${response.status}: ${response.statusText}`,
+      detail: raw.detail || raw.error || `Error ${response.status}: ${response.statusText}`,
+      raw,
+    };
+    throw err;
   }
 
   const isPaginated = Array.isArray(raw.results);

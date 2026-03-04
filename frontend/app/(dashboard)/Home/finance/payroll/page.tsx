@@ -195,7 +195,6 @@ function AddEditModal({
       payment_period: form.payment_period,
       remarks: form.remarks,
     };
-
     setLoading(true);
     try {
       if (isEdit && record) {
@@ -247,45 +246,47 @@ function AddEditModal({
         {error && <ErrorMessage errorDetail={error} className="error-message" />}
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <label>
-            Staff Member *
-            <select
-              required
-              value={form.staff}
-              onChange={(e) => handleStaffChange(e.target.value)}
-              disabled={staffLoading}
-              style={{ width: "100%" }}
-            >
-              <option value="">
-                {staffLoading ? "Loading staff…" : "— Select a staff member —"}
-              </option>
-              {staffList.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.full_name}
-                  {s.role ? ` · ${s.role}` : ""}
+          <div className="grid-two">
+            <label>
+              Staff Member *
+              <select
+                required
+                value={form.staff}
+                onChange={(e) => handleStaffChange(e.target.value)}
+                disabled={staffLoading}
+                style={{ width: "100%" }}
+              >
+                <option value="">
+                  {staffLoading ? "Loading staff…" : "— Select a staff member —"}
                 </option>
-              ))}
-            </select>
-          </label>
+                {staffList.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.full_name}
+                    {s.role ? ` · ${s.role}` : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label>
-            Payment Period *
-            <select
-              required
-              value={form.payment_period}
-              onChange={(e) =>
-                setForm({ ...form, payment_period: e.target.value })
-              }
-              style={{ width: "100%" }}
-            >
-              <option value="">— Select month —</option>
-              {MONTH_OPTIONS.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label>
+              Payment Period *
+              <select
+                required
+                value={form.payment_period}
+                onChange={(e) =>
+                  setForm({ ...form, payment_period: e.target.value })
+                }
+                style={{ width: "100%" }}
+              >
+                <option value="">— Select month —</option>
+                {MONTH_OPTIONS.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
 
           <div className="grid-two">
             <label>
@@ -317,17 +318,34 @@ function AddEditModal({
             </label>
           </div>
 
-          <label>
-            Deductions (GHS)
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={form.deductions}
-              onChange={(e) => setForm({ ...form, deductions: e.target.value })}
-              placeholder="0.00"
-            />
-          </label>
+          <div className="grid-two">
+            <label>
+              Deductions (GHS)
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={form.deductions}
+                onChange={(e) => setForm({ ...form, deductions: e.target.value })}
+                placeholder="0.00"
+              />
+            </label>
+            <label>
+              Status
+              <select
+                value={form.status}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    status: e.target.value as PayrollRecord["status"],
+                  })
+                }
+              >
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+              </select>
+            </label>
+          </div>
 
           {Number(form.base_salary) > 0 && (
             <div
@@ -348,21 +366,7 @@ function AddEditModal({
             </div>
           )}
 
-          <label>
-            Status
-            <select
-              value={form.status}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  status: e.target.value as PayrollRecord["status"],
-                })
-              }
-            >
-              <option value="pending">Pending</option>
-              <option value="paid">Paid</option>
-            </select>
-          </label>
+
 
           <label>
             Remarks
@@ -487,8 +491,8 @@ function RunPayrollModal({
         method: "POST",
         body: JSON.stringify({ payment_period: period }),
       });
-      const data = Array.isArray(res.data) ? res.data : [];
-      setResults(data);
+      const responseData = res.data ?? res;
+      setResults(responseData as any ?? []);
       onDone();
     } catch (err: any) {
       setError(extractErrorDetail(err) || "Failed to run payroll.");

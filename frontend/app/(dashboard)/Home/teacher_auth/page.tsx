@@ -43,82 +43,32 @@ export default function TeachingLanding() {
     }
 
     const resolveTeacher = async () => {
-      const userId = localStorage.getItem("userId");
-      const username = localStorage.getItem("userName") || "";
+  const userId = localStorage.getItem("userId");
 
-      const pickTeacher = (items: any[]) => {
-        if (!Array.isArray(items)) return null;
+  if (!userId) {
+    setTeacher(null);
+    return; 
+  }
 
-        const byUserId =
-          userId &&
-          items.find(
-            (t) => String(t?.user?.id ?? t?.user_id ?? "") === String(userId),
-          );
+  try {
+    setLoading(true);
 
-        if (byUserId) return byUserId;
+    const res = await apiRequest<any>(`/teachers/?user_id=${userId}&page_size=10`);
+    const items = (res.data as any)?.results ?? res.results ?? [];
+    const matched = items[0] ?? null;
 
-        const byUsername = username
-          ? items.find(
-              (t) =>
-                String(t?.user?.username ?? t?.username ?? "").toLowerCase() ===
-                username.toLowerCase(),
-            )
-          : null;
+    if (!matched) throw new Error("Teacher profile not found.");
 
-        if (byUsername) return byUsername;
+    setTeacher(mapTeacher(matched));
+    setTeacherId(matched.id ?? null);
+    localStorage.setItem("teacherId", String(matched.id));
 
-        return items.length === 1 ? items[0] : null;
-      };
-
-      try {
-        setLoading(true);
-
-        let matched: any = null;
-
-        if (userId) {
-          const byUserRes = await apiRequest<any>(
-            `/teachers/?user_id=${encodeURIComponent(userId)}&page_size=10`,
-            { method: "GET" },
-          );
-          matched = pickTeacher(byUserRes.results || []);
-        }
-
-        if (!matched && username) {
-          const bySearchRes = await apiRequest<any>(
-            `/teachers/?search=${encodeURIComponent(username)}&page_size=50`,
-            { method: "GET" },
-          );
-          matched = pickTeacher(bySearchRes.results || []);
-        }
-
-        if (!matched) {
-          const fallbackRes = await apiRequest<any>(`/teachers/?page_size=50`, {
-            method: "GET",
-          });
-          matched = pickTeacher(fallbackRes.results || []);
-        }
-
-        if (!matched) {
-          throw new Error("Teacher profile not found for the logged-in user.");
-        }
-
-        setTeacher(mapTeacher(matched));
-        setTeacherId(matched.id ?? null);
-        if (matched?.id) {
-          localStorage.setItem("teacherId", String(matched.id));
-        }
-        if (!userId && (matched?.user?.id || matched?.user_id)) {
-          localStorage.setItem(
-            "userId",
-            String(matched?.user?.id ?? matched?.user_id),
-          );
-        }
-      } catch (error) {
-        setTeacher(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+  } catch (error) {
+    setTeacher(null);
+  } finally {
+    setLoading(false);
+  }
+};
 
     resolveTeacher();
   }, []);
@@ -352,7 +302,6 @@ export default function TeachingLanding() {
       `}</style>
 
       <div className="teaching-container">
-        {/* Breadcrumb */}
         <div className="nav-breadcrumb">
           <a href="/Home/">
             <Home size={14} />
@@ -362,7 +311,6 @@ export default function TeachingLanding() {
           <span>Teacher Portal</span>
         </div>
 
-        {/* Hero Section */}
         <div className="hero-section">
           <div className="hero-content">
             <div className="hero-text">
@@ -398,15 +346,13 @@ export default function TeachingLanding() {
             <Link href="/Home/Academics/syllabi/" className="action-btn">
               Syllabi
             </Link>
-            <Link href="/Home/timetable/" className="action-btn">
+            <Link href="/Home/teacherSchedule/" className="action-btn">
               Timetable
             </Link>
           </div>
         </div>
 
-        {/* Main Content Cards */}
         <div className="main-grid">
-          {/* Grades Card */}
           <div className="card">
             <div className="card-icon">
               <FileText size={24} />
@@ -418,7 +364,6 @@ export default function TeachingLanding() {
             </Link>
           </div>
 
-          {/* Syllabi Card */}
           <div className="card">
             <div className="card-icon">
               <BookOpen size={24} />
@@ -430,19 +375,16 @@ export default function TeachingLanding() {
             </Link>
           </div>
 
-          {/* Timetable Card */}
           <div className="card">
             <div className="card-icon">
               <Clock size={24} />
             </div>
             <h3>Timetable</h3>
             <p>View your complete weekly schedule including classes, rooms, and time slots for all subjects.</p>
-            <Link href="/Home/timetable/" className="card-link">
+            <Link href="/Home/teacherSchedule/" className="card-link">
               View Timetable <ChevronRight size={14} />
             </Link>
           </div>
-
-          {/* Students Card */}
           <div className="card">
             <div className="card-icon">
               <Users size={24} />
@@ -454,7 +396,6 @@ export default function TeachingLanding() {
             </Link>
           </div>
 
-          {/* Attendance Card */}
           <div className="card">
             <div className="card-icon">
               <Clock size={24} />
@@ -466,7 +407,6 @@ export default function TeachingLanding() {
             </Link>
           </div>
 
-          {/* Profile Settings Card */}
           <div className="card">
             <div className="card-icon">
               <Settings size={24} />

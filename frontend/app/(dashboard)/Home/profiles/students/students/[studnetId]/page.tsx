@@ -87,13 +87,11 @@ export default function StudentProfilePage() {
   const handleUpdateStudent = async (updatedFields: any) => {
     try {
       setActionError(null);
-      // Call your Django API to update the student
       await apiRequest(`/students/${id}/`, {
         method: "PATCH",
         body: JSON.stringify(updatedFields),
       });
 
-      // Update local state so UI refreshes without reload
       setData((prev: any) => ({
         ...prev,
         student: { ...prev.student, ...updatedFields },
@@ -131,14 +129,11 @@ export default function StudentProfilePage() {
       </div>
     );
   }
-
-  // Destructure the data returned from your 'full_details' Django action
-  const { student, parents, academic_record, current_enrollment } = data.data;
+  const { student, parents, academic_record, recent_attendance,current_enrollment } = data.data;
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500">
       {actionError && <ErrorMessage errorDetail={actionError} />}
-      {/* Header Section */}
       <section className="bg-white rounded-2xl border overflow-hidden shadow-sm">
         <div className="h-32 bg-gradient-to-r from-blue-500 to-cyan-400" />
         <div className="p-6 flex flex-col md:flex-row gap-6 items-center md:items-end -mt-12">
@@ -173,7 +168,6 @@ export default function StudentProfilePage() {
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sidebar */}
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl border shadow-sm">
             <h3 className="font-bold text-slate-800 mb-4">Personal Details</h3>
@@ -206,8 +200,9 @@ export default function StudentProfilePage() {
                     {p.first_name} {p.last_name}
                   </p>
                   <p className="text-[11px] text-slate-500 uppercase font-medium">
-                    {p.relationship} • {p.phone}
+                    {p.relationship} • {p.phone_number}
                   </p>
+                 
                 </div>
               ))
             ) : (
@@ -224,22 +219,20 @@ export default function StudentProfilePage() {
           />
         </div>
 
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatsCard
               label="GPA"
-              value="3.8"
+              value={academic_record.summary?.gpa}
               subValue="Term Avg"
               color="cyan"
             />
             <StatsCard
               label="Attendance"
-              value="94%"
+              value={recent_attendance.length}
               subValue="This Month"
               color="blue"
             />
-            {/* Emerald/Slate colors require updating the StatsCard component as discussed previously */}
             <StatsCard
               label="Status"
               value={student.status?.toUpperCase()}

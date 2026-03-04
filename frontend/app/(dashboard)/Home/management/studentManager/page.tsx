@@ -126,11 +126,14 @@ try {
 };
 
 async function patchProgression(
-  id: number,
+  record:any,
   payload: { status: ProgressionStatus; to_class?: string; remarks?: string }
 ): Promise<StudentProgression> {
+  if(record.from_class === payload.to_class){
+    throw new Error("You cannot perform this operation, from_class and to_class must make a unique_set");
+  }
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/academics/studentmanager/${id}/`,
+    `${process.env.NEXT_PUBLIC_API_URL}/academics/studentmanager/${record.id}/`,
     { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }
   );
     if (!res.ok) {
@@ -204,7 +207,7 @@ function SkeletonRow() {
 function EditModal({ record, onClose, onSave,classRecord }: {
   record: StudentProgression;
   onClose: () => void;
-  onSave: (id: number, payload: { status: ProgressionStatus; to_class?: string; remarks?: string }) => Promise<void>;
+  onSave: (id: any, payload: { status: ProgressionStatus; to_class?: string; remarks?: string }) => Promise<void>;
   classRecord:ClassData[]
 }) {
   const [status, setStatus] = useState<ProgressionStatus>(record.status);
@@ -236,7 +239,7 @@ function EditModal({ record, onClose, onSave,classRecord }: {
     if (needsClass && !toClass) { setError("Please select the destination class."); return; }
     setSaving(true); setError("");
     try {
-      await onSave(record.id, { status, to_class: toClass || undefined, remarks: remarks || undefined });
+      await onSave(record, { status, to_class: toClass || undefined, remarks: remarks || undefined });
       onClose();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
@@ -497,7 +500,7 @@ export default function ProgressionPage() {
         setTotalResults(data.count);
     } catch (err) {
         console.error(err);
-        { showToast(`${err}`, "error"); load(currentPage); }
+        { showToast(`${(err as any)?.raw.detail || String(err)}`, "error"); }
 
     } finally {
         setIsLoading(false);

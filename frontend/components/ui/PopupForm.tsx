@@ -138,7 +138,8 @@ export default function TeachingForm({ formData, Update, setFormData, onSuccess 
   const [errorDetail,     setErrorDetail]     = useState<any>(null);
   const [loadingTeachers, setLoadingTeachers] = useState(true);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
-  const [submitting,      setSubmitting]      = useState(false);
+  const [submitting,      setSubmitting]      = useState(false);  
+  const [newVal, setNewVal] = useState("");
 
   useEffect(() => {
     fetchTeachers();
@@ -147,6 +148,10 @@ export default function TeachingForm({ formData, Update, setFormData, onSuccess 
     setMessageMsg("");
   }, []);
 
+  const ConvertTime = ()=>{
+    const startal = formData.start_time || '07';
+    return (`${startal.toString().padStart(2, "0")}:00:00`);
+  }
   const fetchTeachers = async () => {
     setLoadingTeachers(true);
     try {
@@ -260,7 +265,7 @@ export default function TeachingForm({ formData, Update, setFormData, onSuccess 
 
           <p className="tf-section">Schedule</p>
           <div className="tf-grid-3">
-            <SelectField label="Start Time" icon={Clock} name="start_time" value={formData.start_time||""} onChange={handleChange} required>
+            <SelectField label="Start Time" icon={Clock} name="start_time" value={ConvertTime()||""} onChange={handleChange} required>
               <option value="">Select start</option>
               {timeSlots.map(t => <option key={t.id} value={t.value}>{fmtTime(t.value)}</option>)}
             </SelectField>

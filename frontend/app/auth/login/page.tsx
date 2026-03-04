@@ -10,70 +10,60 @@ export default function LoginPage() {
   const router = useRouter();
 
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [Response, setResponse] = useState<Record<string, any>>({});
-  const [loader, setloader] = useState(false);
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setloader(true);
+const [password, setPassword] = useState("");
+const [response, setResponse] = useState<{ status?: string; message?: string }>({});
+const [loader, setLoader] = useState(false);
+const [showPassword, setShowPassword] = useState(false);
 
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/login/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: username, password }),
-        },
-      );
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  setLoader(true);
+  setResponse({});
 
-      const data = await res.json();
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/login/`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: username, password }),
+      },
+    );
 
-      if (res.ok) {
-        localStorage.setItem("accessToken", data.access);
-        localStorage.setItem("refreshToken", data.refresh);
-        localStorage.setItem("userRole", data.user.role);
-        localStorage.setItem("userName", data.user.username);
-        sessionStorage.setItem("tab_alive", "true");
-        if (data.user?.id !== undefined && data.user?.id !== null) {
-          localStorage.setItem("userId", String(data.user.id));
+    const data = await res.json();
+    console.log(data);
+
+    if (res.ok) {
+      localStorage.setItem("accessToken", data.access);
+      localStorage.setItem("refreshToken", data.refresh);
+      localStorage.setItem("userRole", data.user.role);
+      localStorage.setItem("userName", data.user.username);
+      sessionStorage.setItem("tab_alive", "true");
+      if (data.user?.id != null) localStorage.setItem("userId", String(data.user.id));
+      if (data.user?.email) localStorage.setItem("userEmail", data.user.email);
+
+      document.cookie = `token=${data.access}; path=/; max-age=3600; SameSite=Lax`;
+
+      setResponse({ status: "success", message: "Login successful! Redirecting..." });
+
+      setTimeout(() => {
+        const role = data.user.role?.toLowerCase();
+        if (role === "teacher") {
+          router.push("/Home/teacher_auth/");
+        } else {
+          router.push("/Home/");
         }
-        if (data.user?.email) {
-          localStorage.setItem("userEmail", data.user.email);
-        }
+      }, 1500);
 
-        document.cookie = `token=${data.access}; path=/; max-age=3600; SameSite=Lax`;
-
-        setResponse({
-          status: "success",
-          message: "Login successful! Redirecting...",
-        });
-
-        setTimeout(() => {
-          if(data.user.role =='teacher'){
-              const lowerRole = data.user.role.toLowerCase();
-              if (lowerRole !== "admin" && lowerRole !== "headmaster") {
-                router.push("/Home/teacher_auth/");
-              }
-          }else{
-            router.push("/Home/");
-          }
-        }, 1500);
-      } else {
-        setResponse({
-          status: "error",
-          message: data.detail || "Invalid credentials",
-        });
-        setloader(false);
-      }
-    } catch (err) {
-      setResponse({
-        status: "error",
-        message: "Connection failed. Is the server running?",
-      });
-      setloader(false);
+    } else {
+      setResponse({ status: "error", message: data.detail || "Invalid credentials" });
+      setLoader(false);
     }
-  };
+  } catch {
+    setResponse({ status: "error", message: "Connection failed. Is the server running?" });
+    setLoader(false);
+  }
+};
 
   return (
     <div className="login">
@@ -84,7 +74,7 @@ export default function LoginPage() {
               <i className="fa-solid fa-code"></i>
             </div>
             <div
-              className={`response ${Response.status == "success" ? "success" : ""} ${Response.status == "error" ? "error" : ""}`}
+              className={`response ${response.status == "success" ? "success" : ""} ${response.status == "error" ? "error" : ""}`}
             >
               <div className={`loader_wrapper ${loader ? "play" : "active"}`}>
                 <div className="load-3">
@@ -93,7 +83,7 @@ export default function LoginPage() {
                   <div className="line"></div>
                 </div>
               </div>
-              <p>{Response.message}</p>
+              <p>{response.message}</p>
             </div>
             <h2>Welcome Back!</h2>
             <form onSubmit={handleSubmit} className="login-form">

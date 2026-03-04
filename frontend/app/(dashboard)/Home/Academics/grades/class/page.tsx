@@ -755,21 +755,24 @@ function SelectField({ icon, value, onChange, children, minWidth = 140 }: any) {
 }
 
 export default function ClassResults() {
+
   const [assignedClasses, setAssignedClasses] = useState<ClassType[]>([]);
   const [assignedSubjects, setAssignedSubjects] = useState<SubjectType[]>([]);
   const [availableClasses, setAvailableClasses] = useState<ClassType[]>([]);
   const [availableSubjects, setAvailableSubjects] = useState<SubjectType[]>([]);
   const [selectedClass, setSelectedClass] = useState<ClassType | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<SubjectType | null>(null);
-  const [academicYear, setAcademicYear] = useState<string>("2025-26");
-  const [term, setTerm] = useState<string>("first");
+  const [academicYear, setAcademicYear] = useState<string>("");
+  const [term, setTerm] = useState<string>("");
   const [studentsWithGrades, setStudentsWithGrades] = useState<StudentWithGrade[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedYear, setSelectedYear] = useState("2025-26");
+  const [selectedYear, setSelectedYear] = useState("");
   const [pagination, setPagination] = useState<PaginatedResponse<StudentWithGrade> | null>(null);
   const [page, setPage] = useState(1);
-
+  const [isInitialized, setIsInitialized] = useState(false);
+  const STORAGE_KEY = 'grades_page_state';
+  
   const generateAcademicYears = (): any => {
     const currentYear = new Date().getFullYear();
     const startYear = 2000;
@@ -785,110 +788,152 @@ export default function ClassResults() {
       };
     });
   };
+  const getSavedState = () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  };
   const academicYears = generateAcademicYears();
 
   useEffect(() => {
+    if (!isInitialized) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      selectedYear,
+      term,
+      selectedClass,
+      selectedSubject,
+    }));
+  }, [selectedYear, term, selectedClass, selectedSubject]);
+
+  useEffect(() => {
     async function initAssignments() {
-      const classRes: ClassApiResponse = await api.getTeacherAssignments();
-      const classes: ClassType[] = classRes.results.map((c) => ({
-        id: c.id,
-        name: c.class_name,
-      }));
-      setAssignedClasses(classes);
-      setAvailableClasses(classes);
-      const subRes: SubjectApiResponse = await api.getSubjects();
-      const subjects: SubjectType[] = subRes.results.map((s) => ({
-        id: s.id,
-        name: s.subject_name,
-        subject_code: s.subject_code,
-      }));
-      setAssignedSubjects(subjects);
-      setAvailableSubjects(subjects);
-      if (!classes.length && !subjects.length)
-        setMessage("You are not yet assigned to any class or subject.");
-      else if (!subjects.length) setMessage("No subjects available yet.");
-      else if (!classes.length) setMessage("No classes assigned yet.");
+      try {
+        const classRes: ClassApiResponse = await api.getTeacherAssignments();
+        const classes: ClassType[] = classRes.results.map((c) => ({ id: c.id, name: c.class_name }));
+        setAssignedClasses(classes);
+        setAvailableClasses(classes);
+
+        const subRes: SubjectApiResponse = await api.getSubjects();
+        const subjects: SubjectType[] = subRes.results.map((s) => ({
+          id: s.id,
+          name: s.subject_name,
+          subject_code: s.subject_code,
+        }));
+        setAssignedSubjects(subjects);
+        setAvailableSubjects(subjects);
+
+        const saved = getSavedState();
+        if (saved) {
+          const validClass = saved.selectedClass
+            ? (classes.find((c) => c.id === saved.selectedClass.id) ?? null)
+            : null;
+          const validSubject = saved.selectedSubject
+            ? (subjects.find((s) => s.id === saved.selectedSubject.id) ?? null)
+            : null;
+
+          if (validClass) setSelectedClass(validClass);
+          if (validSubject) setSelectedSubject(validSubject);
+          if (saved.term) setTerm(saved.term);
+          if (saved.selectedYear) {
+            setSelectedYear(saved.selectedYear);
+            setAcademicYear(saved.selectedYear);
+          }
+        }
+
+        if (!classes.length && !subjects.length) setMessage("You are not yet assigned to any class or subject.");
+        else if (!subjects.length) setMessage("No subjects available yet.");
+        else if (!classes.length) setMessage("No classes assigned yet.");
+
+      } finally {
+        setIsInitialized(true);
+      }
     }
     initAssignments();
   }, []);
 
-  useEffect(() => {
-    async function loadSubjects() {
-      if (!selectedClass) return;
-      if (!assignedSubjects.length)
-        setAvailableSubjects(await api.getSubjectsForClass(selectedClass.id));
-      fetchResults();
-    }
-    loadSubjects();
-  }, [selectedClass]);
+useEffect(() => {
+  if (!isInitialized || !selectedClass || assignedSubjects.length) return;
+  api.getSubjectsForClass(selectedClass.id).then(setAvailableSubjects);
+}, [selectedClass, isInitialized]);
 
-  useEffect(() => {
-    fetchResults();
-  }, [academicYear, term, page]);
+useEffect(() => {
+  if (!isInitialized) return;
+  fetchResults();
+}, [isInitialized, selectedClass, selectedSubject, academicYear, term, page]);
 
-  useEffect(() => {
-    async function loadClasses() {
-      if (!selectedSubject) return;
-      if (!assignedClasses.length)
-        setAvailableClasses(await api.getClassesForSubject(selectedSubject.id));
-      fetchResults();
-    }
-    loadClasses();
-  }, [selectedSubject]);
+useEffect(() => {
+  if (!isInitialized || !selectedSubject || assignedClasses.length) return;
+  api.getClassesForSubject(selectedSubject.id).then(setAvailableClasses);
+}, [selectedSubject, isInitialized]);
+
 
   const handleYearSelect = (val: string) => {
     setSelectedYear(val);
     setAcademicYear(val);
   };
 
-  async function fetchResults() {
-    if (!selectedClass || !selectedSubject) return;
-    setLoading(true);
+async function fetchResults(overrides?: {
+  classObj?: ClassType | null;
+  subjectObj?: SubjectType | null;
+  year?: string;
+  termVal?: string;
+  pageNum?: number;
+}) {
+   
+
+  const classObj = overrides?.classObj !== undefined ? overrides.classObj : selectedClass;
+  const subjectObj = overrides?.subjectObj !== undefined ? overrides.subjectObj : selectedSubject;
+  const year = overrides?.year !== undefined ? overrides.year : academicYear;
+  const termVal = overrides?.termVal !== undefined ? overrides.termVal : term;
+  const pageNum = overrides?.pageNum !== undefined ? overrides.pageNum : page;
+
+  console.log(selectedClass);
+
+  if (!classObj || !subjectObj) return;
+  setLoading(true);
+  try {
+    const studentsData = await api.getStudentsInClass(classObj.id, pageNum);
+    let grades: ResultType[] = [];
     try {
-      const studentsData = await api.getStudentsInClass(selectedClass.id, page);
-      let grades: ResultType[] = [];
-
-      try {
-        const gradesData = await api.getResults({
-          classId: selectedClass.id,
-          subjectId: selectedSubject.id,
-          academicYear,
-          term,
-        });
-        grades = Array.isArray(gradesData)
-          ? gradesData
-          : Array.isArray(gradesData?.results)
-            ? gradesData.results
-            : [];
-        setMessage("");
-      } catch (err) {
-        console.error("Error fetching grades, falling back to pending rows:", err);
-        setMessage("No grade records found for these filters yet.");
-      }
-
-      const students: StudentType[] = studentsData.results || studentsData;
-      const gradeMap = new Map<number, ResultType>();
-      grades.forEach((g) => gradeMap.set(g.student.id, g));
-      const merged: StudentWithGrade[] = students.map((s) => ({
-        student: s,
-        grade: gradeMap.get(s.id) || null,
-      }));
-      setStudentsWithGrades(merged);
-      setPagination({
-        count: studentsData.count ?? students.length,
-        next: studentsData.next ?? null,
-        previous: studentsData.previous ?? null,
-        results: merged,
+      const gradesData = await api.getResults({
+        classId: classObj.id,
+        subjectId: subjectObj.id,
+        academicYear: year,
+        term: termVal,
       });
-    } catch (err) {
-      console.error("Error fetching results:", err);
-      setStudentsWithGrades([]);
-      setPagination(null);
-    } finally {
-      setLoading(false);
+      grades = Array.isArray(gradesData)
+        ? gradesData
+        : Array.isArray(gradesData?.results)
+          ? gradesData.results
+          : [];
+      setMessage("");
+    } catch {
+      setMessage("No grade records found for these filters yet.");
     }
+    const students: StudentType[] = studentsData.results || studentsData;
+    const gradeMap = new Map<number, ResultType>();
+    grades.forEach((g) => gradeMap.set(g.student.id, g));
+    const merged: StudentWithGrade[] = students.map((s) => ({
+      student: s,
+      grade: gradeMap.get(s.id) || null,
+    }));
+    setStudentsWithGrades(merged);
+    setPagination({
+      count: studentsData.count ?? students.length,
+      next: studentsData.next ?? null,
+      previous: studentsData.previous ?? null,
+      results: merged,
+    });
+  } catch {
+    setStudentsWithGrades([]);
+    setPagination(null);
+  } finally {
+    setLoading(false);
   }
-
+}
   const handlePageChange = (newPage: number) => setPage(newPage);
 
   const gradedCount = studentsWithGrades.filter((r) => r.grade).length;
@@ -896,7 +941,7 @@ export default function ClassResults() {
   const avgScore = studentsWithGrades.length
     ? (
         studentsWithGrades.reduce(
-          (s, r) => s + (r.grade?.total_score ?? 0),
+          (s, r) => s + Number(r.grade?.total_score ?? 0),
           0,
         ) / studentsWithGrades.length
       ).toFixed(1)
@@ -939,6 +984,7 @@ export default function ClassResults() {
         <div className="gr-divider" />
 
         <SelectField icon={IC.cal} value={selectedYear} onChange={(e: any) => handleYearSelect(e.target.value)}>
+          <option>select year</option>
           {academicYears.map((y: any) => (
             <option key={y.id} value={y.year_name}>
               {y.year_name}
@@ -947,6 +993,7 @@ export default function ClassResults() {
         </SelectField>
 
         <SelectField icon={IC.clock} value={term} onChange={(e: any) => setTerm(e.target.value)}>
+          <option>select Term</option>
           <option value="first">First Term</option>
           <option value="second">Second Term</option>
           <option value="third">Third Term</option>

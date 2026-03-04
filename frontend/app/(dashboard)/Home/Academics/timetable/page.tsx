@@ -284,7 +284,7 @@ export default function Timetable() {
     setUpdate(false);
   }, []);
 
-  const openCreatePopup = useCallback((dayOfWeek: string) => {
+  const openCreatePopup = useCallback((dayOfWeek: string,hour:string|undefined) => {
     setFormData((prev) => {
       if (!prev.class_id || !prev.term || !prev.academic_year) {
         setPageError("Please select class, term, and year before adding a new timetable entry.");
@@ -296,6 +296,7 @@ export default function Timetable() {
         term:          prev.term,
         academic_year: prev.academic_year,
         day_of_week:   dayOfWeek,
+        start_time:hour
       };
     });
     setUpdate(false);
@@ -454,7 +455,7 @@ export default function Timetable() {
                           <TimetableCell
                             matches={matches}
                             colorIndex={colorIndex}
-                            onAdd={() => openCreatePopup(day)}
+                            onAdd={() => openCreatePopup(day,row.hour)}
                             onEdit={openEditPopup}
                             onDelete={openDeleteMiddleware}
                           />

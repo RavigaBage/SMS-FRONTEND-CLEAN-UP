@@ -1,14 +1,21 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
-const apiDomain = process.env.NEXT_PUBLIC_API_URL ?? "";
 
-const allowedImageHostnames = [
-  "www.gstatic.com",
-  "i.pravatar.cc",
-  "api.dicebear.com",
-  "ui-avatars.com",
-];
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+
+
+const allowedImageHostnames = (
+  process.env.ALLOWED_IMAGE_HOSTS ??
+  "www.gstatic.com,i.pravatar.cc,api.dicebear.com,ui-avatars.com"
+)
+  .split(",")
+  .map((h) => h.trim())
+  .filter(Boolean);
+
+const isHttps =
+  process.env.FORCE_HTTPS === "true" ||
+  (!isDev && apiUrl.startsWith("https://"));
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -23,19 +30,20 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 1080, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
-    minimumCacheTTL: 60 * 60 * 24 * 30, 
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     dangerouslyAllowSVG: true,
-    contentDispositionType: "attachment", 
+    contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'none'; script-src 'none'; sandbox;",
-    remotePatterns: allowedImageHostnames.map((hostname) => ({
-      protocol: "https",
-      hostname,
-    })),
+
+    remotePatterns: allowedImageHostnames.flatMap((hostname) => [
+      { protocol: "https", hostname },
+      { protocol: "http", hostname },
+    ]),
   },
 
   async headers() {
     const remoteImgSrc = allowedImageHostnames
-      .map((h) => `https://${h}`)
+      .flatMap((h) => [`https://${h}`, `http://${h}`])
       .join(" ");
 
     const cspDirectives = [
@@ -44,12 +52,17 @@ const nextConfig: NextConfig = {
       "font-src 'self' https://fonts.gstatic.com",
       "script-src 'self' 'unsafe-inline'",
       `img-src 'self' data: blob: ${remoteImgSrc}`,
-      `connect-src 'self' ${apiDomain}${isDev ? " ws://localhost:* http://localhost:*" : ""}`,
+
+      `connect-src 'self'${apiUrl ? ` ${apiUrl}` : ""}${
+        isDev ? " ws://localhost:* http://localhost:*" : ""
+      }`,
+
       "frame-src 'none'",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
-      "upgrade-insecure-requests",
+
+      ...(isHttps ? ["upgrade-insecure-requests"] : []),
     ].join("; ");
 
     const securityHeaders = [
@@ -61,10 +74,16 @@ const nextConfig: NextConfig = {
         key: "Permissions-Policy",
         value: "camera=(), microphone=(), geolocation=(), payment=()",
       },
-      {
-        key: "Strict-Transport-Security",
-        value: "max-age=63072000; includeSubDomains; preload",
-      },
+
+      ...(isHttps
+        ? [
+            {
+              key: "Strict-Transport-Security",
+              value: "max-age=63072000; includeSubDomains; preload",
+            },
+          ]
+        : []),
+
       { key: "X-DNS-Prefetch-Control", value: "on" },
     ];
 

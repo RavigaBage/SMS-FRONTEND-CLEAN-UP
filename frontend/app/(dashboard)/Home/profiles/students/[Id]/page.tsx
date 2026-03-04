@@ -88,7 +88,6 @@ export default function StudentProfilePage() {
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Sidebar Info */}
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl border shadow-sm">
             <h3 className="font-bold mb-4">Personal Details</h3>
@@ -108,7 +107,6 @@ export default function StudentProfilePage() {
           <QuickNotes note={student.quickNote} />
         </div>
 
-        {/* Right Content Area */}
         <div className="lg:col-span-2 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatsCard

@@ -55,6 +55,7 @@ export interface Expenditure {
   categoryDisplay?: string;
   amount: number;
   vendorName?: string | null;
+  processedBy?: number | null; 
   date?: string | null;
   staffName?: string | null;
   description?: string | null;
@@ -89,6 +90,7 @@ const normalizeExpenditure = (raw: ExpenditureRaw): Expenditure => ({
   itemName: raw.item_name,
   category: raw.category,
   categoryDisplay: raw.category_display,
+  processedBy: raw.processed_by ?? null,
   amount:
     typeof raw.amount === "string" ? parseFloat(raw.amount) || 0 : raw.amount,
   vendorName: raw.vendor_name ?? null,
@@ -107,12 +109,29 @@ function unwrapArray<T>(payload: ApiResponse<T> | T[] | null | undefined): T[] {
   return [];
 }
 
-const buildQuery = (opts?: { search?: string; page?: number }) => {
+const buildQuery = (opts?: { search?: string; page?: number; startDate?: string; endDate?: string }) => {
   const params = new URLSearchParams();
   if (opts?.search) params.append("search", opts.search);
   if (opts?.page && opts.page > 1) params.append("page", String(opts.page));
+  if (opts?.startDate) params.append("start_date", opts.startDate);
+  if (opts?.endDate) params.append("end_date", opts.endDate);
   return params.toString();
 };
+const denormalizeExpenditure = (exp: Expenditure): ExpenditureRaw => ({
+  id: exp.id,
+  expenditure_number: exp.expenditureNumber,
+  item_name: exp.itemName,
+  category: exp.category,
+  processed_by: exp.processedBy,
+  category_display: exp.categoryDisplay,
+  amount: exp.amount,
+  vendor_name: exp.vendorName,
+  transaction_date: exp.date,
+  staff_name: exp.staffName,
+  description: exp.description,
+  receipt_url: exp.receiptUrl,
+  created_at: exp.createdAt,
+});
 
 const getCurrentMonthStart = (): string => {
   const now = new Date();
@@ -179,7 +198,7 @@ export default function ExpenditurePage() {
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  useEffect(() => setPage(1), [debouncedSearch]);
+  useEffect(() => setPage(1), [debouncedSearch,dateRange]);
 
   useEffect(() => {
     fetchExpenditureData({
@@ -603,7 +622,7 @@ export default function ExpenditurePage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by description, staff, or category..."
+              placeholder="Search by item..."
               className="w-full pl-12 pr-4 py-3 bg-white border rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 text-sm font-medium"
               disabled={loading}
             />
@@ -755,7 +774,7 @@ export default function ExpenditurePage() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
-        editData={editing}
+        editData={editing ? denormalizeExpenditure(editing) : null}
       />
     </div>
   );

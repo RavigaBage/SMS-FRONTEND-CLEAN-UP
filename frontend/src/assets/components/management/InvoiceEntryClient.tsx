@@ -9,6 +9,7 @@ type FeeItem = {
   description: string;
   qty: number;
   unitPrice: number;
+  type: "fee" | "custom";
 };
 
 type Student = {
@@ -32,7 +33,7 @@ export default function InvoiceEntry() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [feeStructures, setFeeStructures] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -57,13 +58,14 @@ export default function InvoiceEntry() {
   const [notes, setNotes] = useState<string>("");
 
   const [items, setItems] = useState<FeeItem[]>([
-    {
-      id: Date.now().toString(),
-      description: "First Term Tuition Fees",
-      qty: 1,
-      unitPrice: 1200.0,
-    },
-  ]);
+  {
+    id: Date.now().toString(),
+    description: "First Term Tuition Fees",
+    qty: 1,
+    unitPrice: 1200.0,
+    type: "fee", 
+  },
+]);
   const [discountType, setDiscountType] = useState<"percentage" | "amount">(
     "percentage",
   );
@@ -98,11 +100,11 @@ export default function InvoiceEntry() {
       setLoading(true);
       try {
         const date_now = new Date().getFullYear();
-        const [stuRes, yearRes] = await Promise.all([
+        const [stuRes, yearRes, feeRes] = await Promise.all([
           fetchWithAuth(`${baseUrl}/students/`),
           generateAcademicYears(date_now, 10),
+          fetchWithAuth(`${baseUrl}/fee-structures/`),
         ]);
-
         const stuJson = await stuRes.json();
         const yearJson = yearRes;
 
@@ -116,6 +118,9 @@ export default function InvoiceEntry() {
           : Array.isArray(yearJson)
             ? yearJson
             : [];
+
+        const feeJson = await feeRes.json();
+        setFeeStructures(Array.isArray(feeJson.results) ? feeJson.results : []);
 
         setStudents(stuArr);
         setAcademicYears(yearArr);
@@ -179,10 +184,10 @@ export default function InvoiceEntry() {
   const grandTotal = fromCents(totalCents);
 
   const addItem = () =>
-    setItems((prev) => [
-      ...prev,
-      { id: Date.now().toString(), description: "", qty: 1, unitPrice: 0 },
-    ]);
+  setItems((prev) => [
+    ...prev,
+    { id: Date.now().toString(), description: "", qty: 1, unitPrice: 0, type: "custom" },
+  ]);
 
   const updateItem = (
     id: string,
@@ -461,6 +466,7 @@ export default function InvoiceEntry() {
             <table className="w-full text-sm">
               <thead className="text-slate-500 bg-slate-50">
                 <tr>
+                  <th className="p-2 text-left">Type</th>
                   <th className="p-2 text-left">Item / Description</th>
                   <th className="p-2 text-left">Qty</th>
                   <th className="p-2 text-left">Unit Amount</th>
@@ -471,58 +477,94 @@ export default function InvoiceEntry() {
               <tbody>
                 {items.map((item) => (
                   <tr key={item.id} className="border-t">
-                    <td className="p-2">
-                      <input
-                        className="w-full border rounded px-2 py-1"
-                        placeholder="Description"
-                        value={item.description}
-                        onChange={(e) =>
-                          updateItem(item.id, "description", e.target.value)
-                        }
-                      />
+                    <td className="p-2 w-28">
+                      <select
+                        className="w-full border rounded px-2 py-1 text-xs bg-slate-50"
+                        value={item.type}
+                        onChange={(e) => {
+                          const newType = e.target.value as "fee" | "custom";
+                          setItems((prev) =>
+                            prev.map((i) =>
+                              i.id === item.id
+                                ? { ...i, type: newType, description: "", unitPrice: 0 }
+                                : i,
+                            ),
+                          );
+                        }}
+                      >
+                        <option value="fee">Fee Schedule</option>
+                        <option value="custom">Custom</option>
+                      </select>
                     </td>
+
+                    <td className="p-2">
+                      {item.type === "fee" ? (
+                        <select
+                          className="w-full border rounded px-2 py-1"
+                          value={item.description}
+                          onChange={(e) => {
+                            const selected = feeStructures.find(
+                              (f) => f.category_name === e.target.value,
+                            );
+                            setItems((prev) =>
+                              prev.map((i) =>
+                                i.id === item.id
+                                  ? {
+                                      ...i,
+                                      description: selected?.category_name || "",
+                                      unitPrice: parseFloat(selected?.amount || "0"),
+                                    }
+                                  : i,
+                              ),
+                            );
+                          }}
+                        >
+                          <option value="">Select fee...</option>
+                          {feeStructures.map((f) => (
+                            <option key={f.id} value={f.category_name}>
+                              {f.category_name} — ₵{parseFloat(f.amount).toFixed(2)} ({f.frequency_display})
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          className="w-full border rounded px-2 py-1"
+                          placeholder="e.g. Broken window replacement"
+                          value={item.description}
+                          onChange={(e) => updateItem(item.id, "description", e.target.value)}
+                        />
+                      )}
+                    </td>
+
                     <td className="p-2 w-24">
                       <input
                         type="number"
                         className="w-full border rounded px-2 py-1"
                         min={1}
                         value={item.qty}
-                        onChange={(e) =>
-                          updateItem(
-                            item.id,
-                            "qty",
-                            Number(e.target.value || 0),
-                          )
-                        }
+                        onChange={(e) => updateItem(item.id, "qty", Number(e.target.value || 0))}
                       />
                     </td>
+
                     <td className="p-2 w-40">
                       <input
                         type="number"
                         className="w-full border rounded px-2 py-1"
                         step="0.01"
                         value={item.unitPrice}
-                        onChange={(e) =>
-                          updateItem(
-                            item.id,
-                            "unitPrice",
-                            Number(e.target.value || 0),
-                          )
-                        }
+                        onChange={(e) => updateItem(item.id, "unitPrice", Number(e.target.value || 0))}
                       />
                     </td>
+
                     <td className="p-2 w-40 font-medium">
-                      ₵
-                      {(item.qty * item.unitPrice).toLocaleString(undefined, {
+                      ₵{(item.qty * item.unitPrice).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </td>
+
                     <td className="p-2 text-right w-16">
-                      <button
-                        className="text-rose-500 font-bold"
-                        onClick={() => removeItem(item.id)}
-                      >
+                      <button className="text-rose-500 font-bold" onClick={() => removeItem(item.id)}>
                         ×
                       </button>
                     </td>

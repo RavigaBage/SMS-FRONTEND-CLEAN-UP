@@ -85,7 +85,7 @@ export default function InvoiceViewPage({ params }: PageProps) {
         ) : !invoice ? (
           <p>Invoice not found.</p>
         ) : (
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-6 rounded-lg shadow print-area">
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="font-semibold text-lg">Student Details:</h2>
