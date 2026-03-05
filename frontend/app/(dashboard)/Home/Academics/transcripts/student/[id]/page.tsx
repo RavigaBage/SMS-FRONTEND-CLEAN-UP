@@ -5,9 +5,11 @@ import { useParams, useSearchParams } from "next/navigation";
 import "@/styles/transcripts.css";
 import { fetchWithAuth } from "@/src/lib/apiClient";
 import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import pdfMake from "pdfmake/build/pdfmake";
+import * as pdfFonts from "pdfmake/build/vfs_fonts";
+import { TDocumentDefinitions } from "pdfmake/interfaces";
 
-// --- Interfaces ---
+(pdfMake as any).vfs = (pdfFonts as any).vfs;
 interface Subject {
   subject_name: string;
   subject_code: string;
@@ -91,27 +93,46 @@ export default function StudentTranscript() {
     }
   };
 
-  const handleDownloadPDF = async () => {
-    if (!transcriptRef.current) return;
-    setIsExporting(true);
+  const handleDownloadPDF = async (): Promise<void> => {
+  if (!transcriptRef?.current) return;
 
-    try {
-      const element = transcriptRef.current;
-      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL("image/png");
+  setIsExporting(true);
 
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  try {
+    const element = transcriptRef.current;
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Transcript_${student?.first_name?.replace(/\s+/g, "_")}.pdf`);
-    } catch (error) {
-      console.error("PDF Export failed", error);
-    } finally {
-      setIsExporting(false);
-    }
-  };
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const PAGE_WIDTH = 595;
+    const PAGE_HEIGHT = (canvas.height * PAGE_WIDTH) / canvas.width;
+
+    const docDefinition: TDocumentDefinitions = {
+      pageSize: "A4",
+      pageMargins: [0, 0, 0, 0] as [number, number, number, number],
+      content: [
+        {
+          image: imgData,
+          width: PAGE_WIDTH,
+          height: PAGE_HEIGHT,
+        },
+      ],
+    };
+
+    const safeName =
+      student?.first_name?.replace(/\s+/g, "_") || "Student";
+
+    pdfMake.createPdf(docDefinition).download(`Transcript_${safeName}.pdf`);
+  } catch (error) {
+    console.error("PDF Export failed:", error);
+  } finally {
+    setIsExporting(false);
+  }
+};
 
   if (loading)
     return <div className="dashboardWrapper">Loading transcript...</div>;
