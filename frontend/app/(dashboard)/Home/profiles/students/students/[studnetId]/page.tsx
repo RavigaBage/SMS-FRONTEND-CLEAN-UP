@@ -17,7 +17,9 @@ import {
 } from "lucide-react";
 import { EditStudentModal } from "@/src/assets/components/management/EditStudentModal";
 import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import pdfMake from "pdfmake/build/pdfmake";
+import * as pdfFonts from "pdfmake/build/vfs_fonts";
+import { TDocumentDefinitions } from "pdfmake/interfaces";
 import Image from "next/image";
 import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 
@@ -66,23 +68,47 @@ export default function StudentProfilePage() {
     }
   }, [id]);
 
-  const handleDownloadPDF = async () => {
-    if (!printRef.current || !data) return;
-    setIsExporting(true);
-    try {
-      const canvas = await html2canvas(printRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const width = pdf.internal.pageSize.getWidth();
-      const height = (canvas.height * width) / canvas.width;
-      pdf.addImage(imgData, "PNG", 0, 0, width, height);
-      pdf.save(`${data.student.first_name}_Profile.pdf`);
-    } catch (err) {
-      console.error("PDF generation failed", err);
-    } finally {
-      setIsExporting(false);
-    }
-  };
+  const handleDownloadPDF = async (): Promise<void> => {
+  if (!printRef?.current) return;
+
+  setIsExporting(true);
+
+  try {
+    const element = printRef.current;
+
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const PAGE_WIDTH = 595;
+    const PAGE_HEIGHT = (canvas.height * PAGE_WIDTH) / canvas.width;
+
+    const docDefinition: TDocumentDefinitions = {
+      pageSize: "A4",
+      pageMargins: [0, 0, 0, 0] as [number, number, number, number],
+      content: [
+        {
+          image: imgData,
+          width: PAGE_WIDTH,
+          height: PAGE_HEIGHT,
+        },
+      ],
+    };
+
+    const safeName =
+      student?.first_name?.replace(/\s+/g, "_") || "Student";
+
+    pdfMake.createPdf(docDefinition).download(`Transcript_${safeName}.pdf`);
+  } catch (error) {
+    console.error("PDF Export failed:", error);
+  } finally {
+    setIsExporting(false);
+  }
+};
+
 
   const handleUpdateStudent = async (updatedFields: any) => {
     try {
