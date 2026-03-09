@@ -132,7 +132,7 @@ function AddEditModal({
             : [];
         setStaffList(list);
       })
-      .catch(() => setError("Could not load staff list."))
+      .catch((err) => setError(extractErrorDetail(err) ||"Could not load staff list."))
       .finally(() => setStaffLoading(false));
   }, [open]);
 
@@ -170,15 +170,15 @@ function AddEditModal({
     setError(null);
 
     if (!form.staff) {
-      setError("Please select a staff member.");
+      setError(extractErrorDetail("Please select a staff member."));
       return;
     }
     if (!form.payment_period) {
-      setError("Please select a payment period.");
+      setError(extractErrorDetail("Please select a payment period."));
       return;
     }
     if (!form.base_salary || Number(form.base_salary) <= 0) {
-      setError("Please enter a valid base salary.");
+      setError(extractErrorDetail("Please enter a valid base salary."));
       return;
     }
 
@@ -211,16 +211,7 @@ function AddEditModal({
       onSaved();
       onClose();
     } catch (err: any) {
-      const raw = err?.message ?? err?.detail ?? "Failed to save record.";
-
-      if (typeof raw === "object") {
-        const msgs = Object.entries(raw)
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
-          .join(" · ");
-        setError(msgs);
-      } else {
-        setError(String(raw));
-      }
+        setError(extractErrorDetail(err.raw));
     } finally {
       setLoading(false);
     }
@@ -481,7 +472,7 @@ function RunPayrollModal({
 
   const handleRun = async () => {
     if (!period) {
-      setError("Please select a payment period.");
+      setError(extractErrorDetail("Please select a payment period."));
       return;
     }
     setLoading(true);

@@ -486,7 +486,7 @@ export default function Sidebar() {
                 </ProtectedLink>
 
                 <ProtectedLink isAdmin={isAdmin} isHeadmaster={isHeadmaster}
-                  href="/Home/finance/salary-structures" className={styles.submenuItem}>
+                  href="/Home/finance/salarystructure" className={styles.submenuItem}>
                   <div className={styles.navItemContent}>
                     <div className={styles.navIcon}><StaffIcon /></div>
                     <span>Salary Structures</span>

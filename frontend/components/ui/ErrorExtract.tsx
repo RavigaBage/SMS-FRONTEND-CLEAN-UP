@@ -39,8 +39,10 @@ export const extractErrorDetail = (payload: any): any => {
   if (!payload) return null;
   if (typeof payload === "string") {
     try {
+        console.log(payload)
       return JSON.parse(payload);
     } catch {
+        console.log(payload)
       return payload;
     }
   }
@@ -49,8 +51,10 @@ export const extractErrorDetail = (payload: any): any => {
     const message = payload.message;
     if (!message) return "An unexpected error occurred.";
     try {
+        console.log(message)
       return JSON.parse(message);
     } catch {
+        console.log(payload)
       return message;
     }
   }
@@ -58,6 +62,7 @@ export const extractErrorDetail = (payload: any): any => {
   if (payload.detail) return payload.detail;
   if (payload.error) return payload.error;
   if (payload.message) return payload.message;
+
 
   return payload;
 };

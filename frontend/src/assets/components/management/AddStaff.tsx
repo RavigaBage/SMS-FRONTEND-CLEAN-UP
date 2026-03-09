@@ -4,7 +4,7 @@ import { useState } from "react";
 import { X, Save, Loader2, Briefcase } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
 import { useRouter } from "next/navigation";
-
+import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 type StaffFormData = {
   first_name: string;
   last_name: string;
@@ -70,10 +70,8 @@ export function AddStaffModal({
       });
 
       if (response.error || (response.status && response.status >= 400)) {
-        setErrors({
-          general:
-            response.error || "Failed to save staff member. Please try again.",
-        });
+        setErrors(extractErrorDetail(response.error) || "Failed to save staff member. Please try again.",
+        );
         return;
       }
 
@@ -82,12 +80,10 @@ export function AddStaffModal({
       setFormData(initialData);
     } catch (err: any) {
       if (err?.response?.data && typeof err.response.data === "object") {
-        setErrors(err.response.data);
+        setErrors(extractErrorDetail(err));
       } else {
-        setErrors({
-          general:
-            err?.message || "Failed to save staff member. Please try again.",
-        });
+        setErrors(extractErrorDetail(err) || "Failed to save staff member. Please try again.",
+        );
       }
     } finally {
       setLoading(false);
@@ -341,11 +337,7 @@ export function AddStaffModal({
             />
           </div>
 
-          {errors.general && (
-            <p className="text-center text-red-500 text-xs font-bold">
-              {errors.general}
-            </p>
-          )}
+          {errors && <ErrorMessage errorDetail={errors} className="error-message" />}
 
           <div className="pt-4 flex gap-3">
             <button
