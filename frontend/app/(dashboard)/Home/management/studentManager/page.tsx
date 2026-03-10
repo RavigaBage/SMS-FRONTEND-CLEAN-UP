@@ -132,10 +132,22 @@ async function patchProgression(
   if(record.from_class === payload.to_class){
     throw new Error("You cannot perform this operation, from_class and to_class must make a unique_set");
   }
+
+  const bodypayload = {
+    student:       record.student,
+    academic_year: record.academic_year,
+    from_class:    record.from_class,
+    status:        payload.status,
+    to_class:      payload.to_class ?? null,
+    remarks:       payload.remarks  ?? null,
+  };
+  console.log('patch works', bodypayload)
+
   const res = await fetchWithAuth(
     `${process.env.NEXT_PUBLIC_API_URL}/academics/studentmanager/${record.id}/`,
-    { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }
+    { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(bodypayload) }
   );
+    console.log('patch works', bodypayload)
     if (!res.ok) {
     const errorData = await res.json().catch(() => ({})) as { detail?: string };
 
@@ -698,7 +710,7 @@ export default function ProgressionPage() {
                   {r.to_class ?? (r.status === "graduated" ? "—" : r.status === "withheld" ? r.from_class : "—")}
                 </span>
                 <StatusBadge status={r.status} />
-                <button className="prog-action" onClick={() => setEditingRecord(r)} style={{ padding: "7px 14px", borderRadius: 8, cursor: "pointer", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#64748b", fontSize: 12, fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>Edit</button>
+                <button className="prog-action" onClick={() => setEditingRecord(r)} disabled={r.status !== "pending"} style={{ padding: "7px 14px", borderRadius: 8, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#64748b", fontSize: 12, fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s", opacity: r.status !== "pending" ? 0.35 : 1, cursor:  r.status !== "pending" ? "not-allowed" : "pointer", }}>{r.status === "pending" ? "Edit" : "Locked"}</button>
               </div>
             ))}
 

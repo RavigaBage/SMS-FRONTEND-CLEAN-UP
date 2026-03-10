@@ -34,7 +34,7 @@ export function RecordExpenseModal({
   const buildInitialForm = (data?: any) => ({
     expenditure_number: data?.expenditureNumber || data?.expenditure_number || generateExpenditureNumber(),
     item_name: data?.itemName || data?.item_name || "",
-    category: data?.category || "infrastructure",
+    category: data?.category,
     description: data?.description || "",
     amount: data?.amount?.toString() || "",
     transaction_date: data?.date || data?.transaction_date || new Date().toISOString().split("T")[0], 
@@ -212,6 +212,7 @@ export function RecordExpenseModal({
                 <option value="maintenance">Maintenance</option>
                 <option value="salaries">Salaries</option>
                 <option value="other">Others</option>
+                
               </select>
               {errors.category && (
                 <p className="text-rose-600 text-[10px] font-bold">{errors.category.join(", ")}</p>

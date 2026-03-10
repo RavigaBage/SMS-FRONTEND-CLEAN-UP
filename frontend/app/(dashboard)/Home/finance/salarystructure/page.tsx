@@ -221,7 +221,7 @@ function EditModal({
           )}
 
           <div style={styles.taxNote}>
-            <span>10% tax will be automatically deducted on payroll processing.</span>
+            <span>00% tax will be automatically deducted on payroll processing.</span>
             {estimated > 0 && (
               <span style={{ fontWeight: 700 }}>Net ≈ {ghs(estimated * 0.9)}</span>
             )}

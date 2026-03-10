@@ -102,7 +102,15 @@ const STATUS_STYLES: Record<string, { badge: string; dot: string }> = {
     dot: "bg-rose-500",
   },
 };
+const StatusOptions = [
+  { name: 'active', display: 'Active' },
+  { name: 'completed', display: 'Completed' },
+  { name: 'withdrawn', display: 'Withdrawn' },
+  { name: 'inactive', display: 'inactive' },
+  { name: 'graduated', display: 'graduated' },
+  { name: 'suspended', display: 'suspended' }
 
+];
 function getStatusStyle(status: string) {
   return STATUS_STYLES[status.toLowerCase()] ?? STATUS_STYLES.inactive;
 }
@@ -295,6 +303,7 @@ export default function EnrollmentsManagement() {
   const [Classes, setClasses] = useState<ClassData[]>([]);
   const [ClassFilter, setClassFilter] = useState("");
   const [AcademicYearFilter, setAcademicYearFilter] = useState("");
+  const [AcademicstatusFilter, setAcademicstatusFilter] = useState("");
   const [academicYearOptions, setacademicYearOptions] = useState<YearsModel[]>([]);
   const [selectedClassId, setSelectedClassId] = useState("");
   const [active, setActive] = useState(false);
@@ -311,12 +320,14 @@ export default function EnrollmentsManagement() {
     pageNumber: number = page,
     query: string = searchQuery,
     filterAcademicYear: string = AcademicYearFilter,
+    filterAcademicstatus: string = AcademicstatusFilter,
   ) => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (filterClassId) params.append("class_id", filterClassId);
       if (filterAcademicYear) params.append("academic_year", filterAcademicYear);
+      if (filterAcademicstatus) params.append("status", filterAcademicstatus);
       if (query && query.trim()) params.append("search", query.trim());
       params.append("page", String(pageNumber));
       const qs = params.toString();
@@ -358,8 +369,8 @@ export default function EnrollmentsManagement() {
   }, [selectedClassId, searchQuery, AcademicYearFilter]);
 
   useEffect(() => {
-    fetchEnrollmentData(selectedClassId, page, searchQuery, AcademicYearFilter);
-  }, [selectedClassId, searchQuery, page, AcademicYearFilter]);
+    fetchEnrollmentData(selectedClassId, page, searchQuery, AcademicYearFilter, AcademicstatusFilter);
+  }, [selectedClassId, searchQuery, page, AcademicYearFilter, AcademicstatusFilter]);
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to remove this enrollment?"))
@@ -406,6 +417,10 @@ export default function EnrollmentsManagement() {
     setSelectedClassId(val);
   };
 
+  const handleAcademicstatusFilter = (val: string) => {
+    setAcademicstatusFilter(val);
+  };
+
   const handleAcademicYearFilter = (val: string) => {
     setAcademicYearFilter(val);
   };
@@ -447,6 +462,7 @@ export default function EnrollmentsManagement() {
               page,
               searchQuery,
               AcademicYearFilter,
+              AcademicstatusFilter,
             )
           }
         />
@@ -583,6 +599,31 @@ export default function EnrollmentsManagement() {
               ))}
             </select>
           </div>
+                    <div className="relative">
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+            <select
+              value={AcademicstatusFilter}
+              onChange={(e) =>handleAcademicstatusFilter(e.target.value)}
+              className="pl-8 pr-8 py-2.5 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition shadow-sm appearance-none cursor-pointer"
+            >
+              <option value="">select status</option>
+              {StatusOptions.map((c,index) => (
+                <option key={index} value={c.name}>
+                  {c.display}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <div className="relative">
             <svg
@@ -613,17 +654,77 @@ export default function EnrollmentsManagement() {
             </select>
           </div>
 
-          {(ClassFilter || AcademicYearFilter || isSearching) && (
+          {(ClassFilter || AcademicYearFilter || AcademicstatusFilter || isSearching) && (
             <button
-              onClick={() => {
+                onClick={() => {
                 handleClassFilter("");
                 handleAcademicYearFilter("");
+                handleAcademicstatusFilter("");
                 resetSearch();
-              }}
-              className="px-3 py-2.5 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition shadow-sm"
-            >
-              Reset
-            </button>
+                      }}
+          style={{
+            position: "relative",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "10px 16px",
+            borderRadius: 9,
+            background: "#fff",
+            border: "1px solid #fde68a",
+            color: "#b45309",
+            fontSize: 12,
+            fontWeight: 600,
+            fontFamily: "'DM Sans', sans-serif",
+            cursor: "pointer",
+            letterSpacing: "0.03em",
+            whiteSpace: "nowrap",
+            transition: "all 0.15s ease",
+            boxShadow: "0 1px 3px rgba(245,158,11,0.08)",
+            overflow: "hidden",
+          }}
+          onMouseEnter={e => {
+            const el = e.currentTarget;
+            el.style.background = "rgba(245,158,11,0.06)";
+            el.style.borderColor = "#f59e0b";
+            el.style.boxShadow = "0 2px 8px rgba(245,158,11,0.18)";
+            el.style.transform = "translateY(-1px)";
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget;
+            el.style.background = "#fff";
+            el.style.borderColor = "#fde68a";
+            el.style.boxShadow = "0 1px 3px rgba(245,158,11,0.08)";
+            el.style.transform = "translateY(0)";
+          }}
+        >
+          <span style={{
+            position: "absolute",
+            top: 0, left: 0, right: 0,
+            height: 2,
+            background: "linear-gradient(90deg, transparent, #f59e0b, transparent)",
+            borderRadius: "9px 9px 0 0",
+            opacity: 0.5,
+          }} />
+
+          <span style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            background: "rgba(245,158,11,0.12)",
+            color: "#d97706",
+            fontSize: 9,
+            fontWeight: 700,
+            flexShrink: 0,
+          }}>
+            ✕
+          </span>
+
+          Clear filters
+        </button>
+
           )}
         </div>
 
