@@ -54,7 +54,7 @@ const nextConfig: NextConfig = {
       `img-src 'self' data: blob: ${remoteImgSrc}`,
 
       `connect-src 'self'${apiUrl ? ` ${apiUrl}` : ""}${
-        isDev ? " ws://localhost:* http://localhost:*" : ""
+        isDev ? " ws://localhost:* http://localhost:* http://127.0.0.1:*" : ""
       }`,
 
       "frame-src 'none'",

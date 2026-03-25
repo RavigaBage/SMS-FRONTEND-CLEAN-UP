@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { apiRequest, fetchWithAuth } from "@/src/lib/apiClient";
 import { StudentTable } from "@/src/assets/components/management/StudentTable";
 import { AddStudentModal } from "@/src/assets/components/management/AddStudentModal";
 import { Student } from "@/src/assets/types/api";
 import { Pagination } from "@/src/assets/components/management/Pagination";
+import { downloadStudentTemplate } from "@/src/lib/excelTemplate";
 
 import "@/styles/student_page.css";
 
@@ -52,6 +53,8 @@ export default function StudentsManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [filters, setFilters] = useState<Filters>({
     grade: "",
     gender: "",
@@ -59,6 +62,44 @@ export default function StudentsManagementPage() {
   });
 
   const totalPages = Math.ceil(totalResults / PAGE_SIZE);
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    //Basic file check
+    if (!file.name.match(/\.(csv|xlsx|xls)$/i)) {
+      alert("Please upload a valid CSV file.");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setIsImporting(true);
+    try {
+      const res = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/students/import/`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+      if (res.ok) {
+        alert("Students imported successfully!");
+        fetchStudents(1, filters, searchTerm);
+      } else {
+        const errorData = await res.json();
+        alert(`Import failed: ${errorData.detail || "Unknown error"}`);
+      }
+    } catch (err) {
+      console.error("Import error:", err);
+      alert("An error occurred during import. Please try again.");
+    } finally {
+      setIsImporting(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   const buildQuery = (
     page: number,
@@ -200,7 +241,28 @@ export default function StudentsManagementPage() {
           <h1 className="page-title">Students</h1>
           <p className="page-subtitle">Manage and track student records</p>
         </div>
-        <div className="page-actions">
+        <div className="control-actions" style={{ display: "flex", gap: "10px" }}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .xlsx, .xls, .xls"
+            onChange={handleImport}
+            style={{ display: "none" }}
+          />
+          {/* NEW: Template Link */}
+          <button 
+            className="text-blue-600 text-sm hover:underline"
+            onClick={downloadStudentTemplate}
+          >
+            Download Template (.xlsx)
+          </button>
+          <button 
+            className="ghost-button" 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isImporting}
+          >
+            {isImporting ? "Importing..." : "📥 Import Excel"}
+          </button>
           <button
             className="primary-button"
             onClick={() => setIsModalOpen(true)}
