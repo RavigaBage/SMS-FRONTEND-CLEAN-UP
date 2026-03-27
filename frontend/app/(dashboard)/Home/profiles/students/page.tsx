@@ -7,6 +7,7 @@ import { AddStudentModal } from "@/src/assets/components/management/AddStudentMo
 import { Student } from "@/src/assets/types/api";
 import { Pagination } from "@/src/assets/components/management/Pagination";
 import { downloadStudentTemplate } from "@/src/lib/excelTemplate";
+import * as XLSX from "xlsx";
 
 import "@/styles/student_page.css";
 
@@ -63,43 +64,86 @@ export default function StudentsManagementPage() {
 
   const totalPages = Math.ceil(totalResults / PAGE_SIZE);
 
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-    //Basic file check
-    if (!file.name.match(/\.(csv|xlsx|xls)$/i)) {
-      alert("Please upload a valid CSV file.");
-      return;
-    }
-  
-    const formData = new FormData();
-    formData.append("file", file);
-
-    setIsImporting(true);
-    try {
-      const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/students/import/`,
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
-      if (res.ok) {
-        alert("Students imported successfully!");
-        fetchStudents(1, filters, searchTerm);
-      } else {
-        const errorData = await res.json();
-        alert(`Import failed: ${errorData.detail || "Unknown error"}`);
-      }
-    } catch (err) {
-      console.error("Import error:", err);
-      alert("An error occurred during import. Please try again.");
-    } finally {
-      setIsImporting(false);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+  // 1. Basic extension check
+  if (!file.name.match(/\.(csv|xlsx|xls)$/i)) {
+    alert("Please upload a valid Excel or CSV file.");
+    return;
   }
+
+  setIsImporting(true);
+
+  try {
+    const reader = new FileReader();
+    
+    // Create a promise to handle the file reading/conversion
+    const csvBlob = await new Promise<Blob>((resolve, reject) => {
+      reader.onload = (e) => {
+        try {
+          const result = e.target?.result;
+          if (!result || typeof result === 'string') {
+            reject(new Error('Invalid file read result'));
+            return;
+          }
+          const data = new Uint8Array(result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          // Convert the first sheet to CSV
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const csvString = XLSX.utils.sheet_to_csv(worksheet);
+          
+          // Create a Blob that the backend can read as a file
+          resolve(new Blob([csvString], { type: 'text/csv' }));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+
+    const formData = new FormData();
+    // We name the file 'students.csv' so the backend knows the format
+    formData.append("file", csvBlob, "students.csv");
+
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}/students/bulk-upload/`,
+      {
+        method: "POST",
+        body: formData, // fetchWithAuth should NOT set Content-Type header manually
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("accessToken") || ""}`,
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Handle the summary object from your backend
+      const { success, failed } = data.summary;
+      alert(`Import complete! Success: ${success}, Failed: ${failed}`);
+      
+      if (failed > 0) {
+        console.table(data.errors); // Log specific row errors for debugging
+      }
+      
+      fetchStudents(1, filters, searchTerm);
+    } else {
+      alert(`Import failed: ${data.error || "Unknown error"}`);
+    }
+  } catch (err) {
+    console.error("Import error:", err);
+    alert("An error occurred during conversion or upload.");
+  } finally {
+    setIsImporting(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+};
 
   const buildQuery = (
     page: number,

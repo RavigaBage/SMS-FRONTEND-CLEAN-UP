@@ -76,8 +76,11 @@ export async function fetchWithAuth(url: string, options: any = {}) {
   const headers = {
     ...options.headers,
     Authorization: `Bearer ${accessToken}`,
-    "Content-Type": "application/json",
   };
+
+  if (!(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
 
   let response = await fetch(url, { ...options, headers });
 

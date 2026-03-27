@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
 
 export const downloadStudentTemplate = () => {
-  // 1. Define the headers based on your Django service requirements
+    // 1. Define headers with example data
   const headers = [
     {
       "admission_number": "STU001",
