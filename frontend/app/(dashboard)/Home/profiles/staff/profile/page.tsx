@@ -1,4 +1,43 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { ImportModal, ImportModalConfig } from "@/src/assets/components/management/ImportModal";
+import { downloadStaffTemplate } from "@/src/lib/excelTemplate";
 import "./style.css";
+
+const STAFF_IMPORT_CONFIG: ImportModalConfig = {
+  title: "Import Staff",
+  endpoint: "/staff/",
+  requiredHeaders: [
+    "first_name", "last_name", "email", "staff_type", "gender",
+    "phone_number", "address", "specialization", "date_of_birth",
+    "employment_date", "national_id", "health_info", "photo_url",
+  ],
+  rowLabel: (row) => `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim(),
+  transformPayload: (row) => {
+    const payload: Record<string, any> = {
+      first_name: row.first_name ?? "",
+      last_name: row.last_name ?? "",
+      email: row.email ?? "",
+      staff_type: row.staff_type ?? "admin_staff",
+      gender: row.gender ?? "male",
+      phone_number: row.phone_number ?? "",
+      address: row.address ?? "",
+      specialization: row.specialization ?? "",
+      date_of_birth: row.date_of_birth
+        ? new Date(row.date_of_birth).toISOString().split("T")[0]
+        : "",
+      employment_date: row.employment_date
+        ? new Date(row.employment_date).toISOString().split("T")[0]
+        : "",
+      national_id: row.national_id ?? "",
+      health_info: row.health_info ?? "",
+      photo_url: row.photo_url ?? "",
+    };
+    return Object.fromEntries(Object.entries(payload).filter(([_, v]) => v !== ""));
+  },
+};
+
 
 export default function StaffProfilePage() {
   return (
@@ -222,5 +261,63 @@ export default function StaffProfilePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+export function StaffImportSection({ onSuccess }: { onSuccess: () => void }) {
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.name.match(/\.(xlsx|xls)$/i)) {
+      alert("Please upload a valid Excel file (.xlsx or .xls).");
+      return;
+    }
+    setImportFile(file);
+    setIsImportModalOpen(true);
+    event.target.value = "";
+  };
+
+  return (
+    <>
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        onChange={handleFileSelected}
+        style={{ display: "none" }}
+      />
+      <button
+        className="text-purple-600 text-sm hover:underline"
+        onClick={downloadStaffTemplate}
+      >
+        Download Template (.xlsx)
+      </button>
+      <button
+        className="secondary-button"
+        onClick={() => fileInputRef.current?.click()}
+      >
+        📥 Import Excel
+      </button>
+
+      <ImportModal
+        isOpen={isImportModalOpen}
+        file={importFile}
+        config={STAFF_IMPORT_CONFIG}
+        onClose={() => { setIsImportModalOpen(false); setImportFile(null); }}
+        onSuccess={onSuccess}
+      />
+    </>
   );
 }

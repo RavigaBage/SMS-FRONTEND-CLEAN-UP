@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { apiRequest, fetchWithAuth } from "@/src/lib/apiClient";
 import { StudentTable } from "@/src/assets/components/management/StudentTable";
 import { AddStudentModal } from "@/src/assets/components/management/AddStudentModal";
+import { ImportStudentModal } from "@/src/assets/components/management/ImportStudentModal";
 import { Student } from "@/src/assets/types/api";
 import { Pagination } from "@/src/assets/components/management/Pagination";
 import { downloadStudentTemplate } from "@/src/lib/excelTemplate";
-import * as XLSX from "xlsx";
 
 import "@/styles/student_page.css";
 
@@ -48,13 +48,14 @@ const PAGE_SIZE = 20;
 
 export default function StudentsManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [Classes, setClasses] = useState<ClassData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [filters, setFilters] = useState<Filters>({
     grade: "",
@@ -64,92 +65,21 @@ export default function StudentsManagementPage() {
 
   const totalPages = Math.ceil(totalResults / PAGE_SIZE);
 
-const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
+  const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  // 1. Basic extension check
-  if (!file.name.match(/\.(csv|xlsx|xls)$/i)) {
-    alert("Please upload a valid Excel or CSV file.");
-    return;
-  }
-
-  setIsImporting(true);
-
-  try {
-    const reader = new FileReader();
-    
-    // Create a promise to handle the file reading/conversion
-    const csvBlob = await new Promise<Blob>((resolve, reject) => {
-      reader.onload = (e) => {
-        try {
-          const result = e.target?.result;
-          if (!result || typeof result === 'string') {
-            reject(new Error('Invalid file read result'));
-            return;
-          }
-          const data = new Uint8Array(result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          
-          // Convert the first sheet to CSV
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
-          const csvString = XLSX.utils.sheet_to_csv(worksheet);
-          
-          // Create a Blob that the backend can read as a file
-          resolve(new Blob([csvString], { type: 'text/csv' }));
-        } catch (err) {
-          reject(err);
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(file);
-    });
-
-    const formData = new FormData();
-    // We name the file 'students.csv' so the backend knows the format
-    formData.append("file", csvBlob, "students.csv");
-
-    const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/students/bulk-upload/`,
-      {
-        method: "POST",
-        body: formData, // fetchWithAuth should NOT set Content-Type header manually
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("accessToken") || ""}`,
-        }
-      }
-    );
-
-    const data = await res.json();
-
-    if (res.ok) {
-      // Handle the summary object from your backend
-      const { success, failed } = data.summary;
-      alert(`Import complete! Success: ${success}, Failed: ${failed}`);
-      
-      if (failed > 0) {
-        console.table(data.errors); // Log specific row errors for debugging
-      }
-      
-      fetchStudents(1, filters, searchTerm);
-    } else {
-      alert(`Import failed: ${data.error || "Unknown error"}`);
+    if (!file.name.match(/\.(xlsx|xls)$/i)) {
+      alert("Please upload a valid Excel file (.xlsx or .xls).");
+      return;
     }
-  } catch (err) {
-    console.error("Import error:", err);
-    alert("An error occurred during conversion or upload.");
-  } finally {
-    setIsImporting(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  }
-};
 
-  const buildQuery = (
-    page: number,
-    currentFilters: Filters,
-    search: string,
-  ) => {
+    setImportFile(file);
+    setIsImportModalOpen(true);
+    event.target.value = "";
+  };
+
+  const buildQuery = (page: number, currentFilters: Filters, search: string) => {
     const params = new URLSearchParams();
     params.set("page", String(page));
     if (search) params.set("search", search);
@@ -159,11 +89,7 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     return params.toString();
   };
 
-  const fetchStudents = async (
-    page: number,
-    currentFilters: Filters,
-    search: string,
-  ) => {
+  const fetchStudents = async (page: number, currentFilters: Filters, search: string) => {
     setIsLoading(true);
     try {
       const query = buildQuery(page, currentFilters, search);
@@ -189,7 +115,7 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
         email: s.email || "N/A",
         grade: s.grade || "Unassigned",
         gender: s.gender || "uncaptured",
-        classInfo:s.class_info?.class_name || '-',
+        classInfo: s.class_info?.class_name || "-",
         enrollmentDate: s.created_at
           ? new Date(s.created_at).toLocaleDateString()
           : "N/A",
@@ -198,7 +124,6 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
           s.profile_image ||
           `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}&background=random`,
       }));
-      console.log(formattedData);
 
       setStudents(formattedData as any);
     } catch (err) {
@@ -207,6 +132,7 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchStudents(currentPage, filters, searchTerm);
     fetchClasses();
@@ -216,15 +142,14 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
     setCurrentPage(1);
   };
+
   const fetchClasses = async () => {
     try {
       const res = await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
         {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         },
       );
 
@@ -241,6 +166,7 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
       console.error("Network or Auth error:", err);
     }
   };
+
   const handleClearFilters = () => {
     setFilters({ grade: "", gender: "", status: "" });
     setSearchTerm("");
@@ -260,9 +186,7 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}/students/${studentId}/`,
-        {
-          method: "DELETE",
-        },
+        { method: "DELETE" },
       );
       const newTotal = totalResults - 1;
       const newTotalPages = Math.ceil(newTotal / PAGE_SIZE);
@@ -279,7 +203,6 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
 
   return (
     <div className="students-page">
-
       <div className="page-header">
         <div className="page-title-group">
           <h1 className="page-title">Students</h1>
@@ -289,23 +212,21 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
           <input
             type="file"
             ref={fileInputRef}
-            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .xlsx, .xls, .xls"
-            onChange={handleImport}
+            accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+            onChange={handleFileSelected}
             style={{ display: "none" }}
           />
-          {/* NEW: Template Link */}
-          <button 
+          <button
             className="text-blue-600 text-sm hover:underline"
             onClick={downloadStudentTemplate}
           >
             Download Template (.xlsx)
           </button>
-          <button 
-            className="ghost-button" 
+          <button
+            className="ghost-button"
             onClick={() => fileInputRef.current?.click()}
-            disabled={isImporting}
           >
-            {isImporting ? "Importing..." : "📥 Import Excel"}
+            📥 Import Excel
           </button>
           <button
             className="primary-button"
@@ -404,6 +325,18 @@ const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
         }}
         onSuccess={() => {
           setIsModalOpen(false);
+          fetchStudents(currentPage, filters, searchTerm);
+        }}
+      />
+
+      <ImportStudentModal
+        isOpen={isImportModalOpen}
+        file={importFile}
+        onClose={() => {
+          setIsImportModalOpen(false);
+          setImportFile(null);
+        }}
+        onSuccess={() => {
           fetchStudents(currentPage, filters, searchTerm);
         }}
       />

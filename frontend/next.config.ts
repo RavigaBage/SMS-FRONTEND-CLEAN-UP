@@ -98,6 +98,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ["lucide-react", "date-fns", "chart.js"],
+    
   },
 };
 

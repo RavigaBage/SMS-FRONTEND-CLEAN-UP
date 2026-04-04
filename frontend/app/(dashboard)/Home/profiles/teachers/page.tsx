@@ -1,25 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
-  UserPlus,
-  Search,
-  SlidersHorizontal,
-  Download,
-  Loader2,
-  BookOpen,
+  UserPlus, Search, SlidersHorizontal, Download, Loader2, BookOpen,
 } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
-import {
-  TeacherTable,
-  Teacher,
-} from "@/src/assets/components/management/TeacherTable";
+import { TeacherTable, Teacher } from "@/src/assets/components/management/TeacherTable";
 import { AddTeacherModal } from "@/src/assets/components/management/AddTeacher";
 import { EditTeacherModal } from "@/src/assets/components/management/EditTeacher";
 import { AssignSubjectsModal } from "@/src/assets/components/management/AssignSubject";
 import { TeacherDetailsModal } from "@/src/assets/components/management/TeacherDetails";
 import { Pagination } from "@/src/assets/components/management/Pagination";
 import { FilterModal } from "@/src/assets/components/management/FilterModel";
+import { ImportModal, ImportModalConfig } from "@/src/assets/components/management/ImportModal";
+import { downloadTeacherTemplate } from "@/src/lib/excelTemplate";
 import { toast } from "react-hot-toast";
 import "@/styles/Teachers.css";
 
@@ -36,28 +30,50 @@ interface FilterState {
   subject_id?: string;
 }
 
-export default function TeachersDirectoryPage() {
+const TEACHER_IMPORT_CONFIG: ImportModalConfig = {
+  title: "Import Teachers",
+  endpoint: "/teachers/",
+  requiredHeaders: [
+    "user_id", "first_name", "last_name", "specialization",
+    "subject_ids", "qualifications", "years_of_experience",
+    "phone_number", "emergency_contact",
+  ],
+  rowLabel: (row) => `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim(),
+  transformPayload: (row) => ({
+    user_id: row.user_id ? Number(row.user_id) : undefined,
+    first_name: row.first_name ?? "",
+    last_name: row.last_name ?? "",
+    specialization: row.specialization ?? "",
+    subject_ids: row.subject_ids
+      ? String(row.subject_ids).split(",").map((id: string) => Number(id.trim())).filter(Boolean)
+      : [],
+    qualifications: row.qualifications ?? "",
+    years_of_experience: row.years_of_experience ? Number(row.years_of_experience) : 0,
+    phone_number: row.phone_number ?? "",
+    emergency_contact: row.emergency_contact ?? "",
+  }),
+};
 
+export default function TeachersDirectoryPage() {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<FilterState>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const resultsPerPage = 20;
 
-  const fetchTeachers = async (
-    page: number,
-    search: string,
-    filterParams: FilterState = {},
-  ) => {
+  const fetchTeachers = async (page: number, search: string, filterParams: FilterState = {}) => {
     setLoading(true);
     try {
       const query = new URLSearchParams({
@@ -66,9 +82,7 @@ export default function TeachersDirectoryPage() {
         ...filterParams,
       });
 
-      const res = await apiRequest<PaginatedResponse>(`/teachers/?${query}`, {
-        method: "GET",
-      });
+      const res = await apiRequest<PaginatedResponse>(`/teachers/?${query}`, { method: "GET" });
 
       const data: PaginatedResponse = {
         count: res.count ?? 0,
@@ -109,37 +123,22 @@ export default function TeachersDirectoryPage() {
   };
 
   const handleDelete = async (teacherId: number) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this teacher? This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
-
+    if (!confirm("Are you sure you want to delete this teacher? This action cannot be undone.")) return;
     try {
-      await apiRequest(`/teachers/${teacherId}/`, {
-        method: "DELETE",
-      });
-
+      await apiRequest(`/teachers/${teacherId}/`, { method: "DELETE" });
       toast.success("Teacher deleted successfully");
       fetchTeachers(currentPage, searchTerm, filters);
     } catch (err: any) {
-      console.error("Error deleting teacher:", err);
       toast.error(err?.detail || "Failed to delete teacher");
     }
   };
 
   const handleDeactivate = async (teacherId: number) => {
     try {
-      await apiRequest(`/teachers/${teacherId}/deactivate/`, {
-        method: "POST",
-      });
-
+      await apiRequest(`/teachers/${teacherId}/deactivate/`, { method: "POST" });
       toast.success("Teacher deactivated successfully");
       fetchTeachers(currentPage, searchTerm, filters);
     } catch (err: any) {
-      console.error("Error deactivating teacher:", err);
       toast.error(err?.detail || "Failed to deactivate teacher");
     }
   };
@@ -159,6 +158,18 @@ export default function TeachersDirectoryPage() {
     setIsAssignModalOpen(true);
   };
 
+  const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.name.match(/\.(xlsx|xls)$/i)) {
+      toast.error("Please upload a valid Excel file (.xlsx or .xls).");
+      return;
+    }
+    setImportFile(file);
+    setIsImportModalOpen(true);
+    event.target.value = "";
+  };
+
   const handleExport = async () => {
     try {
       toast.loading("Preparing export...");
@@ -167,43 +178,19 @@ export default function TeachersDirectoryPage() {
         ...filters,
       });
 
-      const res = await apiRequest<PaginatedResponse>(
-        `/teachers/?${query}&page_size=1000`,
-        {
-          method: "GET",
-        },
-      );
+      const res = await apiRequest<PaginatedResponse>(`/teachers/?${query}&page_size=1000`, { method: "GET" });
 
-      const headers = [
-        "ID",
-        "Full Name",
-        "Username",
-        "Email",
-        "Specialization",
-        "Subjects",
-        "Qualifications",
-        "Experience",
-        "Phone",
-        "Status",
-      ];
+      const headers = ["ID", "Full Name", "Username", "Email", "Specialization", "Subjects", "Qualifications", "Experience", "Phone", "Status"];
       const csvData = res?.results?.map((t: any) => [
-        t.id,
-        t.full_name,
-        t.user?.username,
-        t.user?.email,
-        t.specialization,
-        t.subject_list,
-        t.qualifications,
-        t.years_of_experience,
-        t.phone_number,
+        t.id, t.full_name, t.user?.username, t.user?.email,
+        t.specialization, t.subject_list, t.qualifications,
+        t.years_of_experience, t.phone_number,
         t.is_active ? "Active" : "Inactive",
       ]);
 
       const csv = [
         headers.join(","),
-        ...(csvData ?? []).map((row: any[]) =>
-          row.map((cell: any) => `"${cell}"`).join(","),
-        ),
+        ...(csvData ?? []).map((row: any[]) => row.map((cell: any) => `"${cell}"`).join(",")),
       ].join("\n");
 
       const blob = new Blob([csv], { type: "text/csv" });
@@ -217,20 +204,20 @@ export default function TeachersDirectoryPage() {
       toast.success("Teachers exported successfully");
     } catch (err: any) {
       toast.dismiss();
-      console.error("Error exporting teachers:", err);
       toast.error("Failed to export teachers");
     }
   };
+
   const handleApplyFilters = (newFilters: FilterState) => {
     setFilters(newFilters);
     setCurrentPage(1);
     setIsFilterModalOpen(false);
   };
+
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchTeachers(currentPage, searchTerm, filters);
     }, 300);
-
     return () => clearTimeout(delayDebounceFn);
   }, [currentPage, searchTerm, filters]);
 
@@ -250,15 +237,24 @@ export default function TeachersDirectoryPage() {
         </div>
 
         <div className="page-actions">
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            onChange={handleFileSelected}
+            style={{ display: "none" }}
+          />
+          <button className="text-teal-600 text-sm hover:underline" onClick={downloadTeacherTemplate}>
+            Download Template (.xlsx)
+          </button>
+          <button className="secondary-button" onClick={() => fileInputRef.current?.click()}>
+            📥 Import Excel
+          </button>
           <button className="secondary-button" onClick={handleExport}>
             <Download size={18} />
             Export
           </button>
-
-          <button
-            className="primary-dark-button"
-            onClick={() => setIsAddModalOpen(true)}
-          >
+          <button className="primary-dark-button" onClick={() => setIsAddModalOpen(true)}>
             <UserPlus size={18} />
             Add Teacher
           </button>
@@ -271,39 +267,25 @@ export default function TeachersDirectoryPage() {
             <p className="stat-label">Total Teachers</p>
             <p className="stat-value">{totalResults}</p>
           </div>
-          <div className="stat-icon stat-icon-blue">
-            <UserPlus size={24} />
-          </div>
+          <div className="stat-icon stat-icon-blue"><UserPlus size={24} /></div>
         </div>
-
         <div className="stat-card">
           <div className="stat-content">
             <p className="stat-label">Active Teachers</p>
-            <p className="stat-value">
-              {teachers.filter((t) => t.isActive).length}
-            </p>
+            <p className="stat-value">{teachers.filter((t) => t.isActive).length}</p>
           </div>
-          <div className="stat-icon stat-icon-green">
-            <BookOpen size={24} />
-          </div>
+          <div className="stat-icon stat-icon-green"><BookOpen size={24} /></div>
         </div>
-
         <div className="stat-card">
           <div className="stat-content">
             <p className="stat-label">Avg. Experience</p>
             <p className="stat-value">
               {teachers.length > 0
-                ? Math.round(
-                    teachers.reduce((sum, t) => sum + t.yearsOfExperience, 0) /
-                      teachers.length,
-                  )
-                : 0}{" "}
-              yrs
+                ? Math.round(teachers.reduce((sum, t) => sum + t.yearsOfExperience, 0) / teachers.length)
+                : 0}{" "}yrs
             </p>
           </div>
-          <div className="stat-icon stat-icon-purple">
-            <SlidersHorizontal size={24} />
-          </div>
+          <div className="stat-icon stat-icon-purple"><SlidersHorizontal size={24} /></div>
         </div>
       </div>
 
@@ -314,30 +296,17 @@ export default function TeachersDirectoryPage() {
             type="text"
             placeholder="Search by name, username, specialization..."
             value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
+            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
             className="search-input"
           />
         </div>
-
         <div className="control-actions">
-          {loading && (
-            <span className="loading-spinner">
-              <Loader2 className="animate-spin" size={20} />
-            </span>
-          )}
-          <button
-            className="ghost-button"
-            onClick={() => setIsFilterModalOpen(true)}
-          >
+          {loading && <span className="loading-spinner"><Loader2 className="animate-spin" size={20} /></span>}
+          <button className="ghost-button" onClick={() => setIsFilterModalOpen(true)}>
             <SlidersHorizontal size={18} />
             Filters
             {Object.keys(filters).length > 0 && (
-              <span className="filter-badge">
-                {Object.keys(filters).length}
-              </span>
+              <span className="filter-badge">{Object.keys(filters).length}</span>
             )}
           </button>
         </div>
@@ -375,10 +344,7 @@ export default function TeachersDirectoryPage() {
                 : "Get started by adding your first teacher."}
             </p>
             {!searchTerm && Object.keys(filters).length === 0 && (
-              <button
-                className="primary-dark-button"
-                onClick={() => setIsAddModalOpen(true)}
-              >
+              <button className="primary-dark-button" onClick={() => setIsAddModalOpen(true)}>
                 <UserPlus size={18} />
                 Add First Teacher
               </button>
@@ -389,10 +355,7 @@ export default function TeachersDirectoryPage() {
 
       <AddTeacherModal
         isOpen={isAddModalOpen}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          fetchTeachers(currentPage, searchTerm, filters);
-        }}
+        onClose={() => { setIsAddModalOpen(false); fetchTeachers(currentPage, searchTerm, filters); }}
       />
 
       {selectedTeacher && (
@@ -400,30 +363,17 @@ export default function TeachersDirectoryPage() {
           <EditTeacherModal
             isOpen={isEditModalOpen}
             teacher={selectedTeacher}
-            onClose={() => {
-              setIsEditModalOpen(false);
-              setSelectedTeacher(null);
-              fetchTeachers(currentPage, searchTerm, filters);
-            }}
+            onClose={() => { setIsEditModalOpen(false); setSelectedTeacher(null); fetchTeachers(currentPage, searchTerm, filters); }}
           />
-
           <AssignSubjectsModal
             isOpen={isAssignModalOpen}
             teacher={selectedTeacher}
-            onClose={() => {
-              setIsAssignModalOpen(false);
-              setSelectedTeacher(null);
-              fetchTeachers(currentPage, searchTerm, filters);
-            }}
+            onClose={() => { setIsAssignModalOpen(false); setSelectedTeacher(null); fetchTeachers(currentPage, searchTerm, filters); }}
           />
-
           <TeacherDetailsModal
             isOpen={isDetailsModalOpen}
             teacher={selectedTeacher}
-            onClose={() => {
-              setIsDetailsModalOpen(false);
-              setSelectedTeacher(null);
-            }}
+            onClose={() => { setIsDetailsModalOpen(false); setSelectedTeacher(null); }}
           />
         </>
       )}
@@ -433,6 +383,14 @@ export default function TeachersDirectoryPage() {
         filters={filters}
         onClose={() => setIsFilterModalOpen(false)}
         onApply={handleApplyFilters}
+      />
+
+      <ImportModal
+        isOpen={isImportModalOpen}
+        file={importFile}
+        config={TEACHER_IMPORT_CONFIG}
+        onClose={() => { setIsImportModalOpen(false); setImportFile(null); }}
+        onSuccess={() => fetchTeachers(currentPage, searchTerm, filters)}
       />
     </div>
   );
