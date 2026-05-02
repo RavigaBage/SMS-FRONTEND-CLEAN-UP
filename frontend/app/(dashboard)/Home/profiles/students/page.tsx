@@ -39,7 +39,7 @@ export interface ClassesBase {
   results: ClassData[];
 }
 interface Filters {
-  grade: string;
+  class_id: string;
   gender: string;
   status: string;
 }
@@ -58,7 +58,7 @@ export default function StudentsManagementPage() {
   const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [filters, setFilters] = useState<Filters>({
-    grade: "",
+    class_id: "",
     gender: "",
     status: "",
   });
@@ -83,7 +83,7 @@ export default function StudentsManagementPage() {
     const params = new URLSearchParams();
     params.set("page", String(page));
     if (search) params.set("search", search);
-    if (currentFilters.grade) params.set("grade", currentFilters.grade);
+    if (currentFilters.class_id) params.set("class_id", currentFilters.class_id);
     if (currentFilters.gender) params.set("gender", currentFilters.gender);
     if (currentFilters.status) params.set("status", currentFilters.status);
     return params.toString();
@@ -168,7 +168,7 @@ export default function StudentsManagementPage() {
   };
 
   const handleClearFilters = () => {
-    setFilters({ grade: "", gender: "", status: "" });
+    setFilters({ class_id: "", gender: "", status: "" });
     setSearchTerm("");
     setCurrentPage(1);
   };
@@ -258,8 +258,8 @@ export default function StudentsManagementPage() {
 
       <div className="flex flex-wrap items-center gap-3 p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
         <select
-          value={filters.grade}
-          onChange={(e) => handleFilterChange("grade", e.target.value)}
+          value={filters.class_id}
+          onChange={(e) => handleFilterChange("class_id", e.target.value)}
           className="flex-1 min-w-[180px] px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg outline-none cursor-pointer hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-50 transition-all"
         >
           <option value="">Select Class</option>

@@ -37,6 +37,8 @@ export function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProps) {
     specialization: "",
     subject_ids: [] as number[],
     qualifications: "",
+    employment_date:"",
+    gender:"",
     years_of_experience: 0,
     phone_number: "",
     emergency_contact: "",
@@ -113,7 +115,6 @@ export function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProps) {
       onClose();
       resetForm();
     } catch (err: any) {
-      console.error("Error creating teacher:", err);
 
       if (err.response?.data) {
         const errorData = err.response.data;
@@ -145,6 +146,8 @@ export function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProps) {
       last_name: "",
       specialization: "",
       subject_ids: [],
+      employment_date:"",
+      gender:"",
       qualifications: "",
       years_of_experience: 0,
       phone_number: "",
@@ -244,6 +247,30 @@ export function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProps) {
                 )}
               </div>
             </div>
+            <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Date of employment</label>
+                  <input
+                    type="date"
+                    className="form-input"
+                    value={formData.employment_date}
+                    onChange={(e) => setFormData({ ...formData, employment_date: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Date of employment</label>
+                  <select
+                   className="form-input"
+                    value={formData.gender}
+                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                  >
+                    <option value="male">male</option>
+                    <option value="female">female</option>
+                  </select>
+                  
+                </div>
+            </div>
           </div>
 
           <div className="form-section">
@@ -282,6 +309,7 @@ export function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProps) {
                 ))}
               </div>
             </div>
+
 
             <div className="form-group">
               <label className="form-label">Qualifications</label>

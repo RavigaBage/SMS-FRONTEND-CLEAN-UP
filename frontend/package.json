@@ -2,6 +2,7 @@
   "name": "school-management-frontend",
   "version": "1.0.0",
   "private": true,
+  
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -25,7 +26,7 @@
     "framer-motion": "^12.34.0",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.562.0",
-    "next": "^16.1.6",
+    "next": "^16.2.4",
     "pdfmake": "^0.3.5",
     "react": "19.2.3",
     "react-chartjs-2": "^5.3.1",
@@ -35,7 +36,14 @@
     "tailwind-merge": "^3.4.0"
   },
   "overrides": {
-    "minimatch": "^10.2.1"
+    "minimatch": "^10.2.1",
+    "uuid": ">=14.0.0",
+    "next": {
+      "postcss": ">=8.5.10"
+    },
+    "exceljs": {
+      "uuid": ">=14.0.0"
+    }
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.1.1",
@@ -48,7 +56,7 @@
     "autoprefixer": "^10.4.24",
     "cross-env": "^7.0.3",
     "cssnano": "^7.0.6",
-    "eslint": "^10.0.1",
+    "eslint": "^9.39.4",
     "eslint-config-next": "^16.1.6",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.11",
@@ -72,5 +80,12 @@
   "engines": {
     "node": ">=18.17.0",
     "npm": ">=9.0.0"
+  },
+  "notes": {
+    "security": {
+      "accepted-risks": [
+        "postcss <8.5.10 vendored inside next@16.2.4 — affects all Next.js versions up to 16.3.0-canary.5. No patched stable release exists as of May 2026. Build-tooling only, not user-facing. Monitor https://github.com/vercel/next.js/releases for upstream fix."
+      ]
+    }
   }
 }

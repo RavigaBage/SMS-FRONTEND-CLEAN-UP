@@ -162,13 +162,6 @@ export function TeacherTable({
                     </button>
                   )}
 
-                  <button
-                    className="icon-button icon-button-delete"
-                    onClick={() => onDelete(teacher.id)}
-                    title="Delete Teacher"
-                  >
-                    <Trash2 size={24} />
-                  </button>
                 </div>
               </td>
             </tr>

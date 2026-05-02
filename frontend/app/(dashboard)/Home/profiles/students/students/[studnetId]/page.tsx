@@ -28,7 +28,6 @@ export default function StudentProfilePage() {
   const router = useRouter();
   const printRef = useRef<HTMLDivElement>(null);
 
-  // Use the name exactly as it appears in your console logs
   const id = params?.studnetId;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [data, setData] = useState<any>(null);
@@ -42,30 +41,23 @@ export default function StudentProfilePage() {
   useEffect(() => {
     const fetchFullProfile = async () => {
       try {
-        console.log("🚀 Starting fetch for Student ID:", id);
         setLoading(true);
 
         const res = await apiRequest<any>(`/students/${id}/full_details/`);
-
-        console.log("✅ API Response received:", res);
         setData(res.data);
       } catch (err: any) {
-        console.error("❌ Fetch Error:", err);
         setError({
           code: err.status || 500,
           message: err.message || "Failed to load profile",
         });
       } finally {
-        console.log("🏁 Loading sequence complete");
         setLoading(false);
       }
     };
 
     if (id) {
       fetchFullProfile();
-    } else {
-      console.warn("⚠️ No ID found in URL parameters yet.");
-    }
+    } 
   }, [id]);
 
   const handleDownloadPDF = async (): Promise<void> => {

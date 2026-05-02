@@ -150,13 +150,13 @@ export async function apiRequest<T>(
 function buildQueryString(filters: InvoiceFilters): string {
   const params = new URLSearchParams();
 
-  if (filters.search) params.set("search", filters.search);
-  if (filters.status && filters.status !== "all")
-    params.set("status", filters.status);
-  if (filters.term && filters.term !== "all") params.set("term", filters.term);
-  if (filters.academic_year) params.set("academic_year", filters.academic_year);
-  if (filters.page && filters.page > 1)
-    params.set("page", String(filters.page));
+  if (filters.search)             params.set('search', filters.search);
+  if (filters.status && filters.status !== 'all') params.set('status', filters.status);
+  if (filters.page)               params.set('page', String(filters.page));
+  if (filters.class_id != null)   params.set('class_id', String(filters.class_id));
+  if (filters.academic_year)      params.set('academic_year', filters.academic_year);
+  if (filters.term)               params.set('term', filters.term);
+
 
   const qs = params.toString();
   return qs ? `?${qs}` : "";
@@ -165,7 +165,21 @@ function buildQueryString(filters: InvoiceFilters): string {
 
 export const invoiceApi = {
   async list(filters: InvoiceFilters = {}): Promise<InvoiceListResponse> {
+   
+  const params = new URLSearchParams();
+
+  if (filters.search)             params.set('search', filters.search);
+  if (filters.status && filters.status !== 'all') params.set('status', filters.status);
+  if (filters.page)               params.set('page', String(filters.page));
+  if (filters.class_id != null)   params.set('class_id', String(filters.class_id));
+  if (filters.academic_year)      params.set('academic_year', filters.academic_year);
+  if (filters.term)               params.set('term', filters.term);
+
+
+
+
     const qs = buildQueryString(filters);
+    console.log("Fetching invoices with query:", qs);
     const res = await apiRequest<Invoice[]>(`/invoices/${qs}`);
 
     if (res.error) throw new Error(res.error);

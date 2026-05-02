@@ -8,8 +8,28 @@ import type {
   InvoiceSummary,
 } from "@/src/assets/types/invoice";
 import { invoiceApi } from "@/src/lib/invoiceApi";
+import {fetchWithAuth } from "@/src/lib/apiClient";
 import Link from "next/link";
+export interface ClassesBase {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: ClassData[];
+}
 
+export interface ClassData {
+  id: number;
+  class_name: string;
+  academic_year: string;
+  teacher_name: String;
+  teacher: Teacher | null;
+}
+export interface Teacher {
+  id: number;
+  first_name: string;
+  last_name: string;
+  specialization: number;
+}
 const STATUS_CONFIG: Record<
   InvoiceStatus,
   { label: string; color: string; bg: string; dot: string; border: string }
@@ -241,28 +261,48 @@ export default function InvoicesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [Classes, setClasses] = useState<ClassData[]>([]);
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [ClassFilter, setClassFilter] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">(
     "all",
   );
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 350);
-    return () => clearTimeout(t);
-  }, [search]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, statusFilter]);
+    const fetchClasses = async () => {
+      try {
+        const res = await fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+  
+        if (res.status === 401) {
+          console.error("Access denied. Redirecting to login...");
+          return;
+        }
+  
+        const data: ClassesBase = await res.json();
+        if (data && data.results) {
+          setClasses(data.results);
+        }
+      } catch (err) {
+        console.error("Network or Auth error:", err);
+      }
+    }
 
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     const filters: InvoiceFilters = {
       search: debouncedSearch || undefined,
       status: statusFilter,
+      class_id: ClassFilter,
       page,
     };
     try {
@@ -274,7 +314,19 @@ export default function InvoicesPage() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, statusFilter, page]);
+  }, [debouncedSearch, statusFilter, ClassFilter, page]); 
+  
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 350);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, statusFilter,ClassFilter]);
+  useEffect(() => {
+    fetchClasses();
+  }, []);
 
   useEffect(() => {
     fetchInvoices();
@@ -506,6 +558,28 @@ export default function InvoicesPage() {
               </button>
             ))}
           </div>
+          <select
+  value={ClassFilter ?? ""}
+  onChange={(e) => {
+    const value = e.target.value;
+    setClassFilter(value ? Number(value) : null);
+  }}
+  className="flex-1 min-w-[180px] px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg outline-none cursor-pointer hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-50 transition-all"
+>
+  <option value="">Select Class</option>
+
+  {Classes.length === 0 && (
+    <option disabled>No classes available</option>
+  )}
+
+  {Classes.map((t) => (
+    <option key={t.id} value={t.id}>
+      {t.class_name}
+      {t.teacher_name ? ` — ${t.teacher_name}` : " (No Teacher)"}
+    </option>
+  ))}
+</select>
+
           <button
             onClick={fetchInvoices}
             disabled={loading}

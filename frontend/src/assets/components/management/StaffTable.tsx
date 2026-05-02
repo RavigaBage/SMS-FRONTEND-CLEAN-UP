@@ -141,12 +141,6 @@ export function StaffTable({ staff }: { staff: StaffMember[] }) {
                       >
                         <ExternalLink size={18} />
                       </Link>
-                      <button
-                        onClick={() => setDeletingId(member.id)}
-                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all group-hover:opacity-100"
-                      >
-                        <Trash2 size={18} />
-                      </button>
                     </>
                   )}
                 </div>

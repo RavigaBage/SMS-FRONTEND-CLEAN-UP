@@ -75,6 +75,7 @@ export interface InvoiceListResponse {
 export interface InvoiceFilters {
   search?: string;
   status?: InvoiceStatus | "all";
+  class_id?: number | null;
   term?: InvoiceTerm | "all";
   academic_year?: string;
   page?: number;
