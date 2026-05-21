@@ -119,10 +119,10 @@ export function AddStudentModal({
     GenerateStudentAdmissionNumber();
   };
 
-  function GenerateStudentAdmissionNumber(classCode = "SNS", lastNumber = 0) {
-    const year = new Date().getTime();
+  function GenerateStudentAdmissionNumber(classCode = "ADM", lastNumber = 0) {
+    const year = new Date().getFullYear();
     const seq = String(lastNumber + 1).padStart(3, "0");
-    return `${year}${classCode}${seq}`;
+    return `${classCode}/${year}/${seq}`;
   }
 
   if (!isOpen) return null;

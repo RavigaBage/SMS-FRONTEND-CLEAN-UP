@@ -51,19 +51,6 @@ export default function HomePage() {
   const [activities, setActivities] = useState<any[]>([]);
   const [UserName, setUsername] = useState("");
   const [UserRole, setRole] = useState("");
-  // const [showGuide, setShowGuide] = useState(false);
-
-  // useEffect(() => {
-  //   const hasSeenGuide = localStorage.getItem("hasSeenFirstTimeGuide");
-
-  //   if (!hasSeenGuide) {
-  //     setShowGuide(true);
-  //   }
-  // }, []);
-  // const handleGuideComplete = () => {
-  //   localStorage.setItem("hasSeenFirstTimeGuide", "true");
-  //   setShowGuide(false);
-  // };
 
   const fetchDashboardData = async () => {
     setLoading(true);

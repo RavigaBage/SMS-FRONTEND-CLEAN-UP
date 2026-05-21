@@ -38,7 +38,7 @@ export function Sidebar() {
         </div>
         <div>
           <span className="font-bold text-xl tracking-tight text-slate-800 block leading-none">
-            EduManager
+            Theohans
           </span>
           <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase mt-1 block">
             Management System

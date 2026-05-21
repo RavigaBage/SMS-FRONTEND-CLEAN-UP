@@ -122,26 +122,7 @@ const handleSubmit = async (e: FormEvent) => {
                 Sign In
               </button>
 
-              <div className="divider">
-                <span>OR</span>
-              </div>
-
-              <button type="button" className="btn-social">
-                <Image
-                  src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png"
-                  alt="Google"
-                  width={20}
-                  height={20}
-                />
-                Continue with Google
-              </button>
-              <button type="button" className="btn-social">
-                <i className="fa-brands fa-apple"></i> Continue with Apple
-              </button>
-
-              <p className="signup-link">
-                Don't have an Account? <a href="#">Sign Up</a>
-              </p>
+            
             </form>
           </div>
         </div>

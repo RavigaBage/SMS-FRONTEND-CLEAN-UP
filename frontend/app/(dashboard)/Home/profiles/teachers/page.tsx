@@ -244,12 +244,12 @@ export default function TeachersDirectoryPage() {
             onChange={handleFileSelected}
             style={{ display: "none" }}
           />
-          <button className="text-teal-600 text-sm hover:underline" onClick={downloadTeacherTemplate}>
+          {/* <button className="text-teal-600 text-sm hover:underline" onClick={downloadTeacherTemplate}>
             Download Template (.xlsx)
           </button>
           <button className="secondary-button" onClick={() => fileInputRef.current?.click()}>
             📥 Import Excel
-          </button>
+          </button> */}
           <button className="secondary-button" onClick={handleExport}>
             <Download size={18} />
             Export

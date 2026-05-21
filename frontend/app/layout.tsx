@@ -18,11 +18,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "School Management System",
-    template: "%s | School Management System",
+    default: "Theohans Management System",
+    template: "%s | Theohans Academy",
   },
   description:
-    "Comprehensive school management system for managing students, staff, classes, grades, attendance, and more.",
+    "Comprehensive Theohans Academy for managing students, staff, classes, grades, attendance, and more.",
   keywords: [
     "school management",
     "student management",
@@ -30,9 +30,13 @@ export const metadata: Metadata = {
     "academic management",
     "school administration",
   ],
-  authors: [{ name: "Your School Name" }],
-  creator: "Your School Name",
-  publisher: "Your School Name",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  authors: [{ name: "Theohans academy" }],
+  creator: "Theohans academy",
+  publisher: "Theohans academy",
   formatDetection: {
     email: false,
     address: false,
@@ -45,16 +49,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-    title: "School Management System",
+    title: "Theohans Academy",
     description:
-      "Comprehensive school management system for managing students, staff, classes, grades, attendance, and more.",
-    siteName: "School Management System",
+      "Comprehensive Theohans Academy for managing students, staff, classes, grades, attendance, and more.",
+    siteName: "Theohans Academy",
   },
   twitter: {
     card: "summary_large_image",
-    title: "School Management System",
+    title: "Theohans Academy portal",
     description:
-      "Comprehensive school management system for managing students, staff, classes, grades, attendance, and more.",
+      "Comprehensive school portal for managing students, staff, classes, grades, attendance, and more.",
   },
   robots: {
     index: process.env.NODE_ENV === "production",

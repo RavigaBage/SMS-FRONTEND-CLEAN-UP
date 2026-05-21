@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from 'next/image'
 import "@/styles/global.css";
 import styles from "@/styles/sidebar.module.css";
 
@@ -203,18 +204,10 @@ export default function Sidebar() {
       <div className={styles.logoSection}>
         <div className={styles.logo}>
           <div className={styles.logoIcon} aria-hidden>
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-              <defs>
-                <linearGradient id="logoGrad" x1="0" x2="1">
-                  <stop offset="0" stopColor="#667eea" />
-                  <stop offset="1" stopColor="#7c3aed" />
-                </linearGradient>
-              </defs>
-              <rect width="24" height="24" rx="6" fill="url(#logoGrad)" />
-              <path d="M6 9l6-3 6 3-6 3-6-3z" fill="white" opacity="0.95" />
-            </svg>
+           
+            <Image src="/resources/logo.jpg" width="100" height="100"  alt="theohans logo" />
           </div>
-          <div className={styles.logoText}>EduManager</div>
+          <div className={styles.logoText}>Theohans</div>
         </div>
       </div>
 

@@ -11,7 +11,7 @@ interface TimetableEntry {
   room_number: string;
   term: string;
   academic_year: string;
-  subject: { id: number; name: string; code?: string };
+  subject: { id: number; subject_name: string; subject_code?: string };
   class_obj: { id: number; class_name: string };
   teacher: { id: number; first_name: string; last_name: string } | null;
 }
@@ -63,7 +63,7 @@ const isNowInSlot = (day: string, start: string, end: string) => {
 function SessionCard({ entry, index }: { entry: TimetableEntry; index: number }) {
   const color = subjectColor(entry.subject.id);
   const isLive = isNowInSlot(entry.day_of_week, entry.start_time, entry.end_time);
-
+  console.log(entry);
   return (
     <div
       style={{
@@ -103,11 +103,11 @@ function SessionCard({ entry, index }: { entry: TimetableEntry; index: number })
       <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
         <div style={{ width: 8, height: 8, borderRadius: "50%", background: color.dot, flexShrink: 0 }} />
         <span style={{ fontSize: 13, fontWeight: 700, color: color.text, lineHeight: 1.2 }}>
-          {entry.subject.name}
+          {entry.subject.subject_name}
         </span>
-        {entry.subject.code && (
+        {entry.subject.subject_code && (
           <span style={{ fontSize: 10, color: color.text, opacity: 0.6, fontWeight: 500 }}>
-            {entry.subject.code}
+            {entry.subject.subject_code}
           </span>
         )}
       </div>
@@ -163,7 +163,7 @@ export default function TeacherSchedulePage() {
   const years = [...new Set(entries.map((e) => e.academic_year).filter(Boolean))];
 
   const fetchSchedule = useCallback(async () => {
-    const teacherId = localStorage.getItem("teacherId");
+    const teacherId = localStorage.getItem("userId");
     if (!teacherId) {
       setError("Teacher profile not found. Please log in again.");
       setLoading(false);
@@ -457,8 +457,8 @@ export default function TeacherSchedulePage() {
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <div style={{ width: 7, height: 7, borderRadius: "50%", background: color.dot, flexShrink: 0 }} />
                           <div>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>{entry.subject.name}</div>
-                            {entry.subject.code && <div style={{ fontSize: 10, color: "#94a3b8" }}>{entry.subject.code}</div>}
+                            <div style={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>{entry.subject.subject_name}</div>
+                            {entry.subject.subject_code && <div style={{ fontSize: 10, color: "#94a3b8" }}>{entry.subject.subject_code}</div>}
                           </div>
                           {isLive && (
                             <span style={{ fontSize: 9, fontWeight: 700, color: "#166534", background: "#dcfce7", border: "1px solid #86efac", padding: "2px 6px", borderRadius: 20, textTransform: "uppercase" }}>Live</span>

@@ -5,6 +5,13 @@ import { useSearchParams } from "next/navigation";
 import { gradeApi, ResultType } from "@/src/lib/gradeApi";
 import { ErrorMessage, extractErrorDetail } from "@/components/ui/ErrorExtract";
 import "@/styles/grades_student.css";
+import { object } from "framer-motion/client";
+
+interface valuesObj{
+  assessmentScore: [number, number];
+  testScore: [number, number];
+  examScore: [number, number];
+}
 
 export default function GradeEntry() {
   const searchParams = useSearchParams();
@@ -126,6 +133,12 @@ export default function GradeEntry() {
     return "F";
   };
 
+const GradesMonitor = (data: valuesObj): boolean => {
+  return Object.values(data).every(
+    ([score, total]) => score <= total
+  );
+};
+
   const handleSaveGrades = async () => {
     if (!studentId || !classId || !subjectId || !academicYear || !term) {
       setSaveStatus("Error: Missing required parameters");
@@ -137,6 +150,18 @@ export default function GradeEntry() {
     setSaveErrorDetail(null);
 
     try {
+      const values:valuesObj = {
+        assessmentScore:[assessmentScore,assessmentTotal],
+        testScore:[testScore,testTotal],
+        examScore:[examScore,examTotal]
+      }
+
+      if (!GradesMonitor(values)){
+          setSaveStatus("Error");
+          setSaveErrorDetail("Score must not be greater than total score ");
+          return
+      }  
+
       const updated = await gradeApi.saveGrade({
         studentId: Number(studentId),
         classId: Number(classId),
@@ -167,7 +192,6 @@ export default function GradeEntry() {
       setTimeout(() => setSaveStatus(""), 3000);
     } catch (err) {
       setSaveStatus("Error");
-      console.log(err);
       setSaveErrorDetail(extractErrorDetail(err) || "Failed to save grades");
     } finally {
       setIsSaving(false);
