@@ -70,11 +70,12 @@ export default function TeachingLanding() {
   }
 };
 
+
     resolveTeacher();
   }, []);
 
   const teacherProfileHref = teacherId
-    ? `/Home/profiles/teachers&staff/profile/${teacherId}`
+    ? `/Home/profiles/teachers/profile/${teacherId}`
     : "/Home/profiles/teachers";
 
   if (loading) {

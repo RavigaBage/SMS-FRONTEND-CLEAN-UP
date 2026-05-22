@@ -69,28 +69,28 @@ const handleSubmit = async (e: FormEvent) => {
     <div className="login">
       <div className="login-container">
         <div className="login-left">
-          <div className="form-wrapper">
-            <div className="logo">
-              <i className="fa-solid fa-code"></i>
+          <div className="login-form-wrapper">
+            <div className="login-logo">
+              <i className="login-fa-solid fa-code"></i>
             </div>
             <div
               className={`response ${response.status == "success" ? "success" : ""} ${response.status == "error" ? "error" : ""}`}
             >
               <div className={`loader_wrapper ${loader ? "play" : "active"}`}>
-                <div className="load-3">
-                  <div className="line"></div>
-                  <div className="line"></div>
-                  <div className="line"></div>
+                <div className="login-load-3">
+                  <div className="login-line"></div>
+                  <div className="login-line"></div>
+                  <div className="login-line"></div>
                 </div>
               </div>
               <p>{response.message}</p>
             </div>
             <h2>Welcome Back!</h2>
             <form onSubmit={handleSubmit} className="login-form">
-              <div className="input-group">
+              <div className="login-input-group">
                 <label>Email</label>
-                <div className="input-icon">
-                  <i className="fa-regular fa-envelope"></i>
+                <div className="login-input-icon">
+                  <i className="login-fa-regular fa-envelope"></i>
                   <input
                     type="email"
                     value={username}
@@ -100,25 +100,25 @@ const handleSubmit = async (e: FormEvent) => {
                 </div>
               </div>
 
-              <div className="input-group">
+              <div className="login-input-group">
                 <label>Password</label>
-                <div className="input-icon">
-                  <i className="fa-solid fa-lock"></i>
+                <div className="login-input-icon">
+                  <i className="login-fa-solid fa-lock"></i>
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password ***"
                   />
-                  <i className="fa-regular fa-eye-slash show-hide"></i>
+                  <i className="login-fa-regular fa-eye-slash show-hide"></i>
                 </div>
               </div>
 
-              <div className="forgot-password">
+              <div className="login-forgot-password">
                 <a href="#">Forgot Password?</a>
               </div>
 
-              <button type="submit" className="btn-primary">
+              <button type="submit" className="login-btn-primary">
                 Sign In
               </button>
 
@@ -128,9 +128,9 @@ const handleSubmit = async (e: FormEvent) => {
         </div>
 
         <div className="login-right">
-          <div className="content-wrapper">
+          <div className="login-content-wrapper">
             <h1>Bridging the Gap Between Learning and Technology</h1>
-            <div className="testimonial">
+            <div className="login-testimonial">
               <p>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -160,13 +160,13 @@ const handleSubmit = async (e: FormEvent) => {
                 </svg>
               </p>
 
-              <div className="user-info">
+              <div className="login-user-info">
                 <Image
                   src="https://i.pravatar.cc/50?u=marcus"
                   alt="Dr. Marcus Thorne"
                   width={50}
                   height={50}
-                  className="rounded-full"
+                  className="login-rounded-full"
                 />
                 <div>
                   <strong>Dr. Marcus Thorne</strong>
@@ -176,9 +176,9 @@ const handleSubmit = async (e: FormEvent) => {
               </div>
             </div>
 
-            <div className="footer-logos">
+            <div className="login-footer-logos">
               <p>JOIN 1K TEAMS</p>
-              <div className="logo-grid">
+              <div className="login-logo-grid">
                 <span>Discord</span>
                 <span>mailchimp</span>
                 <span>grammarly</span>
