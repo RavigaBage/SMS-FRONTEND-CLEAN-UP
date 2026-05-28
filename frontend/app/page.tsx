@@ -276,7 +276,6 @@ export default function HomePage() {
             <div className="flex items-center gap-4 pb-5 border-b border-[#E8E4F0] mb-5">
               <div className="w-14 h-14 bg-[#4C1D95] rounded-xl flex items-center justify-center font-serif text-2xl font-bold text-white shrink-0 overflow-hidden">
                 <Image src="/resources/crest.jpg" width={100} height={100} alt="school crest" className="object-cover w-full h-full" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-                <span className="text-white text-xl">T</span>
               </div>
               <div>
                 <div className="font-serif text-lg font-semibold text-[#1A0533]">Theohans Academy</div>
