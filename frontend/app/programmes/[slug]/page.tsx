@@ -6,7 +6,6 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-// Generates static paths at build time for fast delivery (SSG)
 export async function generateStaticParams() {
   return Object.keys(curriculumData).map((slug) => ({ slug }));
 }
@@ -23,7 +22,6 @@ export default async function ProgrammePage({ params }: PageProps) {
     <main className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 text-slate-800">
       <div className="max-w-4xl mx-auto">
         
-        {/* Breadcrumb Navigation */}
         <nav className="mb-8 text-sm text-slate-500">
           <Link href="/#programs" className="hover:text-purple-700 transition">
             Academic Programmes
@@ -32,7 +30,7 @@ export default async function ProgrammePage({ params }: PageProps) {
           <span className="font-medium text-slate-700">{programme.title}</span>
         </nav>
 
-        {/* Hero Section */}
+      
         <header className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 mb-8">
           <div className="flex items-center gap-4 mb-4">
             <span className="text-4xl bg-purple-50 p-3 rounded-xl">{programme.icon}</span>
@@ -50,7 +48,7 @@ export default async function ProgrammePage({ params }: PageProps) {
           </p>
         </header>
 
-        {/* Subjects Grid Section */}
+      
         <section>
           <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
             GES Certified Curriculum Subjects
@@ -65,7 +63,7 @@ export default async function ProgrammePage({ params }: PageProps) {
                 key={index} 
                 className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs hover:border-purple-300 hover:shadow-sm transition-all duration-200 flex items-start gap-4 group"
               >
-                {/* Custom stylized indicator dot */}
+              
                 <span className="w-2.5 h-2.5 rounded-full bg-purple-600 mt-2 shrink-0 group-hover:scale-125 transition-transform" />
                 <div>
                   <h3 className="font-semibold text-slate-800 group-hover:text-purple-900 transition-colors">

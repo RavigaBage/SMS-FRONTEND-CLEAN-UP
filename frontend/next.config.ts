@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
-
+// Fallback to local Django development port if the environment variable isn't set yet
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
 const allowedImageHostnames = (
   process.env.ALLOWED_IMAGE_HOSTS ??
@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  trailingSlash: true,
 
   compiler: {
     removeConsole: isDev ? false : { exclude: ["error", "warn"] },
@@ -39,6 +40,19 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname },
       { protocol: "http", hostname },
     ]),
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${apiUrl}/api/:path*/`,
+      },
+      {
+        source: "/api/:path*",
+        destination: `${apiUrl}/api/:path*`,
+      },
+    ];
   },
 
   async headers() {
@@ -98,7 +112,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ["lucide-react", "date-fns", "chart.js"],
-    
   },
 };
 
