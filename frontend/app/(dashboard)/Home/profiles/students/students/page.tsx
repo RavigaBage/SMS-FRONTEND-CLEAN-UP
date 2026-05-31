@@ -29,6 +29,16 @@ export default function StudentsManagementPage() {
     setFilters({});
     setCurrentPage(1);
   };
+
+  const handleApproveStudent = (id: number) => {
+    if (!window.confirm("Approve this student?")) return;
+    window.alert(`Approve requested for student ID ${id}.`);
+  };
+
+  const handleEnrollStudent = (id: number) => {
+    window.alert(`Enroll requested for student ID ${id}.`);
+  };
+
   const handleDeleteStudent = async (id: number) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this student? All enrollment records will be removed.",
@@ -174,7 +184,12 @@ export default function StudentsManagementPage() {
         </div>
       ) : students.length > 0 ? (
         <>
-          <StudentTable students={students} onDelete={handleDeleteStudent} />
+          <StudentTable
+            students={students}
+            onDelete={handleDeleteStudent}
+            onApprove={handleApproveStudent}
+            onEnroll={handleEnrollStudent}
+          />
           <div className="bg-white border-x border-b rounded-b-2xl">
             <Pagination
               currentPage={currentPage}

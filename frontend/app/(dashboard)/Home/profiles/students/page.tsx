@@ -93,7 +93,7 @@ export default function StudentsManagementPage() {
     setIsLoading(true);
     try {
       const query = buildQuery(page, currentFilters, search);
-      const res = await apiRequest<PaginatedResponse>(`/students/?${query}`);
+      const res = await apiRequest<PaginatedResponse>(`/api/students/?${query}`);
 
       if (!res || res.detail === "Invalid page.") {
         setCurrentPage(1);
@@ -146,7 +146,7 @@ export default function StudentsManagementPage() {
   const fetchClasses = async () => {
     try {
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/classes/`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -185,7 +185,7 @@ export default function StudentsManagementPage() {
     if (!confirm("Are you sure you want to delete this student?")) return;
     try {
       await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/students/${studentId}/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/students/${studentId}/`,
         { method: "DELETE" },
       );
       const newTotal = totalResults - 1;

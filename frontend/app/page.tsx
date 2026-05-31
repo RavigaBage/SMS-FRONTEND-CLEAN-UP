@@ -194,7 +194,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white text-[#1A0533] antialiased selection:bg-purple-200">
       
-      {/* ==================== NAVIGATION ==================== */}
+      
       <nav className={`fixed top-0 left-0 right-0 z-40 h-[70px] flex items-center justify-between px-6 md:px-12 lg:px-16 transition-all duration-300 ${
         scrolled ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-[#E8E4F0]" : "bg-slate-100/50 backdrop-blur-sm"
       }`}>
@@ -359,7 +359,7 @@ export default function HomePage() {
         </div>
       </section>
 
-            <section className="bg-[#F5F3FF] py-16 md:py-24 px-6 md:px-12 lg:px-16" id="programs">
+      <section className="bg-[#F5F3FF] py-16 md:py-24 px-6 md:px-12 lg:px-16" id="programs">
         <div className="max-w-[1200px] mx-auto flex flex-col gap-10">
           <div>
             <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#6D28D9] mb-3 before:content-[''] before:block before:w-6 before:h-0.5 before:bg-[#7C3AED]">
@@ -384,7 +384,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       
       <section className="bg-white py-16 md:py-24 px-6 md:px-12 lg:px-16" id="academics">
         <div className="max-w-[1200px] mx-auto">

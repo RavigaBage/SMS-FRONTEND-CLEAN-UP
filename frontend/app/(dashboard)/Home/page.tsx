@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "@/src/lib/apiClient";
+import AdmissionSection from "@/src/assets/components/dashboard/AdmissionSection";
 import {
   Users,
   GraduationCap,
@@ -315,6 +316,9 @@ export default function HomePage() {
               </table>
             </div>
           </div>
+                  <div className="lg:col-span-4 mt-2">
+          <AdmissionSection />
+        </div>
         </section>
 
         <aside className="lg:col-span-1 space-y-8">

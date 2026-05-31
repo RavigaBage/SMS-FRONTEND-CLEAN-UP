@@ -59,7 +59,7 @@ export function AddStudentModal({
     if (isOpen) {
       const fetchClasses = async () => {
         try {
-          const res = await apiRequest<any>("/classes/");
+          const res = await apiRequest<any>("/api/classes/");
           setClasses(res.data || []);
         } catch (err) {
           console.error("Failed to load classes");
@@ -69,7 +69,7 @@ export function AddStudentModal({
     }
   }, [isOpen]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -88,7 +88,7 @@ export function AddStudentModal({
         parents: [],
       };
 
-      const result = await apiRequest<Student>("/students/", {
+      const result = await apiRequest<Student>("/api/students/", {
         method: "POST",
         body: JSON.stringify(payload),
       });

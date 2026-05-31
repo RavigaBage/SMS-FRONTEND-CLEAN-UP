@@ -5,8 +5,10 @@ import Image from "next/image";
 interface StudentTableProps {
   students: Student[];
   onDelete: (id: number) => void;
+  onApprove?: (id: number) => void;
+  onEnroll?: (id: number, classId: string) => void;
 }
-export function StudentTable({ students, onDelete }: StudentTableProps) {
+export function StudentTable({ students, onDelete, onApprove, onEnroll }: StudentTableProps) {
 
   return (
     <div className="bg-white overflow-hidden">
@@ -79,12 +81,16 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
                   <StatusBadge status={student.status} />
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => onDelete(student.id)}
-                    className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    
+                    <button
+                      type="button"
+                      onClick={() => onDelete(student.id)}
+                      className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

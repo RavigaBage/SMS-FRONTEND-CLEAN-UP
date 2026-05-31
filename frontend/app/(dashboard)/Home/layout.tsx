@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/src/assets/components/dashboard/Sidebar";
 import { TopNav } from "@/src/assets/components/dashboard/TopNav";
 import PageTransition from "@/src/assets/components/dashboard/PagnationTransition";
 
