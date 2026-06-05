@@ -105,7 +105,7 @@ export default function EnrollForm({
 
   const fetchClasses = async () => {
     try {
-      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/classes/`, {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/classes/`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -122,7 +122,7 @@ export default function EnrollForm({
 
   const fetchStudents = async () => {
     try {
-      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/students/`, {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/students/`, {
         headers: { "Content-Type": "application/json" },
       });
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
@@ -152,8 +152,8 @@ export default function EnrollForm({
     e.preventDefault();
     const isEditing = selectedIM !== null;
     const url = isEditing
-      ? `${process.env.NEXT_PUBLIC_API_URL}/enrollments/${selectedIM}/`
-      : `${process.env.NEXT_PUBLIC_API_URL}/enrollments/`;
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/${selectedIM}/`
+      : `${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/`;
     const method = isEditing ? "PATCH" : "POST";
     const payload = {
       student: Number(formData.student?.id),
@@ -203,7 +203,7 @@ export default function EnrollForm({
   };
 
   return (
-    <div className="min-h-[400px] w-full flex items-center justify-center p-6">
+    <div className="min-h-[400px] w-[100%] flex items-center justify-center p-6">
       <div className="w-full max-w-xl bg-white shadow-xl rounded-2xl border border-gray-100 p-8 space-y-6">
 
         <div>

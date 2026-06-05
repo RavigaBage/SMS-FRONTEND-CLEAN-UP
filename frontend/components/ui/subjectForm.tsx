@@ -39,8 +39,8 @@ export default function SubjectForm({
     const isEditing = selectedIM !== null;
 
     const url = isEditing
-      ? `${process.env.NEXT_PUBLIC_API_URL}/subjects/${selectedIM}/`
-      : `${process.env.NEXT_PUBLIC_API_URL}/subjects/`;
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/subjects/${selectedIM}/`
+      : `${process.env.NEXT_PUBLIC_API_URL}/api/subjects/`;
 
     const payload = {
       subject_name: formData.subject_name,

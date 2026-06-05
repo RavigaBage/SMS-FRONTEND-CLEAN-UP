@@ -59,7 +59,7 @@ export function AddStudentModal({
     if (isOpen) {
       const fetchClasses = async () => {
         try {
-          const res = await apiRequest<any>("/api/classes/");
+          const res = await apiRequest<any>("/classes/");
           setClasses(res.data || []);
         } catch (err) {
           console.error("Failed to load classes");
@@ -88,7 +88,7 @@ export function AddStudentModal({
         parents: [],
       };
 
-      const result = await apiRequest<Student>("/api/students/", {
+      const result = await apiRequest<Student>("/students/", {
         method: "POST",
         body: JSON.stringify(payload),
       });

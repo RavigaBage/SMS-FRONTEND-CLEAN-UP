@@ -31,7 +31,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
   const fetchClassData = async () => {
     try {
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/classes`,
       );
       const data = await res.json();
       if (data?.results) setClassData(data.results);

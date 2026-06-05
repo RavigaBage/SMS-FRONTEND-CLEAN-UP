@@ -173,7 +173,7 @@ export async function fetchStudentsByClass(
 ) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  const url = `${baseUrl}/students/?classes=${encodeURIComponent(
+  const url = `${baseUrl}/api/students/?classes=${encodeURIComponent(
     className,
   )}&academic_year=${encodeURIComponent(academicYear)}`;
 
@@ -191,8 +191,8 @@ export async function apiRequest<T>(
   options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   const baseUrl =
-    process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
-  const url = `${baseUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+  const url = `${baseUrl}/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
   const getHeaders = () => ({
     Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

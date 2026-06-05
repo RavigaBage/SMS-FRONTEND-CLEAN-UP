@@ -102,7 +102,7 @@ async function fetchProgressions(params: Record<string, string> = {}): Promise<P
 const fetchClasses = async () => {
 try {
     const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/classes/`,
     {
         method: "GET",
         headers: {
@@ -144,7 +144,7 @@ async function patchProgression(
   console.log('patch works', bodypayload)
 
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/academics/studentmanager/${record.id}/`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/academics/studentmanager/${record.id}/`,
     { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(bodypayload) }
   );
     console.log('patch works', bodypayload)
@@ -158,7 +158,7 @@ async function patchProgression(
 
 async function postBulkPromote(payload: BulkPromotePayload) {
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/academics/studentmanager/bulk-promote/`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/academics/studentmanager/bulk-promote/`,
     { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }
   );
   if (!res.ok) throw new Error("Failed to bulk promote");

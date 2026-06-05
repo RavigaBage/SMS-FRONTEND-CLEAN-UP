@@ -116,13 +116,13 @@ export default function Syllabi() {
     setLoading(true);
     try {
       const classResponse = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes/`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/classes/`
       );
       const classData = await classResponse.json();
       setClasses(classData.results || classData);
 
       const subjectResponse = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/subjects/`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/subjects/`
       );
       const subjectData = await subjectResponse.json();
       setSubjects(subjectData.results || subjectData);
@@ -142,7 +142,7 @@ export default function Syllabi() {
 
     try {
       setLoading(true);
-      let url = `${process.env.NEXT_PUBLIC_API_URL}/syllabi/?`;
+      let url = `${process.env.NEXT_PUBLIC_API_URL}/api/syllabi/?`;
 
       if (selectedClass) {
         url += `class_obj=${selectedClass}&`;
@@ -183,7 +183,7 @@ export default function Syllabi() {
 
     try {
       const response = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/syllabi/${syllabusId}/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/syllabi/${syllabusId}/`,
         {
           method: "DELETE",
         }
@@ -927,7 +927,7 @@ function UploadModal({
       };
 
       const response = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/syllabi/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/syllabi/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1113,7 +1113,7 @@ function EditModal({
       };
 
       const response = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/syllabi/${syllabus.id}/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/syllabi/${syllabus.id}/`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

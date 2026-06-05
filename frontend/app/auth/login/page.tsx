@@ -74,7 +74,7 @@ const handleSubmit = async (e: FormEvent) => {
               <i className="login-fa-solid fa-code"></i>
             </div>
             <div
-              className={`response ${response.status == "success" ? "success" : ""} ${response.status == "error" ? "error" : ""}`}
+              className={`login-response ${response.status == "success" ? "success" : ""} ${response.status == "error" ? "error" : ""}`}
             >
               <div className={`loader_wrapper ${loader ? "play" : "active"}`}>
                 <div className="login-load-3">

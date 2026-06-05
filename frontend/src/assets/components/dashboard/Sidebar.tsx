@@ -5,13 +5,12 @@ import {
   LayoutDashboard, Users, GraduationCap, School, Calendar,
   Settings, LogOut, Landmark, BookOpen, Clock, UserCheck,
   ChevronRight, Menu, X, ClipboardList, DollarSign,
-  FileText, CreditCard, Briefcase,
+  FileText, CreditCard, Briefcase,Ticket
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface NavItem {
   icon: React.ReactNode;
@@ -29,6 +28,12 @@ const NAV: NavItem[] = [
     icon: <LayoutDashboard size={18} />,
     label: "Dashboard",
     href: "/Home/",
+    allowTeacher: true,
+  },
+    {
+    icon: <Ticket size={18} />,
+    label: "Admission",
+    href: "/Home/management/Admission/",
     allowTeacher: true,
   },
   {
@@ -160,7 +165,7 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Hamburger toggle button — always visible */}
+
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"
@@ -329,7 +334,6 @@ export default function Sidebar() {
           )}
         </nav>
 
-        {/* Logout */}
         <div className="px-3 py-3 border-t border-slate-100">
           <Link
             href="/Home/logout/"

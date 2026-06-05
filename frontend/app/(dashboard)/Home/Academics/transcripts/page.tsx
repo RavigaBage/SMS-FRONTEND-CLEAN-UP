@@ -284,7 +284,7 @@ export default function TranscriptHome() {
     setClassesLoading(true);
     try {
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/classes/`,
         { headers: { "Content-Type": "application/json" } },
       );
       if (!res.ok) throw new Error(`Server error: ${res.status}`);

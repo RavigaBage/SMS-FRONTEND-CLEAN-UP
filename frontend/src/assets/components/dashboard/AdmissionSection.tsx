@@ -74,7 +74,7 @@ export default function AdmissionSection() {
     setLoading(true);
     setError(null);
     try {
-      const res: any = await apiRequest("/api/admission/");
+      const res: any = await apiRequest("/admission/");
       setAdmissions(res?.results ?? res ?? []);
     } catch (e: any) {
       setError(e.message || "Failed to load admissions.");
@@ -85,7 +85,7 @@ export default function AdmissionSection() {
 
   const fetchClasses = useCallback(async () => {
     try {
-      const res: any = await apiRequest("/api/classes/");
+      const res: any = await apiRequest("/classes/");
       setClasses(res?.results ?? res ?? []);
     } catch {}
   }, []);
@@ -123,7 +123,7 @@ export default function AdmissionSection() {
     try {
       await Promise.all(
         ids.map((id) =>
-          apiRequest(`/api/admission/${id}/approve/`, {
+          apiRequest(`/admission/${id}/approve/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ approval: true }),
@@ -148,7 +148,7 @@ export default function AdmissionSection() {
     try {
       await Promise.all(
         ids.map((id) =>
-          apiRequest(`/api/admission/${id}/enroll/`, {
+          apiRequest(`/admission/${id}/enroll/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ class_id: classId }),

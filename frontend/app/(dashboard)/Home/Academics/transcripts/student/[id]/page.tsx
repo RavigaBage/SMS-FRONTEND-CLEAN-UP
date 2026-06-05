@@ -81,7 +81,7 @@ export default function StudentTranscript() {
     if (year_param) query.set('academic_year', year_param);
 
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/transcripts/${id}?${query.toString()}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/transcripts/${id}?${query.toString()}`,
     );
       const data = await res.json();
       setStudent(data);

@@ -540,8 +540,7 @@ export default function HomePage() {
                     Admission framework record initialized successfully for <strong className="text-slate-900">{successData.name}</strong>.
                   </p>
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 w-full max-w-sm mb-8">
-                    <span className="text-[0.7rem] uppercase tracking-widest font-bold text-slate-500 block">Your Admission Number</span>
-                    <span className="text-2xl font-mono font-bold text-[#4C1D95] block mt-1 tracking-wider">{successData.admNum}</span>
+                    <span className="text-[0.7rem] uppercase tracking-widest font-bold text-slate-500 block">Your Admission Number will be dispatched upon approval</span>
                   </div>
                   <button 
                     onClick={closeResetModal}

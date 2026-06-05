@@ -20,7 +20,7 @@ export default function ProfilesList() {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await fetchWithAuth(`${baseUrl}/students/`);
+        const res = await fetchWithAuth(`${baseUrl}/api/students/`);
         if (!res.ok) throw new Error("Failed to fetch students");
         const data = await res.json();
         setStudents(Array.isArray(data) ? data : data.results || []);

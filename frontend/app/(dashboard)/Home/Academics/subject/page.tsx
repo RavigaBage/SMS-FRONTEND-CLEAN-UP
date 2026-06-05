@@ -54,7 +54,7 @@ export default function SubjectsManagement() {
     setIsLoading(true);
     try {
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/subjects/?page=${pageNumber}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/subjects/?page=${pageNumber}`,
         { headers: { "Content-Type": "application/json" } }
       );
       const data: SubjectApiResponse = await res.json();
@@ -82,7 +82,7 @@ export default function SubjectsManagement() {
   const handleDelete = async (id: number) => {
     if (!confirm("Delete this subject?")) return;
     try {
-      await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/subjects/${id}/`, {
+      await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/subjects/${id}/`, {
         method: "DELETE",
       });
       const newCount = totalCount - 1;

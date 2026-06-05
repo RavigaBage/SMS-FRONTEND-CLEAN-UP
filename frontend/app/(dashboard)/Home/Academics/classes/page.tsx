@@ -69,7 +69,7 @@ export async function fetchStudentsByClass(
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const url =
-    `${baseUrl}/enrollments/` +
+    `${baseUrl}/api/enrollments/` +
     `?class=${encodeURIComponent(className)}` +
     `&academic_year=${encodeURIComponent(academicYear)}`;
 
@@ -181,7 +181,7 @@ export default function ClassesManagement() {
 
     try {
       const fetchRequest = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes/${item.id}/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/classes/${item.id}/`,
         {
           method: "DELETE",
           headers: {
@@ -283,7 +283,7 @@ const fetchClassData = async (year: string = selectedYear, pageNum: number = pag
     if (pageNum) params.append("page", pageNum.toString());
 
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/classes?${params.toString()}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/classes?${params.toString()}`,
       { headers: { "Content-Type": "application/json" } },
     );
     const data: PaginatedResponse<Classroom> = await res.json();

@@ -84,28 +84,28 @@ interface PaginatedResponse<T> {
 const api = {
   getTeacherAssignments: async () => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/classes/`,
     );
     if (!res.ok) throw new Error("Failed to fetch classes");
     return res.json();
   },
   getSubjects: async () => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/subjects/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/subjects/`,
     );
     if (!res.ok) throw new Error("Failed to fetch subjects");
     return res.json();
   },
   getSubjectsForClass: async (classId: number) => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/classes/${classId}/subjects/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/classes/${classId}/subjects/`,
     );
     if (!res.ok) throw new Error("Failed to fetch subjects for class");
     return res.json();
   },
   getClassesForSubject: async (subjectId: number) => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/subjects/${subjectId}/classes/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/subjects/${subjectId}/classes/`,
     );
     if (!res.ok) throw new Error("Failed to fetch classes for subject");
     return res.json();
@@ -122,14 +122,14 @@ const api = {
     term: string;
   }) => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/grades/?class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/grades/?class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
     );
     if (!res.ok) throw new Error("Failed to fetch results");
     return res.json();
   },
   getStudentsInClass: async (classId: number, page: number = 1) => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/classes/${classId}/students/?page=${page}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/classes/${classId}/students/?page=${page}`,
     );
     if (!res.ok) throw new Error("Failed to fetch students");
     return res.json();
@@ -247,7 +247,7 @@ const css = `
 }
 
 .gr-header-inner {
-  max-width: calc(100vw - 320px);
+  max-width: calc(100vw - 10px);
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
@@ -305,7 +305,7 @@ const css = `
   background: var(--gr-surface);
   border-bottom: 1px solid var(--gr-border);
   padding: 16px 24px;
-  max-width: calc(100vw - 320px);
+  max-width: calc(100vw - 10px);
   margin: 0 auto;
   display: flex;
   gap: 10px;
@@ -373,7 +373,7 @@ const css = `
 }
 
 .gr-body {
-  max-width: calc(100vw - 320px);
+  max-width: calc(100vw - 10px);
   margin: 0 auto;
   padding: 24px;
   display: flex;

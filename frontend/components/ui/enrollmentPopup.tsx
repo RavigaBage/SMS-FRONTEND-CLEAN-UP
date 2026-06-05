@@ -1,7 +1,7 @@
 "use client";
 
 import EnrollForm from "./enrollmentForm";
-
+import '@/styles/popup.css';
 type PopupProps = {
   active: boolean;
   togglePopup: () => void;

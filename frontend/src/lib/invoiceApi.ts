@@ -24,7 +24,7 @@ export async function apiRequest<T>(
 ): Promise<ApiResponse<T>> {
   const baseUrl =
     process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000/api";
-  const url = `${baseUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+  const url = `${baseUrl}/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
   const getHeaders = (): HeadersInit => ({
     Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

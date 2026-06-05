@@ -233,7 +233,7 @@ export default function ExpenditurePage() {
             signal,
           }),
           fetchWithAuth(
-            `${baseUrl}/financial-dashboard/summary/?start_date=${startDate}&end_date=${endDate}`,
+            `${baseUrl}/api/financial-dashboard/summary/?start_date=${startDate}&end_date=${endDate}`,
             { method: "GET", signal },
           ),
         ]);

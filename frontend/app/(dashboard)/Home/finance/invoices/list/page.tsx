@@ -274,7 +274,7 @@ export default function InvoicesPage() {
     const fetchClasses = async () => {
       try {
         const res = await fetchWithAuth(
-          `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/classes/`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },

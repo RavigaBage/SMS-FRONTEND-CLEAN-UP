@@ -93,7 +93,7 @@ export default function StudentsManagementPage() {
     setIsLoading(true);
     try {
       const query = buildQuery(page, currentFilters, search);
-      const res = await apiRequest<PaginatedResponse>(`/api/students/?${query}`);
+      const res = await apiRequest<PaginatedResponse>(`/students/?${query}`);
 
       if (!res || res.detail === "Invalid page.") {
         setCurrentPage(1);

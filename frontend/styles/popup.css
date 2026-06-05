@@ -1,0 +1,40 @@
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: opacity 0.3s ease,
+                visibility 0.3s ease;
+
+    z-index: 9999;
+}
+
+.popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.popup-content {
+    background: #fff;
+    width: 90%;
+    max-width: 600px;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.popup-overlay.active .popup-content {
+    transform: translateY(0) scale(1);
+}

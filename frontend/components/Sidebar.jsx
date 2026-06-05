@@ -188,7 +188,6 @@ export default function Sidebar() {
   const isHeadmaster = userRole === "headmaster";
   const isTeacher = userRole === "teacher";
 
-  // helpers — is this group visible at all for this user?
   const canSeeAcademic = isAdmin || isHeadmaster || isTeacher;
   const canSeeTimetable = isAdmin || isHeadmaster || isTeacher;
   const canSeeProfiles = isAdmin || isHeadmaster || isTeacher;
@@ -227,7 +226,19 @@ export default function Sidebar() {
             <span>Dashboard</span>
           </div>
         </ProtectedLink>
-
+        <ProtectedLink
+          isAdmin={isAdmin}
+          isHeadmaster={isHeadmaster}
+          isTeacher={isTeacher}
+          allowTeacher={true}
+          href="/Home/"
+          className={`${styles.navItem} ${styles.active}`}
+        >
+          <div className={styles.navItemContent}>
+            <div className={styles.navIcon}><DashboardIcon /></div>
+            <span>Dashboard</span>
+          </div>
+        </ProtectedLink>
         {canSeeAcademic && (
           <div className={styles.navGroup}>
             <div
@@ -400,7 +411,7 @@ export default function Sidebar() {
                     <span>Staff Attendance</span>
                   </div>
                 </ProtectedLink>
-
+                        
                 <ProtectedLink isAdmin={isAdmin} isHeadmaster={isHeadmaster}
                   isTeacher={isTeacher} allowTeacher={true}
                   href="/Home/hr/studentAttendance" className={styles.submenuItem}>

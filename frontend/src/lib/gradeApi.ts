@@ -128,7 +128,7 @@ export const gradeApi = {
     term: string;
   }): Promise<ResultType> => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/grades/by-params/?student=${studentId}&class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/grades/by-params/?student=${studentId}&class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
     );
     if (!res.ok) {
       const error = await res.json();
@@ -153,7 +153,7 @@ export const gradeApi = {
     data: Partial<ResultType>;
   }): Promise<ResultType> => {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/grades/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/grades/`,
       {
         method: "POST",
         headers: {
@@ -206,7 +206,7 @@ export const gradeApi = {
       grade_letter: data.grade_letter || "F",
     };
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/grades/by-params/?student=${studentId}&class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/grades/by-params/?student=${studentId}&class=${classId}&subject=${subjectId}&academic_year=${academicYear}&term=${term}`,
       {
         method: "PATCH",
         headers: {

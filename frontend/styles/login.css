@@ -36,7 +36,6 @@
   width: 100%;
 }
 
-/* Make form feel more dynamic (not dead centered) */
 .login-left::before {
   content: '';
   position: absolute;
@@ -272,8 +271,43 @@ h2 {
   font-size: 0.85rem;
   opacity: 0.85;
 }
-
-/* Responsive */
+.loader_wrapper .login-load-3{
+  display: none;
+}
+.loader_wrapper.play .login-load-3{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+.login-line{
+  background-color: #3b82f6;
+  width: 20px;
+  height:20px;
+  border-radius: 50%;
+  margin-inline:5px;
+  transition: all .5s ease;
+}
+.login-line:nth-child(1){
+  animation: bounce 1s infinite .5s ease-in-out;
+}
+.login-line:nth-child(2){
+    animation: bounce 1s infinite .6s ease-in-out;
+}
+.login-line:nth-child(3){
+    animation: bounce 1s infinite .7s ease-in-out;
+}
+@keyframes bounce {
+  0%{
+    transform: translateY(0px);
+  }
+  50%{
+    transform: translateY(40px);
+  }
+  100%{
+    transform: translateY(0px);
+  }
+}
 @media (max-width: 1024px) {
   .login-container {
     flex-direction: column;

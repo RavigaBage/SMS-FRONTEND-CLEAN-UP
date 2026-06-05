@@ -432,6 +432,7 @@ export default function Sidebar() {
           </div>
         </ProtectedLink>
 
+
         <div className={styles.navGroup}>
           <div
             className={`${styles.navItem} ${openMenu === "academic" ? styles.expanded : ""}`}

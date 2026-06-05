@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "@/src/lib/apiClient";
-import AdmissionSection from "@/src/assets/components/dashboard/AdmissionSection";
 import {
   Users,
   GraduationCap,
@@ -57,12 +56,12 @@ export default function HomePage() {
     setLoading(true);
     setError(null);
     try {
-      const res: any = await apiRequest("/api/dashboard-summary/");
+      const res: any = await apiRequest("/dashboard-summary/");
       setStats(res.data);
       setTransactions(res.data.recent_transactions || []);
       setActivities(res.data.recent_activities || []);
     } catch (e: any) {
-      console.error(e);
+         console.error(e);
       setError(
         e.message ||
           "An unexpected error occurred while loading the dashboard.",
@@ -191,7 +190,6 @@ export default function HomePage() {
 
   return (
     <div className="main-view bg-slate-50 min-h-screen">
-      {/* {showGuide ? <FirstTimeGuide onFinish={handleGuideComplete} /> : ""} */}
 
       <div className="dashboard-grid p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         <section className="left-column lg:col-span-1 space-y-8">
@@ -317,7 +315,7 @@ export default function HomePage() {
             </div>
           </div>
                   <div className="lg:col-span-4 mt-2">
-          <AdmissionSection />
+          
         </div>
         </section>
 

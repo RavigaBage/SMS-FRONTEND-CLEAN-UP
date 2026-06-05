@@ -146,7 +146,7 @@ export default function EmailConfigPage() {
     setConfig((prev) => ({ ...prev, [key]: value }));
 
   useEffect(() => {
-    apiRequest(`/api/settings/email/`)
+    apiRequest(`/settings/email/`)
       .then((r) => r.results)
       .then((data) => setConfig({ ...DEFAULT_CONFIG, ...data }))
       .catch(() => {});
@@ -156,7 +156,7 @@ export default function EmailConfigPage() {
     setSaving(true);
     setSaved(false);
     try {
-      apiRequest(`/api/settings/email/`, {
+      apiRequest(`/settings/email/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config),
@@ -174,7 +174,7 @@ export default function EmailConfigPage() {
     setTestStatus("sending");
     setTestMessage("");
     try {
-      const res = apiRequest(`/api/settings/email/test/`, {
+      const res = apiRequest(`/settings/email/test/`, {
         method: "POST",
         body: JSON.stringify({ to: testEmail }),
       });

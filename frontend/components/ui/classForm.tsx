@@ -68,7 +68,7 @@ export default function classForm({
   const fetchTeachers = async () => {
     try {
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/teachers`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/teachers`,
         { headers: { "Content-Type": "application/json" } }
       );
       const data = await res.json();
@@ -83,7 +83,7 @@ export default function classForm({
     setLoadingSubjects(true);
     try {
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/subjects/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/subjects/`,
         { headers: { "Content-Type": "application/json" } }
       );
       const data = await res.json();
@@ -162,8 +162,8 @@ export default function classForm({
     setIsSubmitting(true);
 
     const url = isUpdating
-      ? `${process.env.NEXT_PUBLIC_API_URL}/classes/${formData.id}/`
-      : `${process.env.NEXT_PUBLIC_API_URL}/classes/`;
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/classes/${formData.id}/`
+      : `${process.env.NEXT_PUBLIC_API_URL}/api/classes/`;
 
     try {
       const fetchRequest = await fetchWithAuth(url, {

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import Image from "next/image";
-
+import { Bell } from "lucide-react";
+import { apiRequest } from "@/src/lib/apiClient";
 const SkeletonBox = ({ className }: { className?: string }) => (
   <div className={`bg-slate-100 animate-pulse rounded ${className}`} />
 );
@@ -14,6 +15,20 @@ interface TopNavProps {
 export const TopNav: React.FC<TopNavProps> = ({ loading = false }) => {
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
+  const [Notifications,setNotify] = useState(0);
+
+
+  const GetAmissionNotification =  useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      params.append("unapproved", '');
+      const res: any = await apiRequest(`/admission?${params.toString()}`);
+      setNotify((res?.results).length ?? 0);
+    } catch (e: any) {
+      console.log(e.message || "Failed to load admissions.");
+    } 
+  }, []);
+
 
   useEffect(() => {
     const username = localStorage.getItem("userName") || "";
@@ -21,7 +36,7 @@ export const TopNav: React.FC<TopNavProps> = ({ loading = false }) => {
     setUserName(username);
     setUserRole(role);
   }, []);
-
+ useEffect(() => { GetAmissionNotification();  }, [GetAmissionNotification]);
   return (
     <header className="top-bar bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-10">
       {loading ? (
@@ -34,7 +49,7 @@ export const TopNav: React.FC<TopNavProps> = ({ loading = false }) => {
           </div>
         </div>
       ) : (
-        <div className="flex justify-between items-center w-full">
+        <div className="flex justify-between items-center w-full m-[30px]">
           <div className="flex gap-3 items-center">
             <button className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg">
               Main Dashboard
@@ -50,6 +65,21 @@ export const TopNav: React.FC<TopNavProps> = ({ loading = false }) => {
           </div>
 
           <div className="flex items-center gap-4">
+            <a href="/Home/management/Admission/"><div className="relative inline-flex items-center justify-center">
+                <button
+                  type="button"
+                  className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+                >
+                  <Bell size={18} className="text-gray-700" />
+
+                  {Notifications > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none">
+                      {Notifications > 99 ? "99+" : Notifications}
+                    </span>
+                  )}
+                </button>
+              </div></a>
+            
             <div className="text-right hidden sm:block">
               <p className="font-bold text-slate-900 text-sm">
                 {userName || "User"}

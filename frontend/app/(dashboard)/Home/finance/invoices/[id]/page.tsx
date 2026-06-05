@@ -48,7 +48,7 @@ export default function InvoiceViewPage({ params }: PageProps) {
     if (!invoiceId) return;
 
     setLoading(true);
-    fetchWithAuth(`${baseUrl}/invoices/${invoiceId}/`)
+    fetchWithAuth(`${baseUrl}/api/invoices/${invoiceId}/`)
       .then((res) => res.json())
       .then((data) => setInvoice(data))
       .catch((err) => setError(String(err)))

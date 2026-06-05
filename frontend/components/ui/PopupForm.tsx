@@ -155,7 +155,7 @@ export default function TeachingForm({ formData, Update, setFormData, onSuccess 
   const fetchTeachers = async () => {
     setLoadingTeachers(true);
     try {
-      const res  = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/teachers/`, { headers: { "Content-Type": "application/json" } });
+      const res  = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/teachers/`, { headers: { "Content-Type": "application/json" } });
       const data = await res.json();
       setTeachers(data.results || []);
     } catch { console.error("Failed to load teachers"); }
@@ -165,7 +165,7 @@ export default function TeachingForm({ formData, Update, setFormData, onSuccess 
   const fetchSubjects = async () => {
     setLoadingSubjects(true);
     try {
-      const res  = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/subjects/`, { headers: { "Content-Type": "application/json" } });
+      const res  = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/subjects/`, { headers: { "Content-Type": "application/json" } });
       const data = await res.json();
       setSubjects(data.results || []);
     } catch { console.error("Failed to load subjects"); }
@@ -191,7 +191,7 @@ export default function TeachingForm({ formData, Update, setFormData, onSuccess 
 
     try {
       const isUpdate = typeof Update === "number";
-      const url    = isUpdate ? `${process.env.NEXT_PUBLIC_API_URL}/timetable/${Update}/` : `${process.env.NEXT_PUBLIC_API_URL}/timetable/`;
+      const url    = isUpdate ? `${process.env.NEXT_PUBLIC_API_URL}/api/timetable/${Update}/` : `${process.env.NEXT_PUBLIC_API_URL}/api/timetable/`;
       const method = isUpdate ? "PUT" : "POST";
 
       const response = await fetchWithAuth(url, {

@@ -331,7 +331,7 @@ export default function EnrollmentsManagement() {
       if (query && query.trim()) params.append("search", query.trim());
       params.append("page", String(pageNumber));
       const qs = params.toString();
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/enrollments/${qs ? `?${qs}` : ""}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/${qs ? `?${qs}` : ""}`;
       const res = await fetchWithAuth(url, {
         headers: { "Content-Type": "application/json" },
       });
@@ -348,7 +348,7 @@ export default function EnrollmentsManagement() {
   const fetchClasses = async () => {
     try {
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/classes/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/classes/`,
         { headers: { "Content-Type": "application/json" } },
       );
       const data: ClassesBase = await res.json();
@@ -377,7 +377,7 @@ export default function EnrollmentsManagement() {
       return;
     try {
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/enrollments/${id}/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/${id}/`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },

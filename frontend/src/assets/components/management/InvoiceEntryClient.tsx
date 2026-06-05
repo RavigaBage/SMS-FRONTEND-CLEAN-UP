@@ -101,9 +101,9 @@ export default function InvoiceEntry() {
       try {
         const date_now = new Date().getFullYear();
         const [stuRes, yearRes, feeRes] = await Promise.all([
-          fetchWithAuth(`${baseUrl}/students/`),
+          fetchWithAuth(`${baseUrl}/api/students/`),
           generateAcademicYears(date_now, 10),
-          fetchWithAuth(`${baseUrl}/fee-structures/`),
+          fetchWithAuth(`${baseUrl}/api/fee-structures/`),
         ]);
         const stuJson = await stuRes.json();
         const yearJson = yearRes;
@@ -133,7 +133,7 @@ export default function InvoiceEntry() {
           } else {
             try {
               const single = await fetchWithAuth(
-                `${baseUrl}/students/${idNum}/`,
+                `${baseUrl}/api/students/${idNum}/`,
               );
               if (single.ok) {
                 const sd = await single.json();
@@ -264,7 +264,7 @@ export default function InvoiceEntry() {
     setError(null);
     try {
       const payload = makePayload(isDraft);
-      const res = await fetchWithAuth(`${baseUrl}/invoices/generate/`, {
+      const res = await fetchWithAuth(`${baseUrl}/api/invoices/generate/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -240,7 +240,7 @@ export default function Timetable() {
   useEffect(() => {
     (async () => {
       try {
-        const res  = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/classes/`, {
+        const res  = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/classes/`, {
           method: "GET", headers: { "Content-Type": "application/json" },
         });
         const data = await res.json();
@@ -258,7 +258,7 @@ export default function Timetable() {
     try {
       setPageError(null);
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}/timetable/${id}/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/timetable/${id}/`,
         { method: "DELETE", headers: { "Content-Type": "application/json" } },
       );
       if (res.ok) {
@@ -331,7 +331,7 @@ export default function Timetable() {
       if (formData.term)          params.append("term",           String(formData.term));
       if (formData.academic_year) params.append("academic_year",  String(formData.academic_year));
 
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/timetable/${params.toString() ? `?${params}` : ""}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/timetable/${params.toString() ? `?${params}` : ""}`;
       const response = await fetchWithAuth(url);
 
       if (!response.ok) {
